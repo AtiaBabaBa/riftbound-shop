@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Riftbound Card Shop</title>
+<title>Jake's Card Shop</title>
 <meta name="description" content="Riftbound singles. Pick the cards you want and send the list to the shop on LINE.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14l-12 7L4 23V9z' fill='%2310131A' stroke='%2346C3C7' stroke-width='2'/%3E%3Cpath d='M16 8v16M10 12l6 4 6-4M10 20l6-4 6 4' fill='none' stroke='%23D9A84C' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#ECEFF3" media="(prefers-color-scheme: light)">
@@ -244,7 +244,7 @@ details.pv pre { margin: 8px 0 0; padding: 10px 12px; background: var(--panel-2)
 .ok-t { color: var(--accent); font-weight: 600; } .bad-t { color: var(--loss); font-weight: 600; }
 
 /* shopkeeper zone (shop.html#keeper): the customer's list gives way to the keeper panel */
-body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps, body.keeper .klink { display: none !important; }
+body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps { display: none !important; }
 @media (min-width: 1000px) { body.keeper .shop { grid-template-columns: minmax(0, 1fr); } }
 .kp { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 10px; font-size: 14px; }
 .kp-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -256,7 +256,6 @@ body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps, bo
 .sql { margin: 0; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; font-family: var(--f-mono); font-size: 12.5px; white-space: pre-wrap; word-break: break-all; }
 .setup summary { cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 600; }
 .setup ul { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 3px; }
-.klink { color: var(--muted); }
 .ed-card { display: flex; gap: 12px; align-items: center; }
 .ed-card b { font-size: 16px; }
 .ed-rows { display: grid; gap: 8px; }
@@ -288,7 +287,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
   <div class="wrap top-row">
     <div class="brand">
       <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14l-12 7L4 23V9z" fill="#10131A" stroke="#46C3C7" stroke-width="2"/><path d="M16 8v16M10 12l6 4 6-4M10 20l6-4 6 4" fill="none" stroke="#D9A84C" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <div><h1 id="shopName">Riftbound Card Shop</h1><p data-t="tagline"></p></div>
+      <div><h1 id="shopName">Jake's Card Shop</h1><p data-t="tagline"></p></div>
     </div>
     <a class="btn sm" id="addFriend" target="_blank" rel="noopener" data-t-label="addFriend" hidden><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9l-.6 2.7c-.1.5.4.8.8.6 2.7-1.6 6.4-4 8.4-6.2C20.9 14.6 22 12.9 22 11c0-4.4-4.5-8-10-8Z" fill="var(--line-green)"/></svg><span data-t="addFriend"></span></a>
     <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div>
@@ -334,7 +333,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
   </aside>
 </main>
 
-<footer class="wrap"><p data-t="footer"></p><p><a class="klink" href="#keeper" data-t="kLink"></a></p></footer>
+<footer class="wrap"><p data-t="footer"></p></footer>
 
 <div class="scrim" id="scrim"></div>
 <div class="mbar" id="mbar">
@@ -373,7 +372,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
 <script>
 // ---------- shop settings: edit these ----------
 const SHOP_CONFIG = {
-  name: 'Riftbound Card Shop',  // shown at the top of the page
+  name: "Jake's Card Shop",  // shown at the top of the page
   currency: '฿',
   // Where orders go. Fill in ONE of the two:
   //  lineOA: your LINE Official Account basic ID, with the @ (like '@123abcde'). The customer's LINE opens a chat with
@@ -390,7 +389,7 @@ const SHOP_CONFIG = {
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0ZGJ2cm9ncXZibGJjbWh4ZnhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MjgwNjIsImV4cCI6MjEwNjQwNDA2Mn0.th6pj6N1v20eOxmvEU7AJ_Deu-yfnH1adMWX5ReOi-w',
   },
   stockFile: 'stock.csv',  // read when there is no cloud stock (not set up, or unreachable); see scripts/make_stock_csv.py
-  showAllCards: true,           // false: only cards with a price, quantity or note are shown
+  showAllCards: false,          // true: customers also see unlisted cards (as Ask price); false: only what's listed, sold out included
 };
 
 const LANG = {
@@ -399,9 +398,9 @@ const LANG = {
     step1: 'Tap cards to add them to your list', step2: 'Check your list', step3: 'Send it to us on LINE. We reply with the total, payment and shipping.',
     search: 'Search card name or text', allSets: 'All sets', allTypes: 'All types', allRarities: 'All rarities',
     sortNum: 'Newest set first', sortName: 'Name A–Z', sortLow: 'Price: low to high', sortHigh: 'Price: high to low',
-    inStock: 'In stock only', clearFilters: 'Clear filters', more: 'Show more',
+    clearFilters: 'Clear filters', more: 'Show more',
     results: n => `${n.toLocaleString('en-US')} card${n === 1 ? '' : 's'}`,
-    noMatch: 'No cards match these filters.', loading: 'Loading cards…', loadFail: "Couldn't load the card list. Check your connection and reload the page.",
+    noMatch: 'No cards match these filters.', nothingYet: 'Nothing for sale yet. Check back soon!', loading: 'Loading cards…', loadFail: "Couldn't load the card list. Check your connection and reload the page.",
     askPrice: 'Ask price', soldOut: 'Sold out', left: n => `${n} left`,
     addX: n => `Add ${n} to your list`, details: 'Details', add: 'Add to list', inList: n => `${n} in your list`,
     added: (n, q) => `Added ${n}` + (q > 1 ? ` (${q})` : ''), maxed: n => `We only have ${n}`,
@@ -424,7 +423,7 @@ const LANG = {
     linePrice: (each, sum, q) => q > 1 ? `${each} each = ${sum}` : each,
     cost: 'Cost', power: 'Power', might: 'Might',
     footer: 'Riftbound, its cards and card images are the property of Riot Games. This shop is not affiliated with Riot Games.',
-    kLink: 'Shopkeeper', kTitle: 'Shopkeeper zone', kBack: 'Back to the shop', kConnecting: 'Connecting…',
+    kTitle: 'Shopkeeper zone', kBack: 'Back to the shop', kConnecting: 'Connecting…',
     kSignInHint: 'Sign in with your Riftcheese account.', kUser: 'Username', kPass: 'Password', kSignIn: 'Sign in', kSigningIn: 'Signing in…', kSignOut: 'Sign out',
     kAs: n => `Signed in as ${n}`,
     kNoTable: 'The stock table isn’t in the database yet. In Supabase → SQL Editor, run supabase/shop.sql from the repository, then check again.',
@@ -461,9 +460,9 @@ const LANG = {
     step1: 'แตะการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: 'ส่งรายการให้เราทาง LINE แล้วเราจะแจ้งยอดชำระและการจัดส่ง',
     search: 'ค้นหาชื่อการ์ดหรือข้อความบนการ์ด', allSets: 'ทุกชุด', allTypes: 'ทุกประเภท', allRarities: 'ทุกความหายาก',
     sortNum: 'ชุดใหม่ล่าสุดก่อน', sortName: 'ชื่อ A–Z', sortLow: 'ราคา: ต่ำไปสูง', sortHigh: 'ราคา: สูงไปต่ำ',
-    inStock: 'เฉพาะที่มีของ', clearFilters: 'ล้างตัวกรอง', more: 'ดูเพิ่ม',
+    clearFilters: 'ล้างตัวกรอง', more: 'ดูเพิ่ม',
     results: n => `${n.toLocaleString('en-US')} ใบ`,
-    noMatch: 'ไม่พบการ์ดที่ตรงกับตัวกรอง', loading: 'กำลังโหลดการ์ด…', loadFail: 'โหลดรายการการ์ดไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วโหลดหน้าใหม่',
+    noMatch: 'ไม่พบการ์ดที่ตรงกับตัวกรอง', nothingYet: 'ยังไม่มีสินค้าวางขาย แวะมาดูใหม่เร็ว ๆ นี้', loading: 'กำลังโหลดการ์ด…', loadFail: 'โหลดรายการการ์ดไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วโหลดหน้าใหม่',
     askPrice: 'สอบถามราคา', soldOut: 'หมด', left: n => `เหลือ ${n}`,
     addX: n => `เพิ่ม ${n} ลงรายการ`, details: 'รายละเอียด', add: 'เพิ่มลงรายการ', inList: n => `อยู่ในรายการ ${n} ใบ`,
     added: (n, q) => `เพิ่ม ${n} แล้ว` + (q > 1 ? ` (${q} ใบ)` : ''), maxed: n => `มีของแค่ ${n} ใบ`,
@@ -486,7 +485,7 @@ const LANG = {
     linePrice: (each, sum, q) => q > 1 ? `ใบละ ${each} = ${sum}` : each,
     cost: 'ค่าร่าย', power: 'พาวเวอร์', might: 'ไมต์',
     footer: 'Riftbound การ์ด และภาพการ์ดเป็นทรัพย์สินของ Riot Games ร้านนี้ไม่ได้เกี่ยวข้องกับ Riot Games',
-    kLink: 'สำหรับเจ้าของร้าน', kTitle: 'โซนเจ้าของร้าน', kBack: 'กลับไปหน้าร้าน', kConnecting: 'กำลังเชื่อมต่อ…',
+    kTitle: 'โซนเจ้าของร้าน', kBack: 'กลับไปหน้าร้าน', kConnecting: 'กำลังเชื่อมต่อ…',
     kSignInHint: 'เข้าสู่ระบบด้วยบัญชี Riftcheese ของคุณ', kUser: 'ชื่อผู้ใช้', kPass: 'รหัสผ่าน', kSignIn: 'เข้าสู่ระบบ', kSigningIn: 'กำลังเข้าสู่ระบบ…', kSignOut: 'ออกจากระบบ',
     kAs: n => `เข้าสู่ระบบเป็น ${n}`,
     kNoTable: 'ยังไม่มีตารางสต็อกในฐานข้อมูล ให้เปิด Supabase → SQL Editor แล้วรันไฟล์ supabase/shop.sql จาก repository จากนั้นกดตรวจอีกครั้ง',
@@ -504,7 +503,7 @@ const LANG = {
     kImportAsk: (a, d, u) => `บันทึก ${a} แถวที่ลงขายจากไฟล์นี้ใช่ไหม` + (d ? ` อีก ${d} เวอร์ชันที่เว้นว่างในไฟล์จะถูกนำออกจากการขาย` : '') + (u ? ` มี ${u} แถวที่ไม่ตรงกับการ์ดใบใดและจะถูกข้าม` : ''),
     kImportEmpty: 'ไม่มีอะไรให้บันทึกจากไฟล์นี้ ไฟล์ต้องมีคอลัมน์ id หรือ name และมีราคา จำนวน หรือหมายเหตุ',
     kImported: n => `บันทึก ${n} แถวแล้ว`,
-    kListed: 'เฉพาะที่ลงขาย', kNotListed: 'ยังไม่ลงขาย', kInStock: n => `มี ${n} ใบ`, kEdit: 'แก้ไขราคาและสต็อก',
+    kListed: 'เฉพาะที่ลงขาย', kNotListed: 'ยังไม่ลงขาย', kInStock: n => `มี ${n} ชิ้น`, kEdit: 'แก้ไขราคาและสต็อก',
     kNoCloud: 'ยังไม่ได้ตั้งค่าสต็อกบนคลาวด์: ใส่ค่าใน SHOP_CONFIG.cloud ใน shop.html',
     kOffline: 'เชื่อมต่อบริการคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต',
     kBadLogin: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', kRate: 'ลองหลายครั้งเกินไป รอสักครู่แล้วลองใหม่', kFail: m => `เข้าสู่ระบบไม่สำเร็จ: ${m}`,
@@ -728,7 +727,6 @@ async function load() {
     // Drop cards the shop no longer lists from a saved list, and keep within the stock.
     Object.keys(S.cart).forEach(k => { const x = DB.byKey.get(k), q = Math.min(S.cart[k] | 0, x ? x.qty ?? MAX_COPIES : 0); if (q > 0) S.cart[k] = q; else delete S.cart[k]; });
     saveCart();
-    S.f.stock = DB.stocked && !K.on;
     DB.ok = true;
   } catch (e) { console.error(e); DB.failed = true; }
   renderAll();
@@ -736,7 +734,7 @@ async function load() {
 async function reloadStock() { setStock(await loadStock()); renderAll(); }
 
 // ---------- filters ----------
-const defaults = () => ({ q: '', set: '', type: '', rar: '', dom: new Set(), stock: DB.stocked && !K.on, sort: S.f.sort });
+const defaults = () => ({ q: '', set: '', type: '', rar: '', dom: new Set(), stock: false, sort: S.f.sort });
 const filtered = () => { const f = S.f, d = defaults(); return f.q || f.set || f.type || f.rar || f.dom.size || f.stock !== d.stock; };
 const searchText = new WeakMap();
 function hasText(x, q) {
@@ -752,7 +750,7 @@ function visible() {
   const f = S.f;
   const xs = DB.listings.filter(x => {
     const c = x.c;
-    if (f.stock && (!x.listed || (x.qty === 0 && !K.on))) return false;  // the shopkeeper sees sold-out cards too
+    if (f.stock && !x.listed) return false;  // the shopkeeper's "Listed only"
     if (x.p) return !(f.set || f.rar || f.dom.size || (f.type && f.type !== PRODUCTS)) && (!f.q || hasText(x, f.q));  // products have no set, type or domain
     if (f.type === PRODUCTS) return false;
     if (f.set && !c.s.includes(f.set)) return false;
@@ -779,8 +777,8 @@ function renderFilters() {
     .map(([v, k]) => `<option value="${v}"${v === S.f.sort ? ' selected' : ''}>${esc(t(k))}</option>`).join('');
   $('#fDoms').innerHTML = DOMAINS.map(d => `<button type="button" class="dom" data-dom="${d}" aria-pressed="${S.f.dom.has(d)}"><i style="background:${domColor(d)}"></i>${d}</button>`).join('');
   $('#fQ').value = S.f.q;
-  $('#fStockWrap').hidden = !DB.stocked;
-  $('#fStockWrap span').textContent = t(K.on ? 'kListed' : 'inStock');
+  $('#fStockWrap').hidden = !K.on || !DB.stocked;
+  $('#fStockWrap span').textContent = t('kListed');
   $('#fStock').checked = S.f.stock;
 }
 
@@ -818,7 +816,7 @@ function renderGrid() {
   S.list = visible();
   $('#resCount').textContent = counted('results', S.list.length, S.list);
   $('#fClear').hidden = !filtered();
-  g.innerHTML = S.list.length ? S.list.slice(0, S.shown).map(x => tile(x)).join('') : `<div class="state">${t('noMatch')}</div>`;
+  g.innerHTML = S.list.length ? S.list.slice(0, S.shown).map(x => tile(x)).join('') : `<div class="state">${t(DB.listings.length ? 'noMatch' : 'nothingYet')}</div>`;
   $('#more').hidden = S.shown >= S.list.length;
 }
 function showMore() {
@@ -1011,7 +1009,7 @@ function setMode() {
   K.on = location.hash === '#keeper';
   document.body.classList.toggle('keeper', K.on);
   if (K.on) openSheet(false);
-  if (DB.ok) { buildListings(); S.f.stock = DB.stocked && !K.on; S.shown = PAGE; }
+  if (DB.ok) { buildListings(); S.f.stock = false; S.shown = PAGE; }
   renderAll();
   if (K.on) keeperInit();
 }

@@ -1,9 +1,9 @@
-# Riftbound Card Shop
+# Jake's Card Shop
 
 A shop page for Riftbound singles and other products. Customers tap what they want, check their list and tap **Send order on LINE**: LINE opens a chat with the shop's LINE Official Account with the order already typed (items, copies, prices, total, plus their name and note), they send it, and payment and shipping are sorted out in the chat. On a computer, the order shows as a QR code to scan with a phone. The page is in Thai or English (it follows the phone's language; there is a switch at the top).
 
 - **Shop:** https://atiabababa.github.io/riftbound-shop/
-- **Shopkeeper zone:** https://atiabababa.github.io/riftbound-shop/#keeper (also the *Shopkeeper* link at the bottom of the shop)
+- **Shopkeeper zone:** https://atiabababa.github.io/riftbound-shop/#keeper (nothing on the shop links to it)
 
 ## One-time setup
 
@@ -28,7 +28,7 @@ In the shopkeeper zone, changes are saved straight away and show in the shop for
 - **Other products** (booster boxes, packs, sleeves, playmats…): tap **+ Add a product** and fill in the name, price, quantity and description, and choose a photo (it's shrunk to 1200 px before uploading). Tap a product in the shop grid to change or delete it.
 - **Lots of cards at once:** *Download as CSV* gives every card with your current prices. Fill in `price`, `qty`, `note` and `description` in Excel or Google Sheets, save as CSV (in Excel, *CSV UTF-8*) and use *Import CSV*. A card's row left blank in the file takes that version off sale; cards missing from the file stay as they are. Products aren't in the CSV.
 
-Once anything has a price or quantity, the shop opens with *In stock only* ticked; customers can untick it to ask for any card. Set `showAllCards: false` in `SHOP_CONFIG` to show only what you've listed. The *Setup check* at the bottom of the shopkeeper zone shows which LINE account orders go to and where the stock is read from.
+Customers see only what you've listed: anything with a price, quantity, version name or description. Something with quantity `0` stays in the shop as *Sold out*; to hide it, clear its row (cards) or delete it (products). In the shopkeeper zone every card shows, so you can find new ones to list; tick *Listed only* to see just yours. Set `showAllCards: true` in `SHOP_CONFIG` to let customers also ask about unlisted cards. The *Setup check* at the bottom of the shopkeeper zone shows which LINE account orders go to and where the stock is read from.
 
 ## Files
 
