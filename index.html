@@ -1,0 +1,1386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Riftbound Card Shop</title>
+<meta name="description" content="Riftbound singles. Pick the cards you want and send the list to the shop on LINE.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14l-12 7L4 23V9z' fill='%2310131A' stroke='%2346C3C7' stroke-width='2'/%3E%3Cpath d='M16 8v16M10 12l6 4 6-4M10 20l6-4 6 4' fill='none' stroke='%23D9A84C' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#ECEFF3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10131A" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Cinzel:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: sticky header; card grid on the left, the customer's list on the right (a bottom sheet on phones). */
+:root {
+  --bg: #ECEFF3; --panel: #FFFFFF; --panel-2: #F5F7FA; --ink: #1A2130; --muted: #5B6577; --line: #D6DCE5;
+  --accent: #0E6D77; --accent-ink: #FFFFFF; --accent-soft: #DCEFF0; --gold: #946511;
+  --warn: #9A5B00; --warn-bg: #FBEBD0; --loss: #B0362E; --loss-bg: #F6DFDB;
+  --fury: #D2453A; --calm: #3B9855; --mind: #3874C6; --body: #DE872B; --chaos: #8C4DC2; --order: #C29C1E; --colorless: #8B93A1;
+  --line-green: #06C755; --line-green-ink: #FFFFFF;
+  --f-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --f-body: "Barlow", "IBM Plex Sans Thai", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 8px; --head: 64px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10131A; --panel: #171B24; --panel-2: #1D222D; --ink: #E5E9F0; --muted: #98A1B2; --line: #2A3140;
+  --accent: #46C3C7; --accent-ink: #08191B; --accent-soft: #163338; --gold: #D9A84C;
+  --warn: #F0B35A; --warn-bg: #3A2A12; --loss: #F07C70; --loss-bg: #3A1D1B; --colorless: #9AA2B0; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #10131A; --panel: #171B24; --panel-2: #1D222D; --ink: #E5E9F0; --muted: #98A1B2; --line: #2A3140;
+  --accent: #46C3C7; --accent-ink: #08191B; --accent-soft: #163338; --gold: #D9A84C;
+  --warn: #F0B35A; --warn-bg: #3A2A12; --loss: #F07C70; --loss-bg: #3A1D1B; --colorless: #9AA2B0; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+body.lock { overflow: hidden; }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 16px; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.r { text-align: right; }
+
+/* header */
+.top { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+.top-row { display: flex; align-items: center; gap: 12px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; margin-right: auto; min-width: 0; }
+.brand svg { flex: none; }
+.brand > div { min-width: 0; }
+.brand h1 { font-family: var(--f-display); font-size: 20px; letter-spacing: .03em; font-weight: 700; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 560px) {
+  #addFriend { padding: 6px 8px; } #addFriend span { display: none; }
+  .brand h1 { font-size: 16px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .brand p { display: none; }
+}
+.brand p { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* controls */
+input[type=text], input[type=search], input[type=password], select, textarea {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0;
+}
+textarea { resize: vertical; line-height: 1.5; min-height: 64px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field > span { font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 8px 14px; cursor: pointer; font-weight: 600; white-space: nowrap; text-decoration: none; color: var(--ink); }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.line { background: var(--line-green); color: var(--line-green-ink); border-color: var(--line-green); }
+.btn.line:hover { filter: brightness(1.06); }
+.btn.sm { padding: 5px 10px; font-size: 13px; }
+.btn.link { border: 0; background: none; padding: 2px 4px; color: var(--accent); }
+.btn.block { width: 100%; padding-block: 11px; font-size: 15.5px; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; filter: none; }
+.btn svg { flex: none; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; flex: none; }
+.seg button { border: 0; background: var(--panel); padding: 5px 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+.notice { border: 1px solid var(--line); border-left: 4px solid var(--warn); background: var(--warn-bg); color: var(--ink); border-radius: var(--r); padding: 10px 14px; font-size: 14px; }
+.notice code { font-family: var(--f-mono); font-size: 13px; }
+
+/* steps */
+.steps { display: flex; gap: 8px 22px; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--muted); }
+.steps li { display: flex; align-items: center; gap: 8px; }
+.steps b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--f-mono); font-size: 12px; flex: none; }
+
+/* page */
+.shop { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
+.browse { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; align-content: start; }
+@media (min-width: 1000px) {
+  .shop { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; padding-bottom: 32px; }
+  .cart { position: sticky; top: calc(var(--head) + 16px); max-height: calc(100vh - var(--head) - 32px); }
+}
+
+/* filters */
+.filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; }
+.frow { display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.frow .q { grid-column: 1 / -1; }
+@media (min-width: 1280px) { .frow { grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr)); } .frow .q { grid-column: auto; } }
+@media (max-width: 760px) { .frow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.frow2 { display: flex; align-items: center; gap: 6px 14px; flex-wrap: wrap; }
+.doms { display: flex; gap: 6px; flex-wrap: wrap; }
+@media (max-width: 760px) { .doms { flex: 1 1 100%; min-width: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -12px; padding-inline: 12px; } .doms::-webkit-scrollbar { display: none; } }
+.dom { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 4px 11px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.dom i { width: 9px; height: 9px; border-radius: 2px; transform: rotate(45deg); display: inline-block; flex: none; }
+.dom[aria-pressed="true"] { border-color: var(--ink); background: var(--panel-2); }
+.chk { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.chk input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+.resbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13.5px; color: var(--muted); }
+
+/* card grid */
+.cards { display: grid; gap: 16px 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+@media (max-width: 560px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; } }
+.tile { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pic { position: relative; display: block; width: 100%; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 9px; -webkit-tap-highlight-color: transparent; }
+.frame { display: flex; align-items: center; justify-content: center; aspect-ratio: 200 / 279; }
+.cimg { display: inline-block; flex: none; border-radius: 7px; background-color: var(--panel-2); background-repeat: no-repeat; }
+.cimg.fluid { display: block; width: 100%; height: auto; }
+.cimg.pimg { display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--muted); border: 1px solid var(--line); }
+.cimg.pimg img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pic .cimg { transition: transform .12s ease, box-shadow .12s ease; box-shadow: 0 1px 3px rgb(0 0 0 / .18); }
+.pic:hover .cimg { transform: translateY(-2px); box-shadow: 0 0 0 2px var(--accent), 0 6px 14px rgb(0 0 0 / .2); }
+.pic:active .cimg { transform: scale(.97); }
+.tile.in .pic .cimg { box-shadow: 0 0 0 3px var(--accent); }
+.pic:disabled { cursor: default; }
+.pic:disabled .cimg { transform: none; box-shadow: none; }
+.tile.out .pic .cimg { filter: grayscale(1) opacity(.5); }
+.count { position: absolute; top: 7px; left: 7px; min-width: 28px; height: 28px; padding-inline: 7px; border-radius: 14px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; box-shadow: 0 2px 6px rgb(0 0 0 / .3); }
+.count.pop { animation: pop .2s ease-out; }
+@keyframes pop { from { transform: scale(1.45); } }
+.flag { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); padding: 5px; text-align: center; background: rgb(12 14 18 / .78); color: #fff; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 13px; }
+.info { position: absolute; top: 7px; right: 7px; width: 28px; height: 28px; border-radius: 50%; border: 0; display: grid; place-items: center; background: rgb(12 14 18 / .62); color: #fff; cursor: pointer; padding: 0; }
+.info:hover { background: rgb(12 14 18 / .85); }
+.nm { font-weight: 600; font-size: 14px; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2.5em; }
+.sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sub b { color: var(--gold); font-weight: 600; }
+.desc { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: -3px; }
+.buy { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 30px; flex-wrap: wrap; }
+.price { font-family: var(--f-mono); font-weight: 600; font-size: 14.5px; }
+.ask { font-size: 12.5px; color: var(--muted); font-weight: 500; }
+.left { font-size: 11.5px; font-weight: 600; color: var(--warn); }
+.step { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); flex: none; }
+.step button { width: 30px; height: 28px; border: 0; background: none; cursor: pointer; font-weight: 700; font-size: 17px; line-height: 1; padding: 0; color: var(--ink); border-radius: 999px; }
+.step button:disabled { opacity: .35; cursor: not-allowed; }
+.step .num { min-width: 20px; text-align: center; font-weight: 600; font-size: 14px; }
+.more { justify-self: center; }
+.state { padding: 40px 12px; text-align: center; color: var(--muted); grid-column: 1 / -1; }
+
+/* the customer's list */
+.cart { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); min-height: 0; overflow: hidden; }
+.cart-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
+.cart-head h2 { font-family: var(--f-display); font-size: 17px; letter-spacing: .02em; margin-right: auto; }
+.lines { list-style: none; margin: 0; padding: 4px 0; overflow-y: auto; flex: 1 1 auto; min-height: 60px; overscroll-behavior: contain; }
+.lines .empty { padding: 26px 18px; color: var(--muted); text-align: center; font-size: 14px; }
+.ln { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 8px 16px; }
+.ln + .ln { border-top: 1px solid var(--line); }
+.ln .cimg { border-radius: 4px; grid-row: span 2; align-self: start; }
+.ln .t { font-weight: 600; font-size: 14px; line-height: 1.25; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ln .s { font-size: 12px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ln .amt { text-align: right; font-size: 13.5px; white-space: nowrap; }
+.ln .step { justify-self: end; }
+.cart-foot { border-top: 1px solid var(--line); padding: 12px 16px 14px; display: grid; gap: 10px; background: var(--panel); }
+.tot { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tot b { font-size: 18px; }
+.foot-row { display: flex; justify-content: space-between; align-items: center; }
+.x { width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--panel-2); cursor: pointer; display: grid; place-items: center; flex: none; padding: 0; color: var(--ink); }
+.x:hover { background: var(--line); }
+
+/* phones: the list is a bottom sheet, opened from the bar */
+.mbar, .scrim { display: none; }
+@media (max-width: 999px) {
+  .cart { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; max-height: 88vh; max-height: 88dvh; border-radius: 16px 16px 0 0; border-bottom: 0;
+    transform: translateY(105%); visibility: hidden; transition: transform .24s ease, visibility 0s linear .24s; padding-bottom: env(safe-area-inset-bottom, 0px); box-shadow: 0 -8px 30px rgb(0 0 0 / .25); }
+  .cart.open { transform: none; visibility: visible; transition: transform .24s ease; }
+  .scrim { position: fixed; inset: 0; z-index: 40; background: rgb(0 0 0 / .45); }
+  .scrim.open { display: block; }
+  .mbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; align-items: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--panel); border-top: 1px solid var(--line); box-shadow: 0 -4px 18px rgb(0 0 0 / .12); }
+  .mbar .what { flex: 1; min-width: 0; line-height: 1.25; }
+  .mbar .what b { display: block; font-size: 15px; }
+  .mbar .what span { font-size: 13px; color: var(--muted); }
+}
+@media (min-width: 1000px) { .cart .x { display: none; } }
+
+/* dialogs */
+dialog { border: 0; padding: 0; background: transparent; color: var(--ink); width: min(680px, calc(100% - 24px)); max-height: calc(100dvh - 24px); max-height: calc(100vh - 24px); }
+dialog::backdrop { background: rgb(6 8 12 / .6); }
+.dlg { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain; }
+.dlg-head { display: flex; align-items: center; gap: 10px; }
+.dlg-head h2 { font-family: var(--f-display); font-size: 19px; margin-right: auto; }
+.ref { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.rev { width: 100%; border-collapse: collapse; font-size: 14px; }
+.rev td, .rev th { padding: 7px 4px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+.rev .r { text-align: right; white-space: nowrap; }
+.rev tfoot th { border-bottom: 0; font-size: 15px; }
+.rev tfoot td { border-bottom: 0; padding-top: 0; }
+.two { display: grid; gap: 10px; grid-template-columns: 1fr 1.4fr; align-items: start; }
+@media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
+.how { background: var(--panel-2); border-radius: var(--r); padding: 11px 13px; font-size: 13.5px; display: grid; gap: 6px; }
+.how a { color: var(--accent); font-weight: 600; }
+.qrbox { display: flex; align-items: center; gap: 14px; }
+.qrbox svg { flex: none; border-radius: 6px; max-width: 100%; height: auto; }
+@media (max-width: 460px) { .qrbox { flex-direction: column; align-items: flex-start; } }
+.acts { display: grid; gap: 8px; grid-template-columns: 1fr auto; }
+@media (max-width: 460px) { .acts { grid-template-columns: 1fr; } }
+details.pv summary { cursor: pointer; font-size: 13px; color: var(--muted); font-weight: 600; }
+details.pv pre { margin: 8px 0 0; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; white-space: pre-wrap; word-break: break-word; font-family: var(--f-mono); font-size: 12.5px; max-height: 220px; overflow-y: auto; }
+.sent { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+
+.detail { grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.detail.wide { grid-template-columns: minmax(0, 1fr); }
+.detail .x { position: absolute; top: 12px; right: 12px; z-index: 1; }
+#detail .dlg { position: relative; }
+@media (max-width: 600px) { .detail { grid-template-columns: minmax(0, 1fr); } .detail .big { max-width: 300px; justify-self: center; width: 100%; } }
+.big { position: relative; }
+.big img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .2s; border-radius: 8px; }
+.big img.ok { opacity: 1; }
+.dinfo { display: grid; gap: 10px; min-width: 0; align-content: start; }
+.dinfo h2 { font-size: 21px; line-height: 1.2; padding-right: 40px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13.5px; color: var(--muted); align-items: center; }
+.tags .d { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--ink); }
+.tags .d i { width: 9px; height: 9px; border-radius: 2px; transform: rotate(45deg); display: inline-block; }
+.ctext { font-size: 14.5px; line-height: 1.55; background: var(--panel-2); border-radius: 6px; padding: 10px 12px; }
+.sdesc { font-size: 14.5px; line-height: 1.55; white-space: pre-line; border-left: 3px solid var(--gold); padding: 2px 0 2px 10px; }
+.sdesc b { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.pbig img { position: static; opacity: 1; width: 100%; height: auto; max-height: 70vh; object-fit: contain; border-radius: 8px; display: block; background: var(--panel-2); }
+.dbuy { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 12px; }
+.dbuy .price { font-size: 20px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 12px); z-index: 60; background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s; max-width: calc(100% - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (min-width: 1000px) { .toast { bottom: 28px; } }
+
+.ok-t { color: var(--accent); font-weight: 600; } .bad-t { color: var(--loss); font-weight: 600; }
+
+/* shopkeeper zone (shop.html#keeper): the customer's list gives way to the keeper panel */
+body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps, body.keeper .klink { display: none !important; }
+@media (min-width: 1000px) { body.keeper .shop { grid-template-columns: minmax(0, 1fr); } }
+.kp { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 10px; font-size: 14px; }
+.kp-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.kp-head h2 { font-family: var(--f-display); font-size: 17px; letter-spacing: .02em; }
+.kp .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.kp .spread { display: flex; gap: 8px 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.kform { display: grid; gap: 10px; max-width: 380px; }
+.kstats { font-weight: 600; }
+.sql { margin: 0; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; font-family: var(--f-mono); font-size: 12.5px; white-space: pre-wrap; word-break: break-all; }
+.setup summary { cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 600; }
+.setup ul { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 3px; }
+.klink { color: var(--muted); }
+.ed-card { display: flex; gap: 12px; align-items: center; }
+.ed-card b { font-size: 16px; }
+.ed-rows { display: grid; gap: 8px; }
+.ed-h, .ed-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto 34px; gap: 8px; align-items: center; }
+.ed-h { font-size: 12px; font-weight: 600; color: var(--muted); }
+.qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); }
+.qty button { width: 30px; height: 36px; border: 0; background: none; cursor: pointer; font-size: 17px; font-weight: 700; color: var(--ink); padding: 0; }
+.qty input[type=text] { width: 42px; border: 0; background: none; text-align: center; padding: 8px 0; border-radius: 0; }
+.ed-foot { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.ed-foot #edMsg, .ed-foot #pedMsg { margin-right: auto; }
+.ed-row textarea { grid-column: 1 / -1; min-height: 40px; font-size: 14px; }
+.ed-row + .ed-row { border-top: 1px solid var(--line); padding-top: 10px; }
+.ped { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; align-items: start; }
+.ped-photo { display: grid; gap: 8px; justify-items: start; }
+.ped-img { width: 150px; aspect-ratio: 200 / 279; border-radius: 8px; background: var(--panel-2); border: 1px dashed var(--line); display: grid; place-items: center; overflow: hidden; color: var(--muted); }
+.ped-img img { width: 100%; height: 100%; object-fit: contain; }
+.ped-fields { display: grid; gap: 10px; min-width: 0; }
+.two-num { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+@media (max-width: 520px) { .ped { grid-template-columns: minmax(0, 1fr); } .ped-photo { grid-template-columns: 96px minmax(0, 1fr); align-items: center; } .ped-img { width: 96px; } }
+.btn.danger { color: var(--loss); }
+
+footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
+@media (max-width: 999px) { footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); } .shop { padding-bottom: 8px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap top-row">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14l-12 7L4 23V9z" fill="#10131A" stroke="#46C3C7" stroke-width="2"/><path d="M16 8v16M10 12l6 4 6-4M10 20l6-4 6 4" fill="none" stroke="#D9A84C" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div><h1 id="shopName">Riftbound Card Shop</h1><p data-t="tagline"></p></div>
+    </div>
+    <a class="btn sm" id="addFriend" target="_blank" rel="noopener" data-t-label="addFriend" hidden><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9l-.6 2.7c-.1.5.4.8.8.6 2.7-1.6 6.4-4 8.4-6.2C20.9 14.6 22 12.9 22 11c0-4.4-4.5-8-10-8Z" fill="var(--line-green)"/></svg><span data-t="addFriend"></span></a>
+    <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div>
+  </div>
+</header>
+
+<main class="wrap shop">
+  <div class="browse">
+    <div class="notice" id="notSetup" hidden></div>
+    <section class="kp" id="keeper" hidden></section>
+    <ol class="steps"><li><b>1</b><span data-t="step1"></span></li><li><b>2</b><span data-t="step2"></span></li><li><b>3</b><span data-t="step3"></span></li></ol>
+    <div class="filters" id="filters">
+      <div class="frow">
+        <input class="q" type="search" id="fQ" data-t-ph="search" autocomplete="off" enterkeyhint="search">
+        <select id="fSet" aria-label="Set"></select>
+        <select id="fType" aria-label="Type"></select>
+        <select id="fRar" aria-label="Rarity"></select>
+        <select id="fSort" aria-label="Sort"></select>
+      </div>
+      <div class="frow2">
+        <div class="doms" id="fDoms" role="group" aria-label="Domains"></div>
+        <label class="chk" id="fStockWrap" hidden><input type="checkbox" id="fStock"><span></span></label>
+      </div>
+    </div>
+    <div class="resbar"><span id="resCount" aria-live="polite"></span><button type="button" class="btn link" id="fClear" data-t="clearFilters" hidden></button></div>
+    <div class="cards" id="grid"><div class="state" data-t="loading"></div></div>
+    <button type="button" class="btn more" id="more" data-t="more" hidden></button>
+  </div>
+
+  <aside class="cart" id="cart" aria-labelledby="cartTitle">
+    <div class="cart-head">
+      <h2 id="cartTitle" data-t="myList"></h2>
+      <span class="small muted" id="cartCount"></span>
+      <button type="button" class="x" id="cartClose" data-t-label="close"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    </div>
+    <ul class="lines" id="lines"></ul>
+    <div class="cart-foot">
+      <div class="tot"><span data-t="total"></span><b class="num" id="cartTotal"></b></div>
+      <div class="small muted" id="cartUnpriced" hidden></div>
+      <button type="button" class="btn primary block" id="toReview" data-t="review"></button>
+      <div class="foot-row"><button type="button" class="btn link small" id="clearCart" data-t="clear"></button></div>
+    </div>
+  </aside>
+</main>
+
+<footer class="wrap"><p data-t="footer"></p><p><a class="klink" href="#keeper" data-t="kLink"></a></p></footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="mbar" id="mbar">
+  <div class="what"><b id="mbCount"></b><span id="mbTotal"></span></div>
+  <button type="button" class="btn primary" id="mbOpen" data-t="viewList"></button>
+</div>
+
+<dialog id="review" aria-labelledby="revTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="revTitle" data-t="reviewTitle"></h2><span class="ref num" id="revRef"></span>
+      <button type="button" class="x" data-close data-t-label="close"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+    <div id="revList"></div>
+    <div class="two">
+      <label class="field"><span data-t="yourName"></span><input type="text" id="who" autocomplete="name" maxlength="80"></label>
+      <label class="field"><span data-t="note"></span><textarea id="note" data-t-ph="notePh" maxlength="600" rows="2"></textarea></label>
+    </div>
+    <div class="how" id="how"></div>
+    <div class="acts">
+      <a class="btn line block" id="sendLine" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9l-.6 2.7c-.1.5.4.8.8.6 2.7-1.6 6.4-4 8.4-6.2C20.9 14.6 22 12.9 22 11c0-4.4-4.5-8-10-8Z" fill="currentColor"/></svg><span data-t="send"></span></a>
+      <button type="button" class="btn block" id="copyOrder" data-t="copy"></button>
+    </div>
+    <div class="sent" id="sent" hidden><span data-t="sent"></span><button type="button" class="btn sm" id="sentClear" data-t="clear"></button></div>
+    <details class="pv"><summary data-t="preview"></summary><pre id="preview"></pre></details>
+  </div>
+</dialog>
+
+<dialog id="detail"><div class="dlg detail" id="detailBody"></div></dialog>
+<dialog id="editor" aria-labelledby="edTitle"><div class="dlg" id="edBody"></div></dialog>
+<dialog id="peditor" aria-labelledby="pedTitle"><div class="dlg" id="pedBody"></div></dialog>
+<input type="file" id="photoFile" accept="image/*" hidden>
+<input type="file" id="importFile" accept=".csv,text/csv" hidden>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p class="wrap">This shop needs JavaScript turned on.</p></noscript>
+
+<script>
+// ---------- shop settings: edit these ----------
+const SHOP_CONFIG = {
+  name: 'Riftbound Card Shop',  // shown at the top of the page
+  currency: '฿',
+  // Where orders go. Fill in ONE of the two:
+  //  lineOA: your LINE Official Account basic ID, with the @ (like '@123abcde'). The customer's LINE opens a chat with
+  //          your account with the order already typed, and they tap Send. Recommended.
+  //  lineId: a personal LINE ID (like 'myname'). LINE opens with the order typed and the customer picks you from their
+  //          friends to send it to, so they have to add you as a friend first.
+  lineOA: '@121peeif',
+  lineId: '',
+  // Cloud stock: the Supabase project that also holds the Riftcheese accounts (CLOUD_CONFIG in Riftcheese's riftbound-prep.html).
+  // The shopkeeper zone (#keeper) saves prices, stock and products there and the shop reads them live; supabase/shop.sql
+  // sets it up. Both values are public by design: only shopkeeper accounts can change stock. Empty = stockFile only.
+  cloud: {
+    url: 'https://dtdbvrogqvblbcmhxfxk.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0ZGJ2cm9ncXZibGJjbWh4ZnhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MjgwNjIsImV4cCI6MjEwNjQwNDA2Mn0.th6pj6N1v20eOxmvEU7AJ_Deu-yfnH1adMWX5ReOi-w',
+  },
+  stockFile: 'stock.csv',  // read when there is no cloud stock (not set up, or unreachable); see scripts/make_stock_csv.py
+  showAllCards: true,           // false: only cards with a price, quantity or note are shown
+};
+
+const LANG = {
+  en: {
+    tagline: 'Riftbound singles · order through LINE',
+    step1: 'Tap cards to add them to your list', step2: 'Check your list', step3: 'Send it to us on LINE. We reply with the total, payment and shipping.',
+    search: 'Search card name or text', allSets: 'All sets', allTypes: 'All types', allRarities: 'All rarities',
+    sortNum: 'Newest set first', sortName: 'Name A–Z', sortLow: 'Price: low to high', sortHigh: 'Price: high to low',
+    inStock: 'In stock only', clearFilters: 'Clear filters', more: 'Show more',
+    results: n => `${n.toLocaleString('en-US')} card${n === 1 ? '' : 's'}`,
+    noMatch: 'No cards match these filters.', loading: 'Loading cards…', loadFail: "Couldn't load the card list. Check your connection and reload the page.",
+    askPrice: 'Ask price', soldOut: 'Sold out', left: n => `${n} left`,
+    addX: n => `Add ${n} to your list`, details: 'Details', add: 'Add to list', inList: n => `${n} in your list`,
+    added: (n, q) => `Added ${n}` + (q > 1 ? ` (${q})` : ''), maxed: n => `We only have ${n}`,
+    myList: 'Your list', empty: 'Your list is empty. Tap a card to add it.', count: n => `${n} card${n === 1 ? '' : 's'}`,
+    total: 'Total', toPrice: n => `+ ${n} card${n === 1 ? '' : 's'} to be priced`,
+    countItems: n => `${n} item${n === 1 ? '' : 's'}`, toPriceItems: n => `+ ${n} item${n === 1 ? '' : 's'} to be priced`, resultsItems: n => `${n.toLocaleString('en-US')} item${n === 1 ? '' : 's'}`,
+    review: 'Review and send', clear: 'Clear list', clearAsk: 'Remove every card from your list?', close: 'Close',
+    viewList: 'View list', tapCards: 'Tap cards to add them', less: 'One less', plus: 'One more',
+    reviewTitle: 'Check your order', yourName: 'Your name (optional)', note: 'Note for us (optional)', notePh: 'Shipping or pickup, card condition, questions…',
+    send: 'Send order on LINE', copy: 'Copy order text', copied: 'Order copied', preview: 'Message preview',
+    howOA: 'LINE opens a chat with us with your order already typed. Tap Send there and we’ll reply with the total, payment and shipping.',
+    howId: id => `LINE opens with your order typed. Pick us (${id}) from your friends and tap Send. Not friends with us yet? Add us first.`,
+    scanOA: 'Scan this with your phone’s camera. LINE opens a chat with us with your order typed; tap Send.',
+    scanId: id => `Scan this with your phone’s camera. LINE opens with your order typed: pick us (${id}) from your friends and tap Send.`,
+    tooLong: 'This list is too long for a QR code.',
+    desktop: id => `Or copy the order and paste it into your LINE chat with us (${id}).`,
+    sent: 'Sent it? Clear your list to start a new one.', addFriend: 'Add us on LINE',
+    notSetup: 'Setup needed: put your LINE ID in <code>SHOP_CONFIG</code> at the top of the script in <code>shop.html</code>. Until then orders can’t be sent.',
+    msgTitle: 'Riftbound order', msgTotal: 'Total', msgName: 'Name', msgNote: 'Note',
+    linePrice: (each, sum, q) => q > 1 ? `${each} each = ${sum}` : each,
+    cost: 'Cost', power: 'Power', might: 'Might',
+    footer: 'Riftbound, its cards and card images are the property of Riot Games. This shop is not affiliated with Riot Games.',
+    kLink: 'Shopkeeper', kTitle: 'Shopkeeper zone', kBack: 'Back to the shop', kConnecting: 'Connecting…',
+    kSignInHint: 'Sign in with your Riftcheese account.', kUser: 'Username', kPass: 'Password', kSignIn: 'Sign in', kSigningIn: 'Signing in…', kSignOut: 'Sign out',
+    kAs: n => `Signed in as ${n}`,
+    kNoTable: 'The stock table isn’t in the database yet. In Supabase → SQL Editor, run supabase/shop.sql from the repository, then check again.',
+    kNotKeeper: 'This account can’t change stock yet. To make it the shopkeeper, run this once in Supabase → SQL Editor:',
+    kCheck: 'Check again', kCopy: 'Copy', kCopied: 'Copied',
+    kStats: (n, p, s) => `${n} listed · ${p} with a price · ${s} sold out`,
+    kTapHint: 'Tap a card to set its price, quantity and description, or add your own products (boxes, packs, sleeves…). Changes show in the shop right away.',
+    kAddProduct: '+ Add a product', typeProducts: 'Other products', prodTag: 'Product',
+    pTitleNew: 'New product', pTitle: 'Edit product', pName: 'Name', pNamePh: 'e.g. Origins booster box', pPhoto: 'Photo',
+    pChoose: 'Choose a photo', pChange: 'Change photo', pRemovePhoto: 'Remove photo', pDelete: 'Delete product',
+    pDeleteAsk: n => `Delete ${n} from the shop?`, pDeleted: 'Product deleted', pNeedName: 'Give the product a name.',
+    pPhotoFail: m => `Couldn’t use this photo: ${m}`, pHint: 'No price shows Ask price. Quantity 0 shows Sold out; blank shows no number.',
+    eDesc: 'Description', eDescPh: 'Optional: condition, language, what’s included…',
+    kExport: 'Download as CSV', kImport: 'Import CSV', kWorking: 'Saving…',
+    kImportAsk: (a, d, u) => `Save ${a} listed row${a === 1 ? '' : 's'} from this file?` + (d ? ` ${d} version${d === 1 ? '' : 's'} left blank in the file will be taken off sale.` : '') + (u ? ` ${u === 1 ? '1 row matches' : u + ' rows match'} no card and will be skipped.` : ''),
+    kImportEmpty: 'Nothing to save from this file. It needs an id or name column and some prices, copies or notes.',
+    kImported: n => `Saved ${n} row${n === 1 ? '' : 's'}`,
+    kListed: 'Listed only', kNotListed: 'Not listed', kInStock: n => `${n} in stock`, kEdit: 'Edit price and stock',
+    kNoCloud: 'Cloud stock isn’t set up: fill in SHOP_CONFIG.cloud in shop.html.',
+    kOffline: 'Couldn’t reach the cloud service. Check your connection.',
+    kBadLogin: 'Username or password is wrong.', kRate: 'Too many attempts. Wait a minute and try again.', kFail: m => `Couldn’t sign in: ${m}`,
+    kSignInFirst: 'Sign in to change stock',
+    eTitle: 'Price and stock', eNote: 'Version', eNotePh: 'Normal', ePrice: 'Price', eQty: 'Quantity',
+    eAdd: 'Add a version (Foil, Alt art…)', eHint: 'No price shows Ask price. Quantity 0 shows Sold out; blank shows no number. Clear a whole row to take it off sale.',
+    eSave: 'Save', eCancel: 'Cancel', eSaving: 'Saving…', eSaved: 'Saved', eRemove: 'Remove this version',
+    eDup: 'Two versions have the same name.', eBadPrice: 'Prices are numbers, like 120.', eBadQty: 'Copies are whole numbers, like 4.', eFail: m => `Couldn’t save: ${m}`,
+    sTitle: 'Setup check', sLine: id => `Orders go to LINE: ${id}`, sNoLine: 'LINE isn’t set: put your LINE ID in SHOP_CONFIG in shop.html.',
+    sCloud: 'Stock is read from the cloud, so changes show in the shop right away.', sFile: f => `Stock is read from ${f} in the repository.`,
+    sNone: 'No stock list yet: every card shows Ask price.', sCloudErr: m => `cloud stock couldn’t be read: ${m}`,
+    sUnmatched: n => n === 1 ? '1 stock row matches no card' : `${n} stock rows match no card`,
+  },
+  th: {
+    tagline: 'การ์ด Riftbound แยกใบ · สั่งซื้อผ่าน LINE',
+    step1: 'แตะการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: 'ส่งรายการให้เราทาง LINE แล้วเราจะแจ้งยอดชำระและการจัดส่ง',
+    search: 'ค้นหาชื่อการ์ดหรือข้อความบนการ์ด', allSets: 'ทุกชุด', allTypes: 'ทุกประเภท', allRarities: 'ทุกความหายาก',
+    sortNum: 'ชุดใหม่ล่าสุดก่อน', sortName: 'ชื่อ A–Z', sortLow: 'ราคา: ต่ำไปสูง', sortHigh: 'ราคา: สูงไปต่ำ',
+    inStock: 'เฉพาะที่มีของ', clearFilters: 'ล้างตัวกรอง', more: 'ดูเพิ่ม',
+    results: n => `${n.toLocaleString('en-US')} ใบ`,
+    noMatch: 'ไม่พบการ์ดที่ตรงกับตัวกรอง', loading: 'กำลังโหลดการ์ด…', loadFail: 'โหลดรายการการ์ดไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วโหลดหน้าใหม่',
+    askPrice: 'สอบถามราคา', soldOut: 'หมด', left: n => `เหลือ ${n}`,
+    addX: n => `เพิ่ม ${n} ลงรายการ`, details: 'รายละเอียด', add: 'เพิ่มลงรายการ', inList: n => `อยู่ในรายการ ${n} ใบ`,
+    added: (n, q) => `เพิ่ม ${n} แล้ว` + (q > 1 ? ` (${q} ใบ)` : ''), maxed: n => `มีของแค่ ${n} ใบ`,
+    myList: 'รายการของคุณ', empty: 'ยังไม่มีการ์ดในรายการ แตะการ์ดเพื่อเพิ่ม', count: n => `${n} ใบ`,
+    total: 'รวม', toPrice: n => `+ อีก ${n} ใบรอแจ้งราคา`,
+    countItems: n => `${n} ชิ้น`, toPriceItems: n => `+ อีก ${n} ชิ้นรอแจ้งราคา`, resultsItems: n => `${n.toLocaleString('en-US')} รายการ`,
+    review: 'ตรวจรายการและส่ง', clear: 'ล้างรายการ', clearAsk: 'ลบการ์ดทั้งหมดออกจากรายการใช่ไหม', close: 'ปิด',
+    viewList: 'ดูรายการ', tapCards: 'แตะการ์ดเพื่อเพิ่มลงรายการ', less: 'ลดหนึ่งใบ', plus: 'เพิ่มหนึ่งใบ',
+    reviewTitle: 'ตรวจสอบคำสั่งซื้อ', yourName: 'ชื่อของคุณ (ไม่บังคับ)', note: 'ข้อความถึงร้าน (ไม่บังคับ)', notePh: 'จัดส่งหรือรับเอง สภาพการ์ด หรือคำถามอื่น ๆ',
+    send: 'ส่งคำสั่งซื้อทาง LINE', copy: 'คัดลอกรายการ', copied: 'คัดลอกรายการแล้ว', preview: 'ตัวอย่างข้อความ',
+    howOA: 'LINE จะเปิดแชตกับร้านโดยพิมพ์รายการไว้ให้แล้ว กดส่งในแชต แล้วร้านจะแจ้งยอดชำระและการจัดส่ง',
+    howId: id => `LINE จะเปิดพร้อมพิมพ์รายการไว้ให้ เลือกร้าน (${id}) จากรายชื่อเพื่อนแล้วกดส่ง ถ้ายังไม่ได้เพิ่มเพื่อนกับร้าน ให้เพิ่มเพื่อนก่อน`,
+    scanOA: 'สแกนด้วยกล้องมือถือ LINE จะเปิดแชตกับร้านโดยพิมพ์รายการไว้ให้แล้ว จากนั้นกดส่ง',
+    scanId: id => `สแกนด้วยกล้องมือถือ LINE จะเปิดพร้อมพิมพ์รายการไว้ให้ เลือกร้าน (${id}) จากรายชื่อเพื่อนแล้วกดส่ง`,
+    tooLong: 'รายการยาวเกินกว่าจะทำเป็น QR code ได้',
+    desktop: id => `หรือคัดลอกรายการแล้ววางในแชต LINE กับร้าน (${id})`,
+    sent: 'ส่งแล้วใช่ไหม? ล้างรายการเพื่อเริ่มรายการใหม่', addFriend: 'เพิ่มเพื่อนใน LINE',
+    notSetup: 'ยังตั้งค่าไม่ครบ: ใส่ LINE ID ของร้านใน <code>SHOP_CONFIG</code> ที่ส่วนบนของสคริปต์ใน <code>shop.html</code> ก่อน จึงจะส่งคำสั่งซื้อได้',
+    msgTitle: 'คำสั่งซื้อ Riftbound', msgTotal: 'รวม', msgName: 'ชื่อ', msgNote: 'หมายเหตุ',
+    linePrice: (each, sum, q) => q > 1 ? `ใบละ ${each} = ${sum}` : each,
+    cost: 'ค่าร่าย', power: 'พาวเวอร์', might: 'ไมต์',
+    footer: 'Riftbound การ์ด และภาพการ์ดเป็นทรัพย์สินของ Riot Games ร้านนี้ไม่ได้เกี่ยวข้องกับ Riot Games',
+    kLink: 'สำหรับเจ้าของร้าน', kTitle: 'โซนเจ้าของร้าน', kBack: 'กลับไปหน้าร้าน', kConnecting: 'กำลังเชื่อมต่อ…',
+    kSignInHint: 'เข้าสู่ระบบด้วยบัญชี Riftcheese ของคุณ', kUser: 'ชื่อผู้ใช้', kPass: 'รหัสผ่าน', kSignIn: 'เข้าสู่ระบบ', kSigningIn: 'กำลังเข้าสู่ระบบ…', kSignOut: 'ออกจากระบบ',
+    kAs: n => `เข้าสู่ระบบเป็น ${n}`,
+    kNoTable: 'ยังไม่มีตารางสต็อกในฐานข้อมูล ให้เปิด Supabase → SQL Editor แล้วรันไฟล์ supabase/shop.sql จาก repository จากนั้นกดตรวจอีกครั้ง',
+    kNotKeeper: 'บัญชีนี้ยังแก้ไขสต็อกไม่ได้ หากต้องการตั้งเป็นเจ้าของร้าน ให้รันคำสั่งนี้หนึ่งครั้งใน Supabase → SQL Editor:',
+    kCheck: 'ตรวจอีกครั้ง', kCopy: 'คัดลอก', kCopied: 'คัดลอกแล้ว',
+    kStats: (n, p, s) => `ลงขาย ${n} รายการ · มีราคา ${p} · หมด ${s}`,
+    kTapHint: 'แตะการ์ดเพื่อตั้งราคา จำนวน และรายละเอียด หรือเพิ่มสินค้าของคุณเอง (บ็อกซ์ ซอง ซองใส่การ์ด…) การเปลี่ยนแปลงจะแสดงในร้านทันที',
+    kAddProduct: '+ เพิ่มสินค้า', typeProducts: 'สินค้าอื่น ๆ', prodTag: 'สินค้า',
+    pTitleNew: 'สินค้าใหม่', pTitle: 'แก้ไขสินค้า', pName: 'ชื่อสินค้า', pNamePh: 'เช่น บูสเตอร์บ็อกซ์ Origins', pPhoto: 'รูปภาพ',
+    pChoose: 'เลือกรูป', pChange: 'เปลี่ยนรูป', pRemovePhoto: 'ลบรูป', pDelete: 'ลบสินค้า',
+    pDeleteAsk: n => `ลบ ${n} ออกจากร้านใช่ไหม`, pDeleted: 'ลบสินค้าแล้ว', pNeedName: 'ใส่ชื่อสินค้าก่อน',
+    pPhotoFail: m => `ใช้รูปนี้ไม่ได้: ${m}`, pHint: 'ไม่ใส่ราคาจะแสดงว่า สอบถามราคา จำนวน 0 แสดงว่า หมด เว้นว่างจะไม่แสดงจำนวน',
+    eDesc: 'รายละเอียด', eDescPh: 'ไม่บังคับ: สภาพ ภาษา สิ่งที่ได้รับ…',
+    kExport: 'ดาวน์โหลดเป็น CSV', kImport: 'นำเข้า CSV', kWorking: 'กำลังบันทึก…',
+    kImportAsk: (a, d, u) => `บันทึก ${a} แถวที่ลงขายจากไฟล์นี้ใช่ไหม` + (d ? ` อีก ${d} เวอร์ชันที่เว้นว่างในไฟล์จะถูกนำออกจากการขาย` : '') + (u ? ` มี ${u} แถวที่ไม่ตรงกับการ์ดใบใดและจะถูกข้าม` : ''),
+    kImportEmpty: 'ไม่มีอะไรให้บันทึกจากไฟล์นี้ ไฟล์ต้องมีคอลัมน์ id หรือ name และมีราคา จำนวน หรือหมายเหตุ',
+    kImported: n => `บันทึก ${n} แถวแล้ว`,
+    kListed: 'เฉพาะที่ลงขาย', kNotListed: 'ยังไม่ลงขาย', kInStock: n => `มี ${n} ใบ`, kEdit: 'แก้ไขราคาและสต็อก',
+    kNoCloud: 'ยังไม่ได้ตั้งค่าสต็อกบนคลาวด์: ใส่ค่าใน SHOP_CONFIG.cloud ใน shop.html',
+    kOffline: 'เชื่อมต่อบริการคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต',
+    kBadLogin: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', kRate: 'ลองหลายครั้งเกินไป รอสักครู่แล้วลองใหม่', kFail: m => `เข้าสู่ระบบไม่สำเร็จ: ${m}`,
+    kSignInFirst: 'เข้าสู่ระบบก่อนจึงจะแก้ไขสต็อกได้',
+    eTitle: 'ราคาและสต็อก', eNote: 'เวอร์ชัน', eNotePh: 'ปกติ', ePrice: 'ราคา', eQty: 'จำนวน',
+    eAdd: 'เพิ่มเวอร์ชัน (Foil, Alt art…)', eHint: 'ไม่ใส่ราคาจะแสดงว่า สอบถามราคา จำนวน 0 แสดงว่า หมด เว้นว่างจะไม่แสดงจำนวน ล้างทั้งแถวเพื่อเลิกขาย',
+    eSave: 'บันทึก', eCancel: 'ยกเลิก', eSaving: 'กำลังบันทึก…', eSaved: 'บันทึกแล้ว', eRemove: 'ลบเวอร์ชันนี้',
+    eDup: 'มีสองเวอร์ชันที่ชื่อซ้ำกัน', eBadPrice: 'ราคาต้องเป็นตัวเลข เช่น 120', eBadQty: 'จำนวนต้องเป็นจำนวนเต็ม เช่น 4', eFail: m => `บันทึกไม่สำเร็จ: ${m}`,
+    sTitle: 'ตรวจการตั้งค่า', sLine: id => `คำสั่งซื้อส่งไปที่ LINE: ${id}`, sNoLine: 'ยังไม่ได้ตั้ง LINE: ใส่ LINE ID ใน SHOP_CONFIG ใน shop.html',
+    sCloud: 'สต็อกอ่านจากคลาวด์ การเปลี่ยนแปลงจึงแสดงในร้านทันที', sFile: f => `สต็อกอ่านจากไฟล์ ${f} ใน repository`,
+    sNone: 'ยังไม่มีรายการสต็อก การ์ดทุกใบแสดงว่า สอบถามราคา', sCloudErr: m => `อ่านสต็อกจากคลาวด์ไม่ได้: ${m}`,
+    sUnmatched: n => `${n} แถวในสต็อกไม่ตรงกับการ์ดใบใด`,
+  },
+};
+
+const SET_NAMES = { OGN: 'Origins', OGS: 'Proving Grounds', SFD: 'Spiritforged', UNL: 'Unleashed', VEN: 'Vendetta', RAD: 'Radiance', OPP: 'OP Promo', PR: 'Promo', JDG: 'Judge' };
+const SET_ORDER = ['rad', 'ven', 'unl', 'sfd', 'ogn', 'ogs', 'opp'];  // newest first, by the set in a card's number
+const TYPES = ['Legend', 'Unit', 'Spell', 'Gear', 'Battlefield', 'Rune'];
+const DOMAINS = ['Fury', 'Calm', 'Mind', 'Body', 'Chaos', 'Order', 'Colorless'];
+const RARITIES = ['Common', 'Uncommon', 'Rare', 'Epic', 'Promo'];
+const PAGE = 60, MAX_COPIES = 99, PRODUCTS = '_products', PRODUCT_BUCKET = 'shop';
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
+const cardKey = s => String(s || '').replace(/\s*\([^)]*\)\s*$/, '').replace(/,\s+/g, ' - ').trim().replace(/\s+/g, ' ').toLowerCase();
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let lang = store.get('rbshop.lang', null) || (/^th\b/i.test(navigator.language || '') ? 'th' : 'en');
+const t = (k, ...a) => { const v = LANG[lang][k] ?? LANG.en[k]; return typeof v === 'function' ? v(...a) : v; };
+const money = v => SHOP_CONFIG.currency + v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+const toNum = s => { const v = parseFloat(String(s).replace(/[^\d.]/g, '')); return s && isFinite(v) ? v : null; };
+const cardNo = c => { const [s, n] = c.id.split('-'); return `${s.toUpperCase()}-${n}`; };
+const domColor = d => `var(--${d.toLowerCase()})`;
+// Ability text the way players read it: icon codes become words (":rb_might:" → "might", ":rb_energy_2:" → "2 energy").
+function readable(x) {
+  return String(x || '').replace(/&(gt|lt|amp|quot|#39);/g, (_, e) => ({ gt: '>', lt: '<', amp: '&', quot: '"', '#39': "'" }[e]))
+    .replace(/:rb_([a-z0-9_]+):/g, (_, k) => ' ' + (k === 'rune_rainbow' ? 'power' : k.startsWith('energy_') ? k.slice(7) + ' energy'
+      : k.startsWith('rune_') ? k.slice(5) + ' power' : k.replace(/_/g, ' ')) + ' ').replace(/ {2,}/g, ' ').replace(/ ([.,:;)])/g, '$1').replace(/\( /g, '(').trim();
+}
+// Card picture from the sprite sheets. w = 0 fills the container's width.
+function thumb(c, w = 0) {
+  const sh = DB.sheets[c.im[0]], i = c.im[1], cx = i % sh.c, cy = Math.floor(i / sh.c);
+  if (!w) return `<span class="cimg fluid" aria-hidden="true" style="aspect-ratio:${sh.w}/${sh.h};background-image:url(${sh.f});background-size:${sh.c * 100}% ${sh.r * 100}%;background-position:${sh.c > 1 ? cx / (sh.c - 1) * 100 : 0}% ${sh.r > 1 ? cy / (sh.r - 1) * 100 : 0}%"></span>`;
+  const h = Math.round(sh.h * w / sh.w);
+  return `<span class="cimg" aria-hidden="true" style="width:${w}px;height:${h}px;background-image:url(${sh.f});background-size:${sh.c * w}px ${sh.r * h}px;background-position:-${cx * w}px -${cy * h}px"></span>`;
+}
+const landscape = c => { const sh = DB.sheets[c.im[0]]; return sh.w > sh.h; };
+// Listings are cards (x.c) or the shopkeeper's own products (x.p); these read either.
+const nameOf = x => x.p ? x.p.name : x.c.n;
+const itemRef = x => x.p ? t('prodTag') : cardNo(x.c) + (x.note ? ' · ' + x.note : '');
+const ICON_BOX = '<svg width="40%" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5zM3 7.5 12 12l9-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+const photoUrl = path => `${SHOP_CONFIG.cloud.url}/storage/v1/object/public/${PRODUCT_BUCKET}/${path.split('/').map(encodeURIComponent).join('/')}`;
+// A product's photo (or a drawn box when it has none) in a card-shaped frame. w = 0 fills the container's width.
+function pthumb(p, w = 0) {
+  const size = w ? `width:${w}px;height:${Math.round(w * 279 / 200)}px` : 'width:100%;aspect-ratio:200/279';
+  return `<span class="cimg pimg" style="${size}" aria-hidden="true">${p.image ? `<img src="${esc(photoUrl(p.image))}" alt="" loading="lazy">` : ICON_BOX}</span>`;
+}
+const itemThumb = (x, w = 0) => x.p ? pthumb(x.p, w) : thumb(x.c, w);
+// "3 cards", or "3 items" once products are in the mix. xs: listings, or { x, q } list items.
+const counted = (k, n, xs) => t(xs.some(i => (i.x || i).p) ? k.replace(/^(count|toPrice|results)$/, '$1Items') : k, n);
+// "฿1,200" → "1200"; the caller checks that what's left is a number.
+const cleanPrice = v => String(v ?? '').trim().split(SHOP_CONFIG.currency).join('').replace(/[,\s]/g, '');
+
+const ICON_INFO = '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const ICON_X = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+
+// ---------- LINE ----------
+const oaId = () => { const s = SHOP_CONFIG.lineOA.trim(); return s.startsWith('@') ? s : '@' + s; };
+const lineReady = () => !!(SHOP_CONFIG.lineOA.trim() || SHOP_CONFIG.lineId.trim());
+const lineName = () => SHOP_CONFIG.lineOA.trim() ? oaId() : SHOP_CONFIG.lineId.trim();
+// LINE URL scheme (developers.line.biz/en/docs/line-login/using-line-url-scheme/): oaMessage opens a chat with an
+// Official Account with the text typed in; msg/text opens the share screen so the customer picks who gets it.
+const lineSendUrl = text => SHOP_CONFIG.lineOA.trim()
+  ? `https://line.me/R/oaMessage/${encodeURIComponent(oaId())}/?${encodeURIComponent(text)}`
+  : `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+const lineAddUrl = () => SHOP_CONFIG.lineOA.trim()
+  ? `https://line.me/R/ti/p/${encodeURIComponent(oaId())}`
+  : `https://line.me/ti/p/~${encodeURIComponent(SHOP_CONFIG.lineId.trim())}`;
+// On a computer those links open LINE's home page instead of the app, so there the order link is shown as a QR code
+// to scan with a phone. The QR library loads only then.
+const onPhone = matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+const QR_LIB = { src: 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js', sri: 'sha512-ZDSPMa/JM1D+7kdg2x3BsruQ6T/JpJo3jWDWkCZsP+5yVyp1KfESqLI+7RqB5k24F7p2cV7i2YHh/890y6P6Sw==' };
+const QR_MAX = 1500;  // longer links make codes too dense to scan off a screen
+let qrState = '';     // '' | 'loading' | 'ready' | 'failed'
+function loadScript(src, integrity) {
+  return new Promise((res, rej) => document.head.append(Object.assign(document.createElement('script'),
+    { src, integrity, crossOrigin: 'anonymous', referrerPolicy: 'no-referrer', onload: res, onerror: () => rej(new Error('load')) })));
+}
+function loadQr() {
+  if (qrState) return; qrState = 'loading';
+  loadScript(QR_LIB.src, QR_LIB.sri).then(() => { qrState = 'ready'; }, () => { qrState = 'failed'; }).then(() => { if ($('#review').open) updateSend(); });
+}
+function qrSvg(text) {
+  const qr = qrcode(0, 'L'); qr.addData(text); qr.make();
+  const n = qr.getModuleCount(), px = Math.round(Math.min(300, Math.max(168, n * 2.6))); let d = '';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
+  return `<svg viewBox="-4 -4 ${n + 8} ${n + 8}" width="${px}" height="${px}" role="img" aria-label="QR code" shape-rendering="crispEdges"><rect x="-4" y="-4" width="${n + 8}" height="${n + 8}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+
+// ---------- data ----------
+// A listing is one thing a customer can pick: a card, or one version of it when the stock has several rows for it
+// (normal and foil). Its key is the card id, plus the note for extra versions, so lists survive price changes.
+// rows are the stock rows that match a card: { c, price, qty, note, descr }; products are the shopkeeper's own items.
+// stock.source is 'cloud', 'file' or 'none'.
+const DB = { ok: false, failed: false, sheets: [], imgBase: '', cards: [], byId: new Map(), byName: new Map(), rows: [], products: [],
+  listings: [], byKey: new Map(), stocked: false, stock: { source: '', error: '', unmatched: [] } };
+const S = { cart: store.get('rbshop.cart', {}), f: { q: '', set: '', type: '', rar: '', dom: new Set(), stock: false, sort: 'num' }, list: [], shown: PAGE, ref: '', detail: null };
+
+// Excel saves plain "CSV" in the computer's own encoding (windows-874 on Thai Windows) unless "CSV UTF-8" is picked.
+function decodeCsv(buf) { try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch { return new TextDecoder('windows-874').decode(buf); } }
+async function fetchText(url) {
+  const r = await fetch(url, { cache: 'no-cache' }); if (!r.ok) return null;
+  return decodeCsv(await r.arrayBuffer());
+}
+function parseCsv(text) {
+  const nl = text.indexOf('\n'), first = nl < 0 ? text : text.slice(0, nl);
+  const delim = [';', '\t'].reduce((a, d) => (first.split(d).length > first.split(a).length ? d : a), ',');  // Excel uses ; in some regions
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === delim) { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+const rank = id => { const [s, n] = id.split('-'), i = SET_ORDER.indexOf(s); return [i < 0 ? SET_ORDER.length : i, parseInt(n, 10) || 0]; };
+
+const byRank = (a, b) => { const x = rank(a.id), y = rank(b.id); return x[0] - y[0] || x[1] - y[1] || a.id.localeCompare(b.id); };
+
+// Stock rows in a CSV file (the stock file, or one the shopkeeper imports): { id, name, price, qty, note, line, listed }.
+function csvRows(text) {
+  const [head = [], ...body] = parseCsv(text);
+  const col = n => head.findIndex(h => norm(h) === n);
+  const at = { id: col('id'), name: col('name'), price: col('price'), qty: col('qty'), note: col('note'), descr: col('description') < 0 ? col('descr') : col('description') };
+  return body.map((r, i) => {
+    const get = k => at[k] < 0 ? '' : String(r[at[k]] ?? '').trim();
+    const price = toNum(get('price')), qty = toNum(get('qty')), note = get('note');
+    const descr = at.descr < 0 ? undefined : get('descr');  // undefined: the file has no description column
+    return { id: get('id'), name: get('name'), price, qty: qty == null ? null : Math.floor(qty), note, descr, line: i + 2, listed: price != null || qty != null || !!note || !!descr };
+  }).filter(r => r.id || r.name);
+}
+// The card a stock row is for: by its id ("ogn-202-298", "OGN-202/298"), else by its name.
+const rowCard = r => DB.byId.get(String(r.id).toLowerCase().replace(/[\s/]+/g, '-')) || DB.byName.get(cardKey(r.name)) || null;
+const cloudReady = () => !!(SHOP_CONFIG.cloud && SHOP_CONFIG.cloud.url && SHOP_CONFIG.cloud.anonKey);
+// One table from the cloud, in pages, since the API returns at most 1000 rows at a time.
+async function fetchTable(table, select, order) {
+  const { url, anonKey } = SHOP_CONFIG.cloud, out = [], size = 1000;
+  for (;;) {
+    const r = await fetch(`${url}/rest/v1/${table}?select=${select}&order=${order}&offset=${out.length}&limit=${size}`,
+      { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, Prefer: 'count=exact' }, cache: 'no-store' });
+    if (!r.ok) { let m = `HTTP ${r.status}`; try { m = (await r.json()).message || m; } catch {} throw new Error(m); }
+    const page = await r.json(), total = parseInt((r.headers.get('content-range') || '').split('/')[1], 10);
+    out.push(...page);
+    if (!page.length || (isFinite(total) ? out.length >= total : page.length < size)) return out;
+  }
+}
+const numOrNull = v => v == null ? null : +v;
+// The cloud stock and products when they're set up and reachable, else the stock file (cards only).
+async function loadStock() {
+  DB.stock.error = '';
+  if (cloudReady()) {
+    try {
+      const [rows, products] = await Promise.all([
+        fetchTable('shop_stock', 'card_id,note,price,qty,descr', 'card_id,note'),
+        fetchTable('shop_products', 'id,name,price,qty,descr,image,sort', 'sort,created_at.desc'),
+      ]);
+      DB.stock.source = 'cloud';
+      return {
+        rows: rows.map(x => ({ id: x.card_id, name: '', price: numOrNull(x.price), qty: x.qty, note: x.note || '', descr: x.descr || '', line: 0, listed: true })),
+        products: products.map(x => ({ id: x.id, name: x.name, price: numOrNull(x.price), qty: x.qty, descr: x.descr || '', image: x.image || '', sort: x.sort || 0 })),
+      };
+    } catch (e) { DB.stock.error = e.message || String(e); }
+  }
+  const text = await fetchText(SHOP_CONFIG.stockFile).catch(() => null);
+  DB.stock.source = text == null ? 'none' : 'file';
+  return { rows: text == null ? [] : csvRows(text), products: [] };
+}
+function setStock({ rows, products }) {
+  DB.rows = []; DB.stock.unmatched = []; DB.products = products;
+  rows.forEach(r => {
+    if (!r.listed) return;  // a blank row: not on sale
+    const c = rowCard(r);
+    if (c) DB.rows.push({ c, price: r.price, qty: r.qty, note: r.note, descr: r.descr || '' });
+    else DB.stock.unmatched.push(`${r.line ? `row ${r.line}: ` : ''}${r.id || r.name}`);
+  });
+  buildListings();
+}
+function buildListings() {
+  const rows = new Map();  // card id → note (lower case) → row; the same card and note twice: the later row wins
+  DB.rows.forEach(r => { if (!rows.has(r.c.id)) rows.set(r.c.id, new Map()); rows.get(r.c.id).set(norm(r.note), r); });
+  const out = DB.products.map(p => ({ key: 'p:' + p.id, p, c: null, price: p.price, qty: p.qty, note: '', descr: p.descr, listed: true }));
+  DB.cards.forEach(c => {
+    const rs = rows.get(c.id);
+    if (rs) [...rs].sort((a, b) => a[0].localeCompare(b[0])).forEach(([n, x]) => out.push({ key: c.id + (n ? '|' + n : ''), c, price: x.price, qty: x.qty, note: x.note, descr: x.descr, listed: true }));
+    else if (SHOP_CONFIG.showAllCards || K.on) out.push({ key: c.id, c, price: null, qty: null, note: '', descr: '', listed: false });
+  });
+  DB.listings = out; DB.byKey = new Map(out.map(x => [x.key, x])); DB.stocked = out.some(x => x.listed);
+}
+
+async function load() {
+  try {
+    const [j, stock] = await Promise.all([
+      fetch('cards/cards.json').then(r => { if (!r.ok) throw 0; return r.json(); }),
+      loadStock(),
+    ]);
+    DB.sheets = j.sheets; DB.imgBase = j.imgBase;
+    // Some Legends are listed twice, by title only ("Matriarch of War") and in full ("Ambessa - Matriarch of War"); keep the full one.
+    const legends = j.cards.filter(c => c.t === 'Legend');
+    const alias = new Set(legends.filter(c => !c.k.includes(' - ') && legends.some(x => x.k.endsWith(' - ' + c.k))).map(c => c.k));
+    DB.cards = j.cards.filter(c => c.im && !alias.has(c.k)).sort(byRank);
+    DB.byId = new Map(DB.cards.map(c => [c.id, c])); DB.byName = new Map(DB.cards.map(c => [c.k, c]));
+    setStock(stock);
+    // Drop cards the shop no longer lists from a saved list, and keep within the stock.
+    Object.keys(S.cart).forEach(k => { const x = DB.byKey.get(k), q = Math.min(S.cart[k] | 0, x ? x.qty ?? MAX_COPIES : 0); if (q > 0) S.cart[k] = q; else delete S.cart[k]; });
+    saveCart();
+    S.f.stock = DB.stocked && !K.on;
+    DB.ok = true;
+  } catch (e) { console.error(e); DB.failed = true; }
+  renderAll();
+}
+async function reloadStock() { setStock(await loadStock()); renderAll(); }
+
+// ---------- filters ----------
+const defaults = () => ({ q: '', set: '', type: '', rar: '', dom: new Set(), stock: DB.stocked && !K.on, sort: S.f.sort });
+const filtered = () => { const f = S.f, d = defaults(); return f.q || f.set || f.type || f.rar || f.dom.size || f.stock !== d.stock; };
+const searchText = new WeakMap();
+function hasText(x, q) {
+  const words = norm(q).replace(/[\[\]]/g, '').split(' ').filter(Boolean);
+  let h = searchText.get(x);
+  if (h == null) {
+    const c = x.c, parts = x.p ? [x.p.name, x.descr] : [c.n, c.id, cardNo(c), c.st, c.t, ...c.d, ...(c.g || []), readable(c.x), x.note, x.descr];
+    h = norm(parts.join(' ').replace(/[\[\]]/g, '')); searchText.set(x, h);
+  }
+  return words.every(w => h.includes(w));
+}
+function visible() {
+  const f = S.f;
+  const xs = DB.listings.filter(x => {
+    const c = x.c;
+    if (f.stock && (!x.listed || (x.qty === 0 && !K.on))) return false;  // the shopkeeper sees sold-out cards too
+    if (x.p) return !(f.set || f.rar || f.dom.size || (f.type && f.type !== PRODUCTS)) && (!f.q || hasText(x, f.q));  // products have no set, type or domain
+    if (f.type === PRODUCTS) return false;
+    if (f.set && !c.s.includes(f.set)) return false;
+    if (f.type && c.t !== f.type) return false;
+    if (f.rar && c.r !== f.rar) return false;
+    if (f.dom.size && !c.d.some(d => f.dom.has(d))) return false;
+    return !f.q || hasText(x, f.q);
+  });
+  if (f.sort === 'name') xs.sort((a, b) => nameOf(a).localeCompare(nameOf(b)));
+  if (f.sort === 'low' || f.sort === 'high') {
+    const s = f.sort === 'low' ? 1 : -1;  // cards without a price go last either way
+    xs.sort((a, b) => (a.price == null) - (b.price == null) || s * ((a.price ?? 0) - (b.price ?? 0)));
+  }
+  return xs;
+}
+function renderFilters() {
+  const sets = Object.keys(SET_NAMES).filter(s => DB.listings.some(x => x.c && x.c.s.includes(s)))
+    .sort((a, b) => { const i = s => { const k = SET_ORDER.indexOf(s.toLowerCase()); return k < 0 ? 99 : k; }; return i(a) - i(b); });
+  const opts = (all, list, cur, label = v => v) => `<option value="">${esc(all)}</option>` + list.map(v => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(label(v))}</option>`).join('');
+  $('#fSet').innerHTML = opts(t('allSets'), sets, S.f.set, s => `${SET_NAMES[s]} (${s})`);
+  $('#fType').innerHTML = opts(t('allTypes'), [...(DB.products.length ? [PRODUCTS] : []), ...TYPES], S.f.type, v => v === PRODUCTS ? t('typeProducts') : v);
+  $('#fRar').innerHTML = opts(t('allRarities'), RARITIES.filter(r => DB.listings.some(x => x.c && x.c.r === r)), S.f.rar);
+  $('#fSort').innerHTML = [['num', 'sortNum'], ['name', 'sortName'], ...(DB.stocked ? [['low', 'sortLow'], ['high', 'sortHigh']] : [])]
+    .map(([v, k]) => `<option value="${v}"${v === S.f.sort ? ' selected' : ''}>${esc(t(k))}</option>`).join('');
+  $('#fDoms').innerHTML = DOMAINS.map(d => `<button type="button" class="dom" data-dom="${d}" aria-pressed="${S.f.dom.has(d)}"><i style="background:${domColor(d)}"></i>${d}</button>`).join('');
+  $('#fQ').value = S.f.q;
+  $('#fStockWrap').hidden = !DB.stocked;
+  $('#fStockWrap span').textContent = t(K.on ? 'kListed' : 'inStock');
+  $('#fStock').checked = S.f.stock;
+}
+
+// ---------- card grid ----------
+const inCart = key => S.cart[key] || 0;
+function priceTag(x) {
+  const p = x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`;
+  return x.qty > 0 ? `<span>${p} <span class="left">· ${t('left', x.qty)}</span></span>` : `<span>${p}</span>`;
+}
+function stepper(x, n) {
+  return `<span class="step"><button type="button" data-act="dec" aria-label="${esc(t('less'))}">−</button><span class="num" aria-label="${esc(t('inList', n))}">${n}</span>`
+    + `<button type="button" data-act="inc" aria-label="${esc(t('plus'))}"${x.qty != null && n >= x.qty ? ' disabled' : ''}>+</button></span>`;
+}
+function keeperTag(x) {
+  if (!x.listed) return `<span class="ask">${t('kNotListed')}</span>`;
+  const p = x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`;
+  return `<span>${p} ${x.qty === 0 ? `<span class="left bad-t">· ${t('soldOut')}</span>` : x.qty != null ? `<span class="left">· ${t('kInStock', x.qty)}</span>` : ''}</span>`;
+}
+function tile(x, pop = false) {
+  const n = K.on ? 0 : inCart(x.key), out = x.qty === 0, label = nameOf(x), name = label + (x.note ? ` (${x.note})` : '');
+  return `<article class="tile${n ? ' in' : ''}${out ? ' out' : ''}" data-key="${esc(x.key)}">
+    <button type="button" class="pic" data-act="add" aria-label="${esc(K.on ? t('kEdit') + ': ' + name : t('addX', name))}"${out && !K.on ? ' disabled' : ''}>
+      <span class="frame">${itemThumb(x)}</span>${n ? `<span class="count num${pop ? ' pop' : ''}">${n}</span>` : ''}${out ? `<span class="flag">${t('soldOut')}</span>` : ''}
+    </button>
+    <button type="button" class="info" data-act="info" aria-label="${esc(t('details') + ': ' + label)}">${ICON_INFO}</button>
+    <div class="nm" title="${esc(label)}">${esc(label)}</div>
+    <div class="sub">${x.p ? t('prodTag') : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>
+    ${x.descr ? `<div class="desc" title="${esc(x.descr)}">${esc(x.descr)}</div>` : ''}
+    <div class="buy">${K.on ? keeperTag(x) : priceTag(x) + (n ? stepper(x, n) : '')}</div>
+  </article>`;
+}
+function renderGrid() {
+  const g = $('#grid');
+  if (!DB.ok) { g.innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; return; }
+  S.list = visible();
+  $('#resCount').textContent = counted('results', S.list.length, S.list);
+  $('#fClear').hidden = !filtered();
+  g.innerHTML = S.list.length ? S.list.slice(0, S.shown).map(x => tile(x)).join('') : `<div class="state">${t('noMatch')}</div>`;
+  $('#more').hidden = S.shown >= S.list.length;
+}
+function showMore() {
+  if (S.shown >= S.list.length) return;
+  $('#grid').insertAdjacentHTML('beforeend', S.list.slice(S.shown, S.shown + PAGE).map(x => tile(x)).join(''));
+  S.shown += PAGE;
+  $('#more').hidden = S.shown >= S.list.length;
+}
+function refreshTile(key) {
+  const g = $('#grid'), sel = `[data-key="${CSS.escape(key)}"]`, el = g.querySelector(sel); if (!el) return;
+  const a = document.activeElement, act = a && el.contains(a) ? a.dataset.act : null;
+  el.outerHTML = tile(DB.byKey.get(key), true);
+  if (act) { const nt = g.querySelector(sel); (nt.querySelector(`[data-act="${act}"]:not(:disabled)`) || nt.querySelector('.pic')).focus({ preventScroll: true }); }
+}
+
+// ---------- the customer's list ----------
+const saveCart = () => store.set('rbshop.cart', S.cart);
+const cartItems = () => Object.entries(S.cart).map(([k, q]) => ({ x: DB.byKey.get(k), q })).filter(i => i.x && i.q > 0);
+function totals(items) {
+  const s = { count: 0, total: 0, priced: 0, unpriced: 0 };
+  items.forEach(({ x, q }) => { s.count += q; if (x.price != null) { s.total += x.price * q; s.priced += q; } else s.unpriced += q; });
+  return s;
+}
+function addOne(key) {
+  const x = DB.byKey.get(key), n = inCart(key); if (!x || x.qty === 0) return;
+  if (n >= (x.qty ?? MAX_COPIES)) return toast(t('maxed', x.qty ?? MAX_COPIES));
+  setQty(key, n + 1);
+  toast(t('added', nameOf(x), n + 1));
+}
+function setQty(key, q) {
+  const x = DB.byKey.get(key); if (!x) return;
+  q = Math.max(0, Math.min(q, x.qty ?? MAX_COPIES));
+  if (q) S.cart[key] = q; else delete S.cart[key];
+  saveCart(); refreshTile(key); renderCart();
+  if (S.detail === key) renderDetail();
+  if ($('#review').open) renderReview();
+}
+function renderCart() {
+  const items = cartItems(), s = totals(items);
+  $('#cartCount').textContent = s.count ? counted('count', s.count, items) : '';
+  $('#lines').innerHTML = items.length ? items.map(({ x, q }) => `<li class="ln" data-key="${esc(x.key)}">
+      ${itemThumb(x, 44)}<div class="t" title="${esc(nameOf(x))}">${esc(nameOf(x))}</div>
+      <div class="amt num">${x.price != null ? money(x.price * q) : `<span class="ask">${t('askPrice')}</span>`}</div>
+      <div class="s">${esc(itemRef(x))}${x.price != null && q > 1 ? ' · ' + money(x.price) + ' ×' + q : ''}</div>
+      ${stepper(x, q)}</li>`).join('') : `<li class="empty">${t('empty')}</li>`;
+  $('#cartTotal').textContent = s.priced ? money(s.total) : s.count ? '—' : money(0);
+  $('#cartUnpriced').hidden = !s.unpriced;
+  $('#cartUnpriced').textContent = counted('toPrice', s.unpriced, items);
+  $('#toReview').disabled = !s.count;
+  $('#clearCart').hidden = !s.count;
+  $('#mbCount').textContent = s.count ? counted('count', s.count, items) : t('myList');
+  $('#mbTotal').textContent = s.count ? (s.priced ? money(s.total) : '') + (s.unpriced ? (s.priced ? ' ' : '') + counted('toPrice', s.unpriced, items) : '') : t('tapCards');
+}
+function openSheet(open) {
+  $('#cart').classList.toggle('open', open); $('#scrim').classList.toggle('open', open);
+  document.body.classList.toggle('lock', open);
+  if (open) $('#cartClose').focus({ preventScroll: true });
+}
+function clearCart() {
+  if (!confirm(t('clearAsk'))) return false;
+  const keys = Object.keys(S.cart); S.cart = {}; saveCart();
+  keys.forEach(refreshTile); renderCart();
+  if (S.detail) renderDetail();
+  return true;
+}
+
+// ---------- review and send ----------
+function orderText() {
+  const items = cartItems(), s = totals(items), L = [`${t('msgTitle')} #${S.ref}`, ''];
+  items.forEach(({ x, q }, i) => {
+    const price = x.price != null ? t('linePrice', money(x.price), money(x.price * q), q) : t('askPrice');
+    L.push(`${i + 1}. ${nameOf(x)}${x.p ? '' : ` (${cardNo(x.c)}${x.note ? ', ' + x.note : ''})`} ×${q} — ${price}`);
+  });
+  L.push('', `${t('msgTotal')}: ${counted('count', s.count, items)}${s.priced ? ' · ' + money(s.total) : ''}${s.unpriced ? ' ' + counted('toPrice', s.unpriced, items) : ''}`);
+  const who = $('#who').value.trim(), note = $('#note').value.trim();
+  if (who) L.push(`${t('msgName')}: ${who}`);
+  if (note) L.push(`${t('msgNote')}: ${note}`);
+  return L.join('\n');
+}
+function renderReview() {
+  const items = cartItems(), s = totals(items);
+  $('#revRef').textContent = '#' + S.ref;
+  $('#revList').innerHTML = items.length ? `<table class="rev"><tbody>${items.map(({ x, q }) => `<tr>
+      <td>${esc(nameOf(x))}<div class="small muted">${esc(itemRef(x))}${x.price != null && q > 1 ? ' · ' + money(x.price) + ' ×' + q : ''}</div></td>
+      <td class="r num">×${q}</td><td class="r num">${x.price != null ? money(x.price * q) : `<span class="ask">${t('askPrice')}</span>`}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><th>${t('total')}</th><th class="r num">${s.count}</th><th class="r num">${s.priced ? money(s.total) : '—'}</th></tr>
+      ${s.unpriced ? `<tr><td colspan="3" class="r small muted">${counted('toPrice', s.unpriced, items)}</td></tr>` : ''}</tfoot></table>`
+    : `<p class="muted">${t('empty')}</p>`;
+  const ready = lineReady(), oa = !!SHOP_CONFIG.lineOA.trim(), add = ready ? ` <a href="${esc(lineAddUrl())}" target="_blank" rel="noopener">${t('addFriend')}</a>` : '';
+  $('#how').innerHTML = !ready ? `<p>${t('notSetup')}</p>`
+    : onPhone ? `<p>${oa ? t('howOA') : esc(t('howId', lineName()))}${add}</p>`
+    : `<div class="qrbox" id="qr" hidden></div><p class="muted">${esc(t('desktop', lineName()))}${add}</p>`;
+  if (ready && !onPhone) loadQr();
+  updateSend();
+}
+function updateSend() {
+  const text = orderText(), ok = lineReady() && cartItems().length > 0, a = $('#sendLine');
+  $('#preview').textContent = text;
+  if (ok) { a.href = lineSendUrl(text); a.removeAttribute('aria-disabled'); }
+  else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); }
+  a.hidden = !onPhone;
+  $('#copyOrder').disabled = !cartItems().length;
+  $('#copyOrder').classList.toggle('primary', !onPhone);
+  const qr = $('#qr');
+  if (qr) {
+    const url = ok && lineSendUrl(text), id = lineName();
+    qr.hidden = !ok || qrState === 'failed' || (qrState !== 'ready' && url.length <= QR_MAX);
+    qr.innerHTML = qr.hidden ? '' : url.length > QR_MAX ? `<p>${t('tooLong')}</p>`
+      : `${qrSvg(url)}<p>${SHOP_CONFIG.lineOA.trim() ? t('scanOA') : esc(t('scanId', id))}</p>`;
+  }
+}
+function openReview() {
+  if (!cartItems().length) return;
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  S.ref = `RB${String(d.getFullYear()).slice(2)}${p(d.getMonth() + 1)}${p(d.getDate())}-${Math.floor(1000 + Math.random() * 9000)}`;
+  $('#who').value = store.get('rbshop.name', '');
+  $('#sent').hidden = true;
+  renderReview();
+  $('#review').showModal();
+}
+async function copyText(s) {
+  try { await navigator.clipboard.writeText(s); return true; } catch {}
+  const ta = Object.assign(document.createElement('textarea'), { value: s, readOnly: true });
+  ta.style.cssText = 'position:fixed;top:0;opacity:0'; document.body.append(ta); ta.select();
+  let ok = false; try { ok = document.execCommand('copy'); } catch {} ta.remove(); return ok;
+}
+
+// ---------- card details ----------
+function openDetail(key) { S.detail = key; renderDetail(); const d = $('#detail'); if (!d.open) d.showModal(); }
+// The row under a card or product: price, version, stock, and the add button (for the shopkeeper, the edit button).
+function dbuy(x) {
+  const n = inCart(x.key);
+  return `<div class="dbuy">
+        ${x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`}
+        ${x.note ? `<b style="color:var(--gold)">${esc(x.note)}</b>` : ''}
+        ${x.qty === 0 ? `<b class="bad-t">${t('soldOut')}</b>` : x.qty > 0 ? `<span class="left">${t('left', x.qty)}</span>` : ''}
+        <span style="margin-left:auto" data-key="${esc(x.key)}">${K.on ? `<button type="button" class="btn primary" data-act="add">${t('kEdit')}</button>`
+          : x.qty === 0 ? '' : n ? stepper(x, n) : `<button type="button" class="btn primary" data-act="add">${t('add')}</button>`}</span>
+      </div>`;
+}
+const shopDesc = x => x.descr ? `<p class="sdesc"><b>${t('eDesc')}</b>${esc(x.descr)}</p>` : '';
+function renderDetail() {
+  const x = DB.byKey.get(S.detail); if (!x) return;
+  const body = $('#detailBody'), close = `<button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button>`;
+  if (x.p) {
+    body.className = 'dlg detail';
+    body.innerHTML = `${close}<div class="big pbig">${x.p.image ? `<img src="${esc(photoUrl(x.p.image))}" alt="${esc(x.p.name)}">` : pthumb(x.p)}</div>
+      <div class="dinfo"><h2>${esc(x.p.name)}</h2><div class="tags"><span>${t('prodTag')}</span></div>${shopDesc(x)}${dbuy(x)}</div>`;
+    return;
+  }
+  const c = x.c, wide = landscape(c);
+  const stats = [[c.e, 'cost'], [c.p, 'power'], [c.m, 'might']].filter(([v]) => v != null).map(([v, k]) => `${t(k)} <b class="num">${v}</b>`);
+  const big = `${DB.imgBase}${c.u}?w=${wide ? 900 : 600}&fm=webp`;  // the card CDN resizes on request
+  body.className = 'dlg detail' + (wide ? ' wide' : '');
+  body.innerHTML = `${close}
+    <div class="big">${thumb(c)}<img src="${esc(big)}" alt="${esc(c.n)}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+    <div class="dinfo">
+      <h2>${esc(c.n)}</h2>
+      <div class="tags"><span>${esc([c.st, c.t].filter(Boolean).join(' '))}</span>${c.d.map(d => `<span class="d"><i style="background:${domColor(d)}"></i>${d}</span>`).join('')}${stats.length ? `<span>${stats.join(' · ')}</span>` : ''}</div>
+      ${c.x ? `<p class="ctext">${esc(readable(c.x))}</p>` : ''}
+      <div class="small muted">${esc(c.r)} · ${cardNo(c)} · ${c.s.map(s => esc(SET_NAMES[s] || s)).join(', ')}</div>
+      ${shopDesc(x)}
+      ${dbuy(x)}
+    </div>`;
+}
+
+// ---------- page ----------
+let toastTimer;
+function toast(msg) { const el = $('#toast'); el.textContent = msg; el.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('on'), 1600); }
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+  document.querySelectorAll('[data-t-ph]').forEach(el => { el.placeholder = t(el.dataset.tPh); });
+  document.querySelectorAll('[data-t-label]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.tLabel)); });
+  document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
+  $('#notSetup').hidden = lineReady();
+  $('#notSetup').innerHTML = t('notSetup');
+}
+// ---------- shopkeeper zone (shop.html#keeper) ----------
+// Sign in with a Riftcheese account (the same accounts and saved sign-in as riftbound-prep.html), then tap a card to set its
+// price and stock. Saves go to the cloud stock through shop_stock_save (supabase/shop.sql), which only shopkeepers may use.
+const SB_LIB = { src: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js', sri: 'sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok' };
+const USER_DOMAIN = 'users.riftprep.app';  // usernames are <name>@this-domain behind the scenes, as in riftbound-prep.html
+const ICON_TRASH = '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// state: 'connecting' | 'out' (signed out) | 'notable' (supabase/shop.sql not run yet) | 'nokeeper' | 'keeper' | 'error' | 'nocloud'
+const K = { on: false, sb: null, starting: false, user: null, state: 'connecting', msg: '', busy: false, lastUser: '' };
+let E = null;  // the card in the stock editor: { c, orig: its notes as saved, rows: [{ note, price, qty }], busy }
+
+function setMode() {
+  K.on = location.hash === '#keeper';
+  document.body.classList.toggle('keeper', K.on);
+  if (K.on) openSheet(false);
+  if (DB.ok) { buildListings(); S.f.stock = DB.stocked && !K.on; S.shown = PAGE; }
+  renderAll();
+  if (K.on) keeperInit();
+}
+async function keeperInit() {
+  if (K.sb || K.starting) return;
+  if (!cloudReady()) { K.state = 'nocloud'; return renderKeeper(); }
+  K.starting = true; K.state = 'connecting'; renderKeeper();
+  try {
+    if (!window.supabase) await loadScript(SB_LIB.src, SB_LIB.sri);
+    K.sb = window.supabase.createClient(SHOP_CONFIG.cloud.url, SHOP_CONFIG.cloud.anonKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'riftprep.auth' } });
+    const { data } = await K.sb.auth.getSession();
+    if (data && data.session) await keeperCheck(data.session.user);
+    else { K.state = 'out'; renderKeeper(); }
+  } catch { K.sb = null; K.state = 'error'; K.msg = t('kOffline'); renderKeeper(); }
+  K.starting = false;
+}
+async function keeperCheck(user) {
+  K.user = user; K.state = 'connecting'; renderKeeper();
+  try {
+    const { data, error } = await K.sb.from('shop_keepers').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (error) throw error;
+    K.state = data ? 'keeper' : 'nokeeper';
+  } catch (e) {
+    K.msg = e.message || String(e);
+    K.state = e.code === 'PGRST205' || e.code === '42P01' || /shop_keepers/.test(K.msg) ? 'notable' : 'error';  // the table isn't there yet
+  }
+  if (K.state === 'keeper' && DB.ok && DB.stock.source !== 'cloud') await reloadStock().catch(() => {});  // it may have only just been made
+  renderAll();
+}
+async function keeperSignIn(username, password) {
+  const u = String(username || '').trim().toLowerCase();
+  if (!u || !password || K.busy) return;
+  K.lastUser = u; K.busy = true; K.msg = ''; renderKeeper();
+  let r;
+  try { r = await K.sb.auth.signInWithPassword({ email: u.includes('@') ? u : `${u}@${USER_DOMAIN}`, password }); }
+  catch (e) { r = { error: e }; }
+  K.busy = false;
+  if (r.error || !r.data || !r.data.session) {
+    const m = (r.error && r.error.message) || '';
+    K.msg = /invalid login|invalid credentials/i.test(m) ? t('kBadLogin') : /rate/i.test(m) ? t('kRate') : t('kFail', m || '?');
+    return renderKeeper();
+  }
+  await keeperCheck(r.data.session.user);
+}
+async function keeperSignOut() {
+  try { await K.sb.auth.signOut(); } catch {}
+  K.user = null; K.state = 'out'; K.msg = ''; renderAll();
+}
+const keeperSql = () => `insert into public.shop_keepers (user_id) select id from auth.users where email = '${String(K.user.email).replace(/'/g, "''")}' on conflict do nothing;`;
+function setupCheck(open) {
+  const st = DB.stock;
+  const src = st.source === 'cloud' ? t('sCloud') : st.source === 'file' ? t('sFile', SHOP_CONFIG.stockFile) : t('sNone');
+  const items = [
+    lineReady() ? esc(t('sLine', lineName())) : `<span class="bad-t">${esc(t('sNoLine'))}</span>`,
+    esc(src) + (st.error ? ` <span class="muted">(${esc(t('sCloudErr', st.error))})</span>` : ''),
+    st.unmatched.length ? `<span class="bad-t">${esc(t('sUnmatched', st.unmatched.length))}</span>: ${esc(st.unmatched.slice(0, 12).join('; '))}${st.unmatched.length > 12 ? '…' : ''}` : '',
+  ].filter(Boolean);
+  return `<details class="setup"${open ? ' open' : ''}><summary>${t('sTitle')}</summary><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul></details>`;
+}
+function renderKeeper() {
+  const el = $('#keeper'); el.hidden = !K.on; if (!K.on) return;
+  const st = K.state, who = K.user ? esc((K.user.user_metadata && K.user.user_metadata.username) || String(K.user.email || '').split('@')[0]) : '';
+  const sig = [st, lang, K.busy, K.msg].join('|');
+  if (st === 'out' && el.dataset.sig === sig && el.querySelector('#kForm')) return;  // don't wipe what's being typed
+  el.dataset.sig = sig;
+  const btn = (k, label) => `<button type="button" class="btn sm" data-k="${k}"${K.busy ? ' disabled' : ''}>${label}</button>`;
+  const signedIn = `<div class="spread"><span>${t('kAs', who)}</span>${btn('out', t('kSignOut'))}</div>`;
+  let body;
+  if (st === 'nocloud') body = `<p>${t('kNoCloud')}</p>`;
+  else if (st === 'connecting') body = `<p class="muted">${t('kConnecting')}</p>`;
+  else if (st === 'error') body = `<p class="bad-t">${esc(K.msg || t('kOffline'))}</p><div class="row">${btn('retry', t('kCheck'))}${K.user ? btn('out', t('kSignOut')) : ''}</div>`;
+  else if (st === 'out') body = `<form class="kform" id="kForm"><p>${t('kSignInHint')}</p>
+      <label class="field"><span>${t('kUser')}</span><input type="text" name="u" value="${esc(K.lastUser)}" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+      <label class="field"><span>${t('kPass')}</span><input type="password" name="p" autocomplete="current-password" required></label>
+      <div class="row"><button class="btn primary"${K.busy ? ' disabled' : ''}>${t(K.busy ? 'kSigningIn' : 'kSignIn')}</button></div>
+      ${K.msg ? `<p class="bad-t small" role="alert">${esc(K.msg)}</p>` : ''}</form>`;
+  else if (st === 'notable') body = `${signedIn}<p>${t('kNoTable')}</p><div class="row">${btn('retry', t('kCheck'))}</div>`;
+  else if (st === 'nokeeper') body = `${signedIn}<p>${t('kNotKeeper')}</p><pre class="sql">${esc(keeperSql())}</pre><div class="row">${btn('copysql', t('kCopy'))}${btn('retry', t('kCheck'))}</div>`;
+  else {
+    const L = DB.listings.filter(x => x.listed);
+    body = `${signedIn}<p class="kstats">${t('kStats', L.length, L.filter(x => x.price != null).length, L.filter(x => x.qty === 0).length)}</p>
+      <p class="muted">${t('kTapHint')}</p>
+      <div class="row"><button type="button" class="btn sm primary" data-k="newprod"${K.busy ? ' disabled' : ''}>${t('kAddProduct')}</button>${btn('export', t('kExport'))}${btn('import', K.busy ? t('kWorking') : t('kImport'))}</div>`;
+  }
+  el.innerHTML = `<div class="kp-head"><h2>${t('kTitle')}</h2><a class="btn link" href="#">${t('kBack')}</a></div>${body}${setupCheck(el.querySelector('.setup')?.open)}`;
+}
+
+// The stock editor: one row per version of the card (normal, Foil…), each with a price and a number of copies.
+const blankRow = () => ({ note: '', price: '', qty: '', descr: '' });
+function openEditor(cardId) {
+  if (K.state !== 'keeper') { toast(t('kSignInFirst')); $('#keeper').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  const c = DB.byId.get(cardId); if (!c) return;
+  const rows = DB.rows.filter(r => r.c.id === c.id);
+  E = { c, orig: rows.map(r => r.note), rows: rows.length ? rows.map(r => ({ note: r.note, price: r.price ?? '', qty: r.qty ?? '', descr: r.descr || '' })) : [blankRow()], busy: false };
+  if ($('#detail').open) $('#detail').close();
+  renderEditor(); $('#editor').showModal();
+}
+function renderEditor() {
+  const c = E.c;
+  $('#edBody').innerHTML = `<div class="dlg-head"><h2 id="edTitle">${t('eTitle')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
+    <div class="ed-card">${thumb(c, 56)}<div><b>${esc(c.n)}</b><div class="small muted">${cardNo(c)} · ${esc(c.r)}</div></div></div>
+    <div class="ed-rows">
+      <div class="ed-h"><span>${t('eNote')}</span><span>${t('ePrice')} (${esc(SHOP_CONFIG.currency)})</span><span>${t('eQty')}</span><span></span></div>
+      ${E.rows.map((r, i) => `<div class="ed-row" data-i="${i}">
+        <input type="text" data-f="note" value="${esc(r.note)}" placeholder="${esc(t('eNotePh'))}" maxlength="40" aria-label="${esc(t('eNote'))}">
+        <input type="text" data-f="price" value="${esc(r.price)}" placeholder="${esc(t('askPrice'))}" inputmode="decimal" aria-label="${esc(t('ePrice'))}">
+        <span class="qty"><button type="button" data-ed="dec" aria-label="${esc(t('less'))}">−</button><input type="text" data-f="qty" value="${esc(r.qty)}" inputmode="numeric" aria-label="${esc(t('eQty'))}"><button type="button" data-ed="inc" aria-label="${esc(t('plus'))}">+</button></span>
+        <button type="button" class="x" data-ed="del" aria-label="${esc(t('eRemove'))}">${ICON_TRASH}</button>
+        <textarea data-f="descr" rows="2" maxlength="1000" placeholder="${esc(t('eDesc') + ' · ' + t('eDescPh'))}" aria-label="${esc(t('eDesc'))}">${esc(r.descr)}</textarea>
+      </div>`).join('')}
+    </div>
+    <div><button type="button" class="btn link" data-ed="add">+ ${t('eAdd')}</button></div>
+    <p class="small muted">${t('eHint')}</p>
+    <div class="ed-foot"><span class="small" id="edMsg" role="status"></span><button type="button" class="btn" data-close>${t('eCancel')}</button><button type="button" class="btn primary" data-ed="save">${t('eSave')}</button></div>`;
+}
+function edMsg(m, bad = true) { const el = $('#edMsg'); if (el) { el.textContent = m; el.className = 'small' + (bad ? ' bad-t' : ''); } }
+async function saveEditor() {
+  if (!E || E.busy) return;
+  const clean = v => String(v ?? '').trim();
+  const rows = E.rows.map(r => ({ note: clean(r.note).slice(0, 40), price: cleanPrice(r.price), qty: clean(r.qty), descr: clean(r.descr).slice(0, 1000) }))
+    .filter(r => r.note || r.price || r.qty || r.descr);  // a cleared row comes off sale
+  if (rows.some(r => r.price && !/^\d+(\.\d{1,2})?$/.test(r.price))) return edMsg(t('eBadPrice'));
+  if (rows.some(r => r.qty && !/^\d+$/.test(r.qty))) return edMsg(t('eBadQty'));
+  const names = rows.map(r => norm(r.note));
+  if (new Set(names).size < names.length) return edMsg(t('eDup'));
+  const id = E.c.id, save = $('#edBody [data-ed="save"]');
+  const changes = rows.map(r => ({ card_id: id, note: r.note, price: r.price ? +r.price : null, qty: r.qty ? +r.qty : null, descr: r.descr }));
+  const removed = E.orig.filter(n => !rows.some(r => r.note === n)).map(note => ({ card_id: id, note }));
+  E.busy = true; save.disabled = true; edMsg(t('eSaving'), false);
+  const err = await saveStock(changes, removed);
+  if (!E) return;  // closed while saving
+  E.busy = false; save.disabled = false;
+  if (err) return edMsg(t('eFail', err));
+  $('#editor').close(); toast(t('eSaved'));
+}
+// Sends changes to the cloud stock, then reloads it. Returns an error message, or '' when saved.
+async function saveStock(changes, removed) {
+  try { const { error } = await K.sb.rpc('shop_stock_save', { changes, removed }); if (error) throw error; }
+  catch (e) { return e.message || String(e); }
+  await reloadStock().catch(() => {});
+  return '';
+}
+
+// CSV in and out, in the same layout as shop/stock.csv, so the stock can be edited in Excel.
+async function importCsv(file) {
+  const rows = csvRows(decodeCsv(await file.arrayBuffer()));
+  const want = new Map(), seen = new Set(); let skipped = 0;  // card id → note (lower case) → row to save
+  rows.forEach(r => {
+    const c = rowCard(r);
+    if (!c) { if (r.listed) skipped++; return; }
+    seen.add(c.id);
+    if (!r.listed) return;
+    if (!want.has(c.id)) want.set(c.id, new Map());
+    const had = DB.rows.find(d => d.c.id === c.id && d.note === r.note);  // a file without a description column keeps the saved ones
+    want.get(c.id).set(norm(r.note), { card_id: c.id, note: r.note.slice(0, 40), price: r.price, qty: r.qty, descr: (r.descr ?? (had ? had.descr : '')).slice(0, 1000) });
+  });
+  const changes = [...want.values()].flatMap(m => [...m.values()]), keep = new Set(changes.map(x => x.card_id + '|' + x.note));
+  // Versions of the cards in the file that the file leaves blank come off sale; cards not in the file stay as they are.
+  const removed = DB.rows.filter(r => seen.has(r.c.id) && !keep.has(r.c.id + '|' + r.note)).map(r => ({ card_id: r.c.id, note: r.note }));
+  if (!changes.length && !removed.length) return alert(t('kImportEmpty'));
+  if (!confirm(t('kImportAsk', changes.length, removed.length, skipped))) return;
+  K.busy = true; renderKeeper();
+  const err = await saveStock(changes, removed);
+  K.busy = false; renderKeeper();
+  if (err) alert(t('eFail', err)); else toast(t('kImported', changes.length));
+}
+function exportCsv() {
+  const cell = v => { const s = String(v ?? ''); return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const by = new Map(); DB.rows.forEach(r => { if (!by.has(r.c.id)) by.set(r.c.id, []); by.get(r.c.id).push(r); });
+  const lines = [['id', 'name', 'set', 'rarity', 'price', 'qty', 'note', 'description']];
+  DB.cards.forEach(c => (by.get(c.id) || [{}]).forEach(r => lines.push([c.id, c.n, c.id.split('-')[0].toUpperCase(), c.r, r.price ?? '', r.qty ?? '', r.note || '', r.descr || ''])));
+  // The BOM makes Excel read it as UTF-8.
+  const url = URL.createObjectURL(new Blob(['﻿' + lines.map(l => l.map(cell).join(',')).join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' }));
+  Object.assign(document.createElement('a'), { href: url, download: 'stock.csv' }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+$('#keeper').addEventListener('submit', e => { e.preventDefault(); keeperSignIn(e.target.u.value, e.target.p.value); });
+$('#keeper').addEventListener('click', async e => {
+  const b = e.target.closest('[data-k]'); if (!b || b.disabled) return;
+  const k = b.dataset.k;
+  if (k === 'out') keeperSignOut();
+  else if (k === 'retry') K.sb && K.user ? keeperCheck(K.user) : keeperInit();
+  else if (k === 'copysql') { if (await copyText(keeperSql())) toast(t('kCopied')); }
+  else if (k === 'export') exportCsv();
+  else if (k === 'import') $('#importFile').click();
+  else if (k === 'newprod') openProductEditor(null);
+});
+$('#importFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) importCsv(f); });
+$('#edBody').addEventListener('input', e => {
+  const row = e.target.closest('[data-i]'), f = e.target.dataset.f;
+  if (E && row && f) E.rows[+row.dataset.i][f] = e.target.value;
+});
+$('#edBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); saveEditor(); } });
+$('#edBody').addEventListener('click', e => {
+  const b = e.target.closest('[data-ed]'); if (!b || !E) return;
+  const row = b.closest('[data-i]'), i = row ? +row.dataset.i : -1, act = b.dataset.ed;
+  if (act === 'dec' || act === 'inc') {
+    const inp = row.querySelector('[data-f="qty"]');
+    inp.value = E.rows[i].qty = String(Math.max(0, (parseInt(inp.value, 10) || 0) + (act === 'inc' ? 1 : -1)));
+  } else if (act === 'del') { E.rows.splice(i, 1); if (!E.rows.length) E.rows.push(blankRow()); renderEditor(); }
+  else if (act === 'add') { E.rows.push(blankRow()); renderEditor(); $(`#edBody [data-i="${E.rows.length - 1}"] [data-f="note"]`).focus(); }
+  else if (act === 'save') saveEditor();
+});
+$('#editor').addEventListener('close', () => { E = null; });
+
+// The product editor: the shopkeeper's own items (boxes, packs, sleeves…) with a photo, price, quantity and description.
+// Photos are shrunk to 1200px JPEGs in the browser and kept in the public "shop" storage bucket (supabase/shop.sql).
+let P = null;  // the product being edited: { id (null for a new one), name, price, qty, descr, image, blob, preview, drop, busy }
+function openProductEditor(id) {
+  if (K.state !== 'keeper') { toast(t('kSignInFirst')); $('#keeper').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  const p = id ? DB.products.find(x => x.id === id) : null;
+  P = { id: p ? p.id : null, name: p ? p.name : '', price: p ? (p.price ?? '') : '', qty: p ? (p.qty ?? '') : '', descr: p ? p.descr : '', image: p ? p.image : '',
+    blob: null, preview: '', drop: false, busy: false };
+  if ($('#detail').open) $('#detail').close();
+  renderProductEditor(); $('#peditor').showModal();
+}
+function renderProductEditor() {
+  const shown = P.preview || (P.image && !P.drop ? photoUrl(P.image) : '');
+  $('#pedBody').innerHTML = `<div class="dlg-head"><h2 id="pedTitle">${t(P.id ? 'pTitle' : 'pTitleNew')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
+    <div class="ped">
+      <div class="ped-photo">
+        <div class="ped-img">${shown ? `<img src="${esc(shown)}" alt="">` : ICON_BOX}</div>
+        <div class="row"><button type="button" class="btn sm" data-pe="photo">${t(shown ? 'pChange' : 'pChoose')}</button>${shown ? `<button type="button" class="btn sm link" data-pe="nophoto">${t('pRemovePhoto')}</button>` : ''}</div>
+      </div>
+      <div class="ped-fields">
+        <label class="field"><span>${t('pName')}</span><input type="text" data-pf="name" value="${esc(P.name)}" maxlength="80" placeholder="${esc(t('pNamePh'))}"></label>
+        <div class="two-num">
+          <label class="field"><span>${t('ePrice')} (${esc(SHOP_CONFIG.currency)})</span><input type="text" data-pf="price" value="${esc(P.price)}" inputmode="decimal" placeholder="${esc(t('askPrice'))}"></label>
+          <div class="field"><span>${t('eQty')}</span><div><span class="qty"><button type="button" data-pe="dec" aria-label="${esc(t('less'))}">−</button><input type="text" data-pf="qty" value="${esc(P.qty)}" inputmode="numeric" aria-label="${esc(t('eQty'))}"><button type="button" data-pe="inc" aria-label="${esc(t('plus'))}">+</button></span></div></div>
+        </div>
+        <label class="field"><span>${t('eDesc')}</span><textarea data-pf="descr" rows="4" maxlength="1000" placeholder="${esc(t('eDescPh'))}">${esc(P.descr)}</textarea></label>
+      </div>
+    </div>
+    <p class="small muted">${t('pHint')}</p>
+    <div class="ed-foot">${P.id ? `<button type="button" class="btn sm danger" data-pe="delete">${t('pDelete')}</button>` : ''}<span class="small" id="pedMsg" role="status"></span><button type="button" class="btn" data-close>${t('eCancel')}</button><button type="button" class="btn primary" data-pe="save">${t('eSave')}</button></div>`;
+}
+function pedMsg(m, bad = true) { const el = $('#pedMsg'); if (el) { el.textContent = m; el.className = 'small' + (bad ? ' bad-t' : ''); } }
+async function shrinkPhoto(file, max = 1200) {
+  const img = await createImageBitmap(file);
+  const s = Math.min(1, max / Math.max(img.width, img.height)), w = Math.round(img.width * s), h = Math.round(img.height * s);
+  const cv = Object.assign(document.createElement('canvas'), { width: w, height: h }), g = cv.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);  // JPEG has no transparency: see-through parts of a PNG turn white, not black
+  g.drawImage(img, 0, 0, w, h);
+  return new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error('encode')), 'image/jpeg', 0.85));
+}
+async function saveProduct() {
+  const cur = P; if (!cur || cur.busy) return;
+  const name = cur.name.trim().slice(0, 80), price = cleanPrice(cur.price), qty = String(cur.qty ?? '').trim();
+  if (!name) return pedMsg(t('pNeedName'));
+  if (price && !/^\d+(\.\d{1,2})?$/.test(price)) return pedMsg(t('eBadPrice'));
+  if (qty && !/^\d+$/.test(qty)) return pedMsg(t('eBadQty'));
+  const save = $('#pedBody [data-pe="save"]'), bucket = K.sb.storage.from(PRODUCT_BUCKET);
+  cur.busy = true; save.disabled = true; pedMsg(t('eSaving'), false);
+  let image = cur.drop ? '' : cur.image, uploaded = '';
+  try {
+    if (cur.blob) {  // a new file name each time, so nobody is shown an old cached photo
+      uploaded = `products/${crypto.randomUUID()}.jpg`;
+      const up = await bucket.upload(uploaded, cur.blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+      if (up.error) throw up.error;
+      image = uploaded;
+    }
+    const row = { name, price: price ? +price : null, qty: qty ? +qty : null, descr: cur.descr.trim().slice(0, 1000), image, updated_at: new Date().toISOString() };
+    const res = cur.id ? await K.sb.from('shop_products').update(row).eq('id', cur.id).select('id') : await K.sb.from('shop_products').insert(row).select('id');
+    if (res.error) throw res.error;
+    if (!res.data || !res.data.length) throw new Error('not allowed');  // the access rules let nothing through
+  } catch (e) {
+    if (uploaded) bucket.remove([uploaded]).catch(() => {});
+    cur.busy = false; save.disabled = false; pedMsg(t('eFail', e.message || String(e)));
+    return;
+  }
+  if (cur.image && cur.image !== image) bucket.remove([cur.image]).catch(() => {});  // the photo it replaced
+  await reloadStock().catch(() => {});
+  if (P === cur) $('#peditor').close();
+  toast(t('eSaved'));
+}
+async function deleteProduct() {
+  const cur = P; if (!cur || cur.busy || !cur.id || !confirm(t('pDeleteAsk', cur.name || t('prodTag')))) return;
+  cur.busy = true; pedMsg(t('eSaving'), false);
+  const res = await K.sb.from('shop_products').delete().eq('id', cur.id).select('id').then(r => r, e => ({ error: e }));
+  if (res.error || !res.data || !res.data.length) { cur.busy = false; return pedMsg(t('eFail', (res.error && res.error.message) || 'not allowed')); }
+  if (cur.image) K.sb.storage.from(PRODUCT_BUCKET).remove([cur.image]).catch(() => {});
+  await reloadStock().catch(() => {});
+  if (P === cur) $('#peditor').close();
+  toast(t('pDeleted'));
+}
+$('#photoFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f || !P) return;
+  try {
+    const blob = await shrinkPhoto(f); if (!P) return;
+    if (P.preview) URL.revokeObjectURL(P.preview);
+    Object.assign(P, { blob, preview: URL.createObjectURL(blob), drop: false }); renderProductEditor();
+  } catch (err) { pedMsg(t('pPhotoFail', err.message || String(err))); }
+});
+$('#pedBody').addEventListener('input', e => { const f = e.target.dataset.pf; if (P && f) P[f] = e.target.value; });
+$('#pedBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); saveProduct(); } });
+$('#pedBody').addEventListener('click', e => {
+  const b = e.target.closest('[data-pe]'); if (!b || !P) return;
+  const act = b.dataset.pe;
+  if (act === 'photo') $('#photoFile').click();
+  else if (act === 'nophoto') { if (P.preview) URL.revokeObjectURL(P.preview); Object.assign(P, { blob: null, preview: '', drop: true }); renderProductEditor(); }
+  else if (act === 'dec' || act === 'inc') { const inp = $('#pedBody [data-pf="qty"]'); inp.value = P.qty = String(Math.max(0, (parseInt(inp.value, 10) || 0) + (act === 'inc' ? 1 : -1))); }
+  else if (act === 'save') saveProduct();
+  else if (act === 'delete') deleteProduct();
+});
+$('#peditor').addEventListener('close', () => { if (P && P.preview) URL.revokeObjectURL(P.preview); P = null; });
+
+
+function renderAll() {
+  $('#shopName').textContent = SHOP_CONFIG.name;
+  document.title = SHOP_CONFIG.name;
+  const af = $('#addFriend'); af.hidden = !lineReady(); if (lineReady()) af.href = lineAddUrl();
+  applyLang();
+  if (DB.ok) renderFilters();
+  $('#filters').hidden = !DB.ok;
+  renderKeeper(); renderGrid(); renderCart();
+  if (S.detail && $('#detail').open) renderDetail();
+  if ($('#review').open) renderReview();
+}
+const setHead = () => document.documentElement.style.setProperty('--head', $('#top').offsetHeight + 'px');
+
+// events
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const key = b.closest('[data-key]')?.dataset.key; if (!key) return;
+  const act = b.dataset.act;
+  if (act === 'info') openDetail(key);
+  else if (K.on && act === 'add') { const x = DB.byKey.get(key); if (x) x.p ? openProductEditor(x.p.id) : openEditor(x.c.id); }
+  else if (act === 'add' || act === 'inc') addOne(key);
+  else if (act === 'dec') setQty(key, inCart(key) - 1);
+});
+document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; store.set('rbshop.lang', lang); renderAll(); }));
+let qTimer;
+$('#fQ').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.f.q = e.target.value; S.shown = PAGE; renderGrid(); }, 120); });
+[['#fSet', 'set'], ['#fType', 'type'], ['#fRar', 'rar'], ['#fSort', 'sort']].forEach(([id, k]) => $(id).addEventListener('change', e => { S.f[k] = e.target.value; S.shown = PAGE; renderGrid(); }));
+$('#fStock').addEventListener('change', e => { S.f.stock = e.target.checked; S.shown = PAGE; renderGrid(); });
+$('#fDoms').addEventListener('click', e => {
+  const b = e.target.closest('[data-dom]'); if (!b) return;
+  const d = b.dataset.dom; S.f.dom.has(d) ? S.f.dom.delete(d) : S.f.dom.add(d);
+  b.setAttribute('aria-pressed', S.f.dom.has(d)); S.shown = PAGE; renderGrid();
+});
+$('#fClear').addEventListener('click', () => { S.f = defaults(); S.shown = PAGE; renderFilters(); renderGrid(); });
+$('#more').addEventListener('click', showMore);
+new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) showMore(); }, { rootMargin: '800px 0px' }).observe($('#more'));
+$('#mbOpen').addEventListener('click', () => openSheet(true));
+$('#cartClose').addEventListener('click', () => openSheet(false));
+$('#scrim').addEventListener('click', () => openSheet(false));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#cart').classList.contains('open') && !document.querySelector('dialog[open]')) openSheet(false); });
+$('#toReview').addEventListener('click', openReview);
+$('#clearCart').addEventListener('click', clearCart);
+$('#sentClear').addEventListener('click', () => { if (clearCart()) { $('#review').close(); openSheet(false); } });
+$('#who').addEventListener('input', e => { store.set('rbshop.name', e.target.value.trim()); updateSend(); });
+$('#note').addEventListener('input', updateSend);
+$('#sendLine').addEventListener('click', e => {
+  if (!lineReady() || !cartItems().length) { e.preventDefault(); return; }
+  const text = orderText(); e.currentTarget.href = lineSendUrl(text);
+  copyText(text);  // a backup in case LINE opens without the text: it can be pasted
+  $('#sent').hidden = false;
+});
+$('#copyOrder').addEventListener('click', async () => { if (await copyText(orderText())) { toast(t('copied')); $('#sent').hidden = false; } });
+document.querySelectorAll('dialog').forEach(d => {
+  d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+  d.addEventListener('close', () => { if (d.id === 'detail') S.detail = null; });
+});
+addEventListener('hashchange', setMode);
+addEventListener('resize', setHead);
+setHead();
+setMode();
+load();
+</script>
+</body>
+</html>
