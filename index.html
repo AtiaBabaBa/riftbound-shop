@@ -233,6 +233,15 @@ details.pv pre { margin: 8px 0 0; padding: 10px 12px; background: var(--panel-2)
 .ctext { font-size: 14.5px; line-height: 1.55; background: var(--panel-2); border-radius: 6px; padding: 10px 12px; }
 .sdesc { font-size: 14.5px; line-height: 1.55; white-space: pre-line; border-left: 3px solid var(--gold); padding: 2px 0 2px 10px; }
 .sdesc b { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.deck { display: grid; gap: 10px; }
+.deck-h { font-size: 15px; }
+.deck-t { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.deck ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px 12px; }
+.deck li { display: flex; align-items: center; gap: 8px; font-size: 13.5px; min-width: 0; }
+.deck li .cimg { border-radius: 3px; }
+.deck li .num { min-width: 14px; text-align: right; font-weight: 600; flex: none; }
+.deck li span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.deck li.miss span:last-child { color: var(--muted); font-style: italic; }
 .pbig img { position: static; opacity: 1; width: 100%; height: auto; max-height: 70vh; object-fit: contain; border-radius: 8px; display: block; background: var(--panel-2); }
 .dbuy { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 12px; }
 .dbuy .price { font-size: 20px; }
@@ -436,6 +445,10 @@ const LANG = {
     pChoose: 'Choose a photo', pChange: 'Change photo', pRemovePhoto: 'Remove photo', pDelete: 'Delete product',
     pDeleteAsk: n => `Delete ${n} from the shop?`, pDeleted: 'Product deleted', pNeedName: 'Give the product a name.',
     pPhotoFail: m => `Couldn’t use this photo: ${m}`, pHint: 'No price shows Ask price. Quantity 0 shows Sold out; blank shows no number.',
+    deckTag: n => `Deck · ${n} cards`, deckList: n => `Deck list · ${n} cards`, pDeck: 'Deck list (for decks)',
+    pDeckPh: 'Paste the deck list, one card per line:\nLegend:\n1 Kai\'Sa, Daughter of the Void [OGN-247]\nMain Deck:\n3 Falling Star [OGN-029]',
+    pDeckCount: (n, bad) => `${n} cards` + (bad ? ` · ${bad === 1 ? '1 line matches' : bad + ' lines match'} no card` : ''),
+    pDeckHint: 'Customers see every card in the deck with its picture. Without a photo, the Legend is the deck’s picture.',
     eDesc: 'Description', eDescPh: 'Optional: condition, language, what’s included…',
     kExport: 'Download as CSV', kImport: 'Import CSV', kWorking: 'Saving…',
     kImportAsk: (a, d, u) => `Save ${a} listed row${a === 1 ? '' : 's'} from this file?` + (d ? ` ${d} version${d === 1 ? '' : 's'} left blank in the file will be taken off sale.` : '') + (u ? ` ${u === 1 ? '1 row matches' : u + ' rows match'} no card and will be skipped.` : ''),
@@ -498,6 +511,10 @@ const LANG = {
     pChoose: 'เลือกรูป', pChange: 'เปลี่ยนรูป', pRemovePhoto: 'ลบรูป', pDelete: 'ลบสินค้า',
     pDeleteAsk: n => `ลบ ${n} ออกจากร้านใช่ไหม`, pDeleted: 'ลบสินค้าแล้ว', pNeedName: 'ใส่ชื่อสินค้าก่อน',
     pPhotoFail: m => `ใช้รูปนี้ไม่ได้: ${m}`, pHint: 'ไม่ใส่ราคาจะแสดงว่า สอบถามราคา จำนวน 0 แสดงว่า หมด เว้นว่างจะไม่แสดงจำนวน',
+    deckTag: n => `เด็ค · ${n} ใบ`, deckList: n => `การ์ดในเด็ค · ${n} ใบ`, pDeck: 'รายการการ์ดในเด็ค (สำหรับเด็ค)',
+    pDeckPh: 'วางรายการเด็ค บรรทัดละหนึ่งการ์ด:\nLegend:\n1 Kai\'Sa, Daughter of the Void [OGN-247]\nMain Deck:\n3 Falling Star [OGN-029]',
+    pDeckCount: (n, bad) => `${n} ใบ` + (bad ? ` · ${bad} บรรทัดไม่ตรงกับการ์ดใบใด` : ''),
+    pDeckHint: 'ลูกค้าจะเห็นการ์ดทุกใบในเด็คพร้อมรูป ถ้าไม่ใส่รูป จะใช้รูป Legend เป็นรูปของเด็ค',
     eDesc: 'รายละเอียด', eDescPh: 'ไม่บังคับ: สภาพ ภาษา สิ่งที่ได้รับ…',
     kExport: 'ดาวน์โหลดเป็น CSV', kImport: 'นำเข้า CSV', kWorking: 'กำลังบันทึก…',
     kImportAsk: (a, d, u) => `บันทึก ${a} แถวที่ลงขายจากไฟล์นี้ใช่ไหม` + (d ? ` อีก ${d} เวอร์ชันที่เว้นว่างในไฟล์จะถูกนำออกจากการขาย` : '') + (u ? ` มี ${u} แถวที่ไม่ตรงกับการ์ดใบใดและจะถูกข้าม` : ''),
@@ -557,11 +574,31 @@ function thumb(c, w = 0) {
 const landscape = c => { const sh = DB.sheets[c.im[0]]; return sh.w > sh.h; };
 // Listings are cards (x.c) or the shopkeeper's own products (x.p); these read either.
 const nameOf = x => x.p ? x.p.name : x.c.n;
-const itemRef = x => x.p ? t('prodTag') : cardNo(x.c) + (x.note ? ' · ' + x.note : '');
+const prodTag = p => p.list.length ? t('deckTag', deckSize(p.list)) : t('prodTag');
+const itemRef = x => x.p ? prodTag(x.p) : cardNo(x.c) + (x.note ? ' · ' + x.note : '');
 const ICON_BOX = '<svg width="40%" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5zM3 7.5 12 12l9-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
 const photoUrl = path => `${SHOP_CONFIG.cloud.url}/storage/v1/object/public/${PRODUCT_BUCKET}/${path.split('/').map(encodeURIComponent).join('/')}`;
-// A product's photo (or a drawn box when it has none) in a card-shaped frame. w = 0 fills the container's width.
+// A deck list in the usual one-card-per-line form: section headings ("Legend:", "Main Deck:"…) and lines like
+// "3 Falling Star [OGN-029]". Cards are found by their number, else by name; lines that match no card are kept (c: null).
+const DECK_SECTIONS = { legend: 'Legend', champion: 'Champion', 'chosen champion': 'Champion', 'main deck': 'Main Deck', main: 'Main Deck',
+  battlefield: 'Battlefields', battlefields: 'Battlefields', rune: 'Runes', runes: 'Runes', sideboard: 'Sideboard' };
+function parseDeck(text) {
+  const out = []; let section = '';
+  String(text || '').split(/\r?\n/).forEach(raw => {
+    const ln = raw.trim(), head = DECK_SECTIONS[norm(ln.replace(/:$/, ''))];
+    if (head) { section = head; return; }
+    const m = ln.match(/^(\d+)\s*x?\s+(.+?)(?:\s*\[([A-Za-z]+)[-\s]?(\w+)\])?$/i); if (!m) return;
+    const [, q, name, set, no] = m;
+    const c = (set && DB.byNo.get(`${set.toLowerCase()}-${no.toLowerCase().replace(/^\d+/, d => d.padStart(3, '0'))}`)) || DB.byName.get(cardKey(name)) || null;
+    out.push({ section, qty: +q, name: c ? c.n : name, c });
+  });
+  return out;
+}
+const deckSize = list => list.reduce((a, l) => a + l.qty, 0);
+const deckCover = list => (list.find(l => l.c && l.section === 'Legend') || list.find(l => l.c && l.section === 'Champion') || list.find(l => l.c) || {}).c || null;
+// A product's photo in a card-shaped frame; a deck without one shows its Legend, anything else a drawn box. w = 0 fills the container's width.
 function pthumb(p, w = 0) {
+  if (!p.image && p.cover) return thumb(p.cover, w);
   const size = w ? `width:${w}px;height:${Math.round(w * 279 / 200)}px` : 'width:100%;aspect-ratio:200/279';
   return `<span class="cimg pimg" style="${size}" aria-hidden="true">${p.image ? `<img src="${esc(photoUrl(p.image))}" alt="" loading="lazy">` : ICON_BOX}</span>`;
 }
@@ -612,7 +649,7 @@ function qrSvg(text) {
 // (normal and foil). Its key is the card id, plus the note for extra versions, so lists survive price changes.
 // rows are the stock rows that match a card: { c, price, qty, note, descr }; products are the shopkeeper's own items.
 // stock.source is 'cloud', 'file' or 'none'.
-const DB = { ok: false, failed: false, sheets: [], imgBase: '', cards: [], byId: new Map(), byName: new Map(), rows: [], products: [],
+const DB = { ok: false, failed: false, sheets: [], imgBase: '', cards: [], byId: new Map(), byName: new Map(), byNo: new Map(), rows: [], products: [],
   listings: [], byKey: new Map(), stocked: false, stock: { source: '', error: '', unmatched: [] } };
 const S = { cart: store.get('rbshop.cart', {}), f: { q: '', set: '', type: '', rar: '', dom: new Set(), stock: false, sort: 'num' }, list: [], shown: PAGE, ref: '', detail: null };
 
@@ -676,12 +713,12 @@ async function loadStock() {
     try {
       const [rows, products] = await Promise.all([
         fetchTable('shop_stock', 'card_id,note,price,qty,descr', 'card_id,note'),
-        fetchTable('shop_products', 'id,name,price,qty,descr,image,sort', 'sort,created_at.desc'),
+        fetchTable('shop_products', '*', 'sort,created_at.desc'),  // every column, so a database without the deck column yet still works
       ]);
       DB.stock.source = 'cloud';
       return {
         rows: rows.map(x => ({ id: x.card_id, name: '', price: numOrNull(x.price), qty: x.qty, note: x.note || '', descr: x.descr || '', line: 0, listed: true })),
-        products: products.map(x => ({ id: x.id, name: x.name, price: numOrNull(x.price), qty: x.qty, descr: x.descr || '', image: x.image || '', sort: x.sort || 0 })),
+        products: products.map(x => ({ id: x.id, name: x.name, price: numOrNull(x.price), qty: x.qty, descr: x.descr || '', image: x.image || '', sort: x.sort || 0, deck: x.deck || '' })),
       };
     } catch (e) { DB.stock.error = e.message || String(e); }
   }
@@ -691,6 +728,7 @@ async function loadStock() {
 }
 function setStock({ rows, products }) {
   DB.rows = []; DB.stock.unmatched = []; DB.products = products;
+  products.forEach(p => { p.list = parseDeck(p.deck); p.cover = deckCover(p.list); });
   rows.forEach(r => {
     if (!r.listed) return;  // a blank row: not on sale
     const c = rowCard(r);
@@ -723,6 +761,7 @@ async function load() {
     const alias = new Set(legends.filter(c => !c.k.includes(' - ') && legends.some(x => x.k.endsWith(' - ' + c.k))).map(c => c.k));
     DB.cards = j.cards.filter(c => c.im && !alias.has(c.k)).sort(byRank);
     DB.byId = new Map(DB.cards.map(c => [c.id, c])); DB.byName = new Map(DB.cards.map(c => [c.k, c]));
+    DB.byNo = new Map(DB.cards.map(c => [c.id.split('-').slice(0, 2).join('-'), c])); // "ogn-029", as deck lists write it
     setStock(stock);
     // Drop cards the shop no longer lists from a saved list, and keep within the stock.
     Object.keys(S.cart).forEach(k => { const x = DB.byKey.get(k), q = Math.min(S.cart[k] | 0, x ? x.qty ?? MAX_COPIES : 0); if (q > 0) S.cart[k] = q; else delete S.cart[k]; });
@@ -741,7 +780,7 @@ function hasText(x, q) {
   const words = norm(q).replace(/[\[\]]/g, '').split(' ').filter(Boolean);
   let h = searchText.get(x);
   if (h == null) {
-    const c = x.c, parts = x.p ? [x.p.name, x.descr] : [c.n, c.id, cardNo(c), c.st, c.t, ...c.d, ...(c.g || []), readable(c.x), x.note, x.descr];
+    const c = x.c, parts = x.p ? [x.p.name, x.descr, ...x.p.list.map(l => l.name)] : [c.n, c.id, cardNo(c), c.st, c.t, ...c.d, ...(c.g || []), readable(c.x), x.note, x.descr];
     h = norm(parts.join(' ').replace(/[\[\]]/g, '')); searchText.set(x, h);
   }
   return words.every(w => h.includes(w));
@@ -805,7 +844,7 @@ function tile(x, pop = false) {
     </button>
     <button type="button" class="info" data-act="info" aria-label="${esc(t('details') + ': ' + label)}">${ICON_INFO}</button>
     <div class="nm" title="${esc(label)}">${esc(label)}</div>
-    <div class="sub">${x.p ? t('prodTag') : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>
+    <div class="sub">${x.p ? prodTag(x.p) : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>
     ${x.descr ? `<div class="desc" title="${esc(x.descr)}">${esc(x.descr)}</div>` : ''}
     <div class="buy">${K.on ? keeperTag(x) : priceTag(x) + (n ? stepper(x, n) : '')}</div>
   </article>`;
@@ -957,6 +996,15 @@ function dbuy(x) {
           : x.qty === 0 ? '' : n ? stepper(x, n) : `<button type="button" class="btn primary" data-act="add">${t('add')}</button>`}</span>
       </div>`;
 }
+// A deck's cards by section, each with a small picture.
+function deckList(list) {
+  if (!list.length) return '';
+  const groups = [];
+  list.forEach(l => { let g = groups.find(x => x.name === l.section); if (!g) groups.push(g = { name: l.section, lines: [] }); g.lines.push(l); });
+  return `<div class="deck"><b class="deck-h">${t('deckList', deckSize(list))}</b>${groups.map(g => `<div>
+    ${g.name ? `<div class="deck-t">${esc(g.name)} · ${deckSize(g.lines)}</div>` : ''}
+    <ul>${g.lines.map(l => `<li${l.c ? '' : ' class="miss"'}>${l.c ? thumb(l.c, 26) : '<span class="cimg blank" style="width:26px;height:36px"></span>'}<span class="num">${l.qty}</span><span title="${esc(l.name)}">${esc(l.name)}</span></li>`).join('')}</ul></div>`).join('')}</div>`;
+}
 const shopDesc = x => x.descr ? `<p class="sdesc"><b>${t('eDesc')}</b>${esc(x.descr)}</p>` : '';
 function renderDetail() {
   const x = DB.byKey.get(S.detail); if (!x) return;
@@ -964,7 +1012,7 @@ function renderDetail() {
   if (x.p) {
     body.className = 'dlg detail';
     body.innerHTML = `${close}<div class="big pbig">${x.p.image ? `<img src="${esc(photoUrl(x.p.image))}" alt="${esc(x.p.name)}">` : pthumb(x.p)}</div>
-      <div class="dinfo"><h2>${esc(x.p.name)}</h2><div class="tags"><span>${t('prodTag')}</span></div>${shopDesc(x)}${dbuy(x)}</div>`;
+      <div class="dinfo"><h2>${esc(x.p.name)}</h2><div class="tags"><span>${prodTag(x.p)}</span></div>${shopDesc(x)}${dbuy(x)}${deckList(x.p.list)}</div>`;
     return;
   }
   const c = x.c, wide = landscape(c);
@@ -1214,7 +1262,7 @@ $('#edBody').addEventListener('click', e => {
   else if (act === 'add') { E.rows.push(blankRow()); renderEditor(); $(`#edBody [data-i="${E.rows.length - 1}"] [data-f="note"]`).focus(); }
   else if (act === 'save') saveEditor();
 });
-$('#editor').addEventListener('close', () => { E = null; });
+$('#editor').addEventListener('close', () => { if (!$('#editor').open) E = null; });  // the close event can land after it was opened again
 
 // The product editor: the shopkeeper's own items (boxes, packs, sleeves…) with a photo, price, quantity and description.
 // Photos are shrunk to 1200px JPEGs in the browser and kept in the public "shop" storage bucket (supabase/shop.sql).
@@ -1223,6 +1271,7 @@ function openProductEditor(id) {
   if (K.state !== 'keeper') { toast(t('kSignInFirst')); $('#keeper').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   const p = id ? DB.products.find(x => x.id === id) : null;
   P = { id: p ? p.id : null, name: p ? p.name : '', price: p ? (p.price ?? '') : '', qty: p ? (p.qty ?? '') : '', descr: p ? p.descr : '', image: p ? p.image : '',
+    deck: p ? p.deck : '', hadDeck: !!(p && p.deck),
     blob: null, preview: '', drop: false, busy: false };
   if ($('#detail').open) $('#detail').close();
   renderProductEditor(); $('#peditor').showModal();
@@ -1232,7 +1281,7 @@ function renderProductEditor() {
   $('#pedBody').innerHTML = `<div class="dlg-head"><h2 id="pedTitle">${t(P.id ? 'pTitle' : 'pTitleNew')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
     <div class="ped">
       <div class="ped-photo">
-        <div class="ped-img">${shown ? `<img src="${esc(shown)}" alt="">` : ICON_BOX}</div>
+        <div class="ped-img">${pedPicture(shown)}</div>
         <div class="row"><button type="button" class="btn sm" data-pe="photo">${t(shown ? 'pChange' : 'pChoose')}</button>${shown ? `<button type="button" class="btn sm link" data-pe="nophoto">${t('pRemovePhoto')}</button>` : ''}</div>
       </div>
       <div class="ped-fields">
@@ -1242,10 +1291,22 @@ function renderProductEditor() {
           <div class="field"><span>${t('eQty')}</span><div><span class="qty"><button type="button" data-pe="dec" aria-label="${esc(t('less'))}">−</button><input type="text" data-pf="qty" value="${esc(P.qty)}" inputmode="numeric" aria-label="${esc(t('eQty'))}"><button type="button" data-pe="inc" aria-label="${esc(t('plus'))}">+</button></span></div></div>
         </div>
         <label class="field"><span>${t('eDesc')}</span><textarea data-pf="descr" rows="4" maxlength="1000" placeholder="${esc(t('eDescPh'))}">${esc(P.descr)}</textarea></label>
+        <label class="field"><span>${t('pDeck')}</span><textarea data-pf="deck" rows="5" maxlength="4000" placeholder="${esc(t('pDeckPh'))}" spellcheck="false">${esc(P.deck)}</textarea></label>
+        <div class="small muted" id="pedDeck">${deckCount()}</div>
       </div>
     </div>
     <p class="small muted">${t('pHint')}</p>
     <div class="ed-foot">${P.id ? `<button type="button" class="btn sm danger" data-pe="delete">${t('pDelete')}</button>` : ''}<span class="small" id="pedMsg" role="status"></span><button type="button" class="btn" data-close>${t('eCancel')}</button><button type="button" class="btn primary" data-pe="save">${t('eSave')}</button></div>`;
+}
+// The picture in the product editor: the photo, else a deck's Legend, else a drawn box.
+function pedPicture(shown) {
+  if (shown) return `<img src="${esc(shown)}" alt="">`;
+  const cover = deckCover(parseDeck(P.deck));
+  return cover ? thumb(cover) : ICON_BOX;
+}
+function deckCount() {
+  const list = parseDeck(P.deck);
+  return list.length ? esc(t('pDeckCount', deckSize(list), list.filter(l => !l.c).length)) + ' · ' + t('pDeckHint') : '';
 }
 function pedMsg(m, bad = true) { const el = $('#pedMsg'); if (el) { el.textContent = m; el.className = 'small' + (bad ? ' bad-t' : ''); } }
 async function shrinkPhoto(file, max = 1200) {
@@ -1273,6 +1334,7 @@ async function saveProduct() {
       image = uploaded;
     }
     const row = { name, price: price ? +price : null, qty: qty ? +qty : null, descr: cur.descr.trim().slice(0, 1000), image, updated_at: new Date().toISOString() };
+    if (cur.deck.trim() || cur.hadDeck) row.deck = cur.deck.trim().slice(0, 4000);  // only sent when used, so saving works before the deck column exists
     const res = cur.id ? await K.sb.from('shop_products').update(row).eq('id', cur.id).select('id') : await K.sb.from('shop_products').insert(row).select('id');
     if (res.error) throw res.error;
     if (!res.data || !res.data.length) throw new Error('not allowed');  // the access rules let nothing through
@@ -1304,7 +1366,14 @@ $('#photoFile').addEventListener('change', async e => {
     Object.assign(P, { blob, preview: URL.createObjectURL(blob), drop: false }); renderProductEditor();
   } catch (err) { pedMsg(t('pPhotoFail', err.message || String(err))); }
 });
-$('#pedBody').addEventListener('input', e => { const f = e.target.dataset.pf; if (P && f) P[f] = e.target.value; });
+$('#pedBody').addEventListener('input', e => {
+  const f = e.target.dataset.pf; if (!P || !f) return;
+  P[f] = e.target.value;
+  if (f === 'deck') {
+    $('#pedDeck').innerHTML = deckCount();
+    if (!P.preview && (!P.image || P.drop)) $('#pedBody .ped-img').innerHTML = pedPicture('');
+  }
+});
 $('#pedBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); saveProduct(); } });
 $('#pedBody').addEventListener('click', e => {
   const b = e.target.closest('[data-pe]'); if (!b || !P) return;
@@ -1315,7 +1384,7 @@ $('#pedBody').addEventListener('click', e => {
   else if (act === 'save') saveProduct();
   else if (act === 'delete') deleteProduct();
 });
-$('#peditor').addEventListener('close', () => { if (P && P.preview) URL.revokeObjectURL(P.preview); P = null; });
+$('#peditor').addEventListener('close', () => { if ($('#peditor').open) return; if (P && P.preview) URL.revokeObjectURL(P.preview); P = null; });
 
 
 function renderAll() {

@@ -14,7 +14,7 @@ create table if not exists public.shop_stock (
 );
 alter table public.shop_stock add column if not exists descr text not null default '' check (char_length(descr) <= 1000);
 
--- The shopkeeper's own products (booster boxes, packs, sleeves…). image is a path in the "shop" storage bucket, or ''.
+-- The shopkeeper's own products (decks, booster boxes, packs, sleeves…). image is a path in the "shop" storage bucket, or ''.
 create table if not exists public.shop_products (
   id         uuid primary key default gen_random_uuid(),
   name       text not null check (char_length(name) between 1 and 80),
@@ -26,6 +26,8 @@ create table if not exists public.shop_products (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+-- For decks: the deck list, one card per line ("3 Falling Star [OGN-029]" under "Legend:", "Main Deck:"… headings).
+alter table public.shop_products add column if not exists deck text not null default '' check (char_length(deck) <= 4000);
 
 -- Accounts allowed to change the shop. Nobody can add themselves: rows are added here in the SQL Editor.
 create table if not exists public.shop_keepers (
