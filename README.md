@@ -42,6 +42,19 @@ In the shopkeeper zone, changes are saved straight away and show in the shop for
 
 Customers see only what you've listed: anything with a price, quantity, version name or description. Something with quantity `0` stays in the shop as *Sold out*; to hide it, clear its row (cards) or delete it (products). In the shopkeeper zone every card shows, so you can find new ones to list; tick *Listed only* to see just yours. Set `showAllCards: true` in `SHOP_CONFIG` to let customers also ask about unlisted cards. The *Setup check* at the bottom of the shopkeeper zone shows which LINE account orders go to and where the stock is read from.
 
+## TCGplayer price comparison
+
+Cards and decks show what the same cards cost on TCGplayer, in baht, so customers can see the shop is cheaper:
+
+- **Tiles:** under the price, e.g. `TCGplayer ฿6,465 · Save 26%`, shown where the shop is cheaper. In the shopkeeper zone every tile shows its TCGplayer price, as a pricing guide.
+- **Details:** the TCGplayer price, what the customer saves, the date of the prices and the exchange rate used.
+- **The list:** "You save ฿… compared with TCGplayer" for everything in it that has a price on both.
+- **Shopkeeper editors:** the card editor shows the card's TCGplayer price (normal, alternate art, overnumbered…), and the deck editor shows the TCGplayer value of the pasted list.
+
+A card is compared with its own printing: the version name picks it (`Alt Art` → TCGplayer's Alternate Art, also `Overnumbered`, `Signature`, `Metal`; `Normal`, `Foil` or blank → the plain card, foil price for `Foil`). A version TCGplayer doesn't sell (e.g. a Chinese-only alt art) shows no comparison. A deck counts every card in its list at that card's cheapest printing on TCGplayer.
+
+Prices are TCGplayer market prices in US dollars with the dollar-to-baht rate, from [Riftcheese's `cards/prices.json`](https://atiabababa.github.io/riftcheese/cards/prices.json), which a GitHub Action there refreshes every day (`tcgPrices` in `SHOP_CONFIG`; empty turns the comparison off). If that file can't be read, the shop works as before without it.
+
 ## Files
 
 - `index.html` – the shop and its shopkeeper zone (everything is in this one page).

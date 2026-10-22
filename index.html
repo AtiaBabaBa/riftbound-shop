@@ -158,6 +158,12 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .tag[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .dom.on svg { width: 12px; height: 12px; }
 .lvb { font-weight: 700; color: var(--ink); border-left: 3px solid var(--lc); padding-left: 7px; }
+/* TCGplayer comparison: a line under a tile's price, a box in the details */
+.tcg { display: flex; align-items: center; gap: 4px 6px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: -3px; }
+.save { background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 1px 7px; font-weight: 700; font-size: 12px; white-space: nowrap; }
+.tcgbox { display: grid; gap: 4px; background: var(--panel-2); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+.tcgbox .row { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
+.tcgbox .num { font-weight: 600; font-size: 16px; }
 
 /* why Chinese-print cards: the banner on top of the Decks tab */
 .why { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 12px; }
@@ -462,6 +468,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     <div class="cart-foot">
       <div class="tot"><span data-t="total"></span><b class="num" id="cartTotal"></b></div>
       <div class="small muted" id="cartUnpriced" hidden></div>
+      <div class="small ok-t" id="cartSave" hidden></div>
       <button type="button" class="btn primary block" id="toReview" data-t="review"></button>
       <div class="foot-row"><button type="button" class="btn link small" id="clearCart" data-t="clear"></button></div>
     </div>
@@ -529,6 +536,9 @@ const SHOP_CONFIG = {
   showAllCards: false,          // true: customers also see unlisted cards (as Ask price); false: only what's listed, sold out included
   // Deck levels by price: up to the first number is Budget Starter, up to the second Mid-Level, above that Tournament Winner.
   deckLevels: [1000, 5000],
+  // TCGplayer market prices (US dollars, with the dollar-to-baht rate), refreshed daily by Riftcheese. Cards and decks show
+  // what the same cards cost on TCGplayer, in baht, next to the shop's price. Empty = don't compare.
+  tcgPrices: 'https://atiabababa.github.io/riftcheese/cards/prices.json',
 };
 
 const LANG = {
@@ -537,7 +547,12 @@ const LANG = {
     step1: 'Tap a deck or card to add it to your list', step2: 'Check your list', step3: 'Send it to us on LINE. We reply with the total, payment and shipping.',
     whyTitle: 'Why Chinese-print cards?',
     why1h: 'Tournament legal', why1: 'Official Riftbound cards, accepted at sanctioned events. Play them in identical opaque sleeves, like any deck.',
-    why2h: 'Much cheaper', why2: 'The same cards and the same game for far less than English prints.',
+    why2h: 'Much cheaper', why2: 'The same cards and the same game for far less than English prints. Each deck and card shows its TCGplayer price next to ours.',
+    save: n => `Save ${n}%`, tcgCard: 'TCGplayer price (English card)', tcgDeck: n => `The same ${n} cards on TCGplayer`,
+    tcgSave: (n, a) => `You save ${n}% (${a})`, tcgN: 'Normal',
+    tcgNote: (d, r) => `TCGplayer market price in US dollars${d ? ` on ${d}` : ''}, at 1 USD = ${r}. A guide: real prices depend on condition and shipping.`,
+    tcgDeckNote: 'Each card counted at its cheapest printing on TCGplayer.', tcgMissing: n => `${n} card${n === 1 ? ' has' : 's have'} no TCGplayer price and ${n === 1 ? 'isn’t' : 'aren’t'} counted.`,
+    cartSave: a => `You save ${a} compared with TCGplayer`, pDeckTcg: v => `TCGplayer value ${v}`,
     why3h: '100% genuine', why3: 'Guaranteed real product, from a certified shop.',
     why4h: 'Easy to read', why4: 'Every deck here shows its cards in English, so you know what each one does.',
     dvOpen: 'See the whole deck on one page', dvMain: n => `${n} cards`, dvSide: 'Sideboard', dvPng: 'Save as image', dvMaking: 'Making the image…',
@@ -635,7 +650,12 @@ const LANG = {
     step1: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: 'ส่งรายการให้เราทาง LINE แล้วเราจะแจ้งยอดชำระและการจัดส่ง',
     whyTitle: 'ทำไมต้องการ์ดพิมพ์จีน?',
     why1h: 'ใช้แข่งได้', why1: 'การ์ด Riftbound ของแท้ ใช้ในงานแข่งที่ได้รับการรับรองได้ ใส่สลีฟทึบแบบเดียวกันทั้งเด็คเหมือนเด็คทั่วไป',
-    why2h: 'ราคาถูกกว่ามาก', why2: 'การ์ดเหมือนกัน เล่นได้เหมือนกัน แต่ราคาถูกกว่าการ์ดพิมพ์อังกฤษมาก',
+    why2h: 'ราคาถูกกว่ามาก', why2: 'การ์ดเหมือนกัน เล่นได้เหมือนกัน แต่ราคาถูกกว่าการ์ดพิมพ์อังกฤษมาก ทุกเด็คและการ์ดแสดงราคา TCGplayer เทียบกับราคาร้าน',
+    save: n => `ถูกกว่า ${n}%`, tcgCard: 'ราคา TCGplayer (การ์ดภาษาอังกฤษ)', tcgDeck: n => `การ์ด ${n} ใบเดียวกันบน TCGplayer`,
+    tcgSave: (n, a) => `ประหยัด ${n}% (${a})`, tcgN: 'ปกติ',
+    tcgNote: (d, r) => `ราคาตลาด TCGplayer เป็นดอลลาร์สหรัฐ${d ? ` วันที่ ${d}` : ''} คิดที่ 1 USD = ${r} ใช้เป็นแนวทาง ราคาจริงขึ้นกับสภาพการ์ดและค่าส่ง`,
+    tcgDeckNote: 'คิดการ์ดแต่ละใบจากเวอร์ชันที่ถูกที่สุดบน TCGplayer', tcgMissing: n => `การ์ด ${n} ใบไม่มีราคาบน TCGplayer จึงไม่ได้นับรวม`,
+    cartSave: a => `ประหยัดกว่า TCGplayer ${a}`, pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
     why3h: 'ของแท้ 100%', why3: 'รับประกันสินค้าของแท้ จากร้านที่ได้รับการรับรอง',
     why4h: 'อ่านง่าย', why4: 'ทุกเด็คในร้านแสดงการ์ดเป็นภาษาอังกฤษ จึงรู้ว่าการ์ดแต่ละใบทำอะไร',
     dvOpen: 'ดูการ์ดทั้งเด็คในหน้าเดียว', dvMain: n => `${n} ใบ`, dvSide: 'Sideboard', dvPng: 'บันทึกเป็นรูปภาพ', dvMaking: 'กำลังสร้างรูป…',
@@ -984,6 +1004,90 @@ async function loadTiers() {
   } catch (e) { return { ...cleanTiers(null), updated: '', missing: /shop_docs|HTTP 404/.test(e.message || '') }; }
 }
 
+// TCGplayer market prices (SHOP_CONFIG.tcgPrices: Riftcheese's cards/prices.json, every printing in US dollars per finish,
+// N normal and F foil, plus fx.THB), shown in baht next to the shop's price. They load after the shop and never hold it up.
+const TCG = { ok: false, fx: 0, updated: '', byNo: new Map(), byKey: new Map() };
+let tcgMemo = new WeakMap();
+async function loadTcg() {
+  if (!SHOP_CONFIG.tcgPrices) return;
+  try {
+    const r = await fetch(SHOP_CONFIG.tcgPrices, { cache: 'no-cache' }); if (!r.ok) return;
+    const j = await r.json(); if (!j.fx || !j.fx.THB || !Array.isArray(j.products)) return;
+    const add = (m, k, p) => { if (!m.has(k)) m.set(k, []); m.get(k).push(p); };
+    j.products.forEach(p => {
+      if (p.N == null && p.F == null) return;
+      if (p.no) add(TCG.byNo, `${p.s}|${p.no}`.toLowerCase(), p);  // "ogn|247/298", as a card id writes it ("ogn-247-298")
+      if (p.k) add(TCG.byKey, p.k, p);
+    });
+    Object.assign(TCG, { ok: true, fx: j.fx.THB, updated: j.updated || '' });
+    tcgMemo = new WeakMap();
+    renderAll();
+  } catch {}
+}
+const tcgNo = c => { const [s, n, of] = c.id.split('-'); return TCG.byNo.get(`${s}|${n}/${of}`) || []; };
+const plainPrint = p => !p.n.includes('(');  // not an overnumbered, signature, metal… version
+// A listing's version ("Alt Art", "Foil", "Overnumbered"…) as TCGplayer names its printings: the tag in brackets, '' for
+// the plain card, null for a version TCGplayer doesn't sell (then there's nothing to compare).
+const TCG_TAGS = [[/alt|alternate/i, 'Alternate Art'], [/overnum/i, 'Overnumbered'], [/signature/i, 'Signature'], [/metal/i, 'Metal']];
+function tcgTag(note) {
+  const hit = TCG_TAGS.find(([re]) => re.test(note)); if (hit) return hit[1];
+  return note.replace(/non-?foil|normal|regular|foil|ปกติ|ฟอยล์|[\s().,\/-]/gi, '') ? null : '';
+}
+// The printings of a card that has a tag ('' = plain), the one with the card's own number first.
+function tcgPrints(c, tag) {
+  const [s, n, of] = c.id.split('-');
+  const all = [...tcgNo(c), ...(TCG.byNo.get(`${s}|${n}a/${of}`) || []), ...(TCG.byKey.get(c.k) || [])];
+  const ps = [...new Set(all)].filter(p => tag ? p.n.includes(`(${tag})`) : plainPrint(p));
+  return ps.sort((a, b) => (b.s.toLowerCase() === s && (b.no || '').startsWith(n)) - (a.s.toLowerCase() === s && (a.no || '').startsWith(n)));
+}
+// A card's price on TCGplayer in US dollars, in the printing its version names, foil or normal (a card that only comes
+// one way has only that price).
+function tcgUsd(c, note) {
+  const tag = tcgTag(note || ''), foil = /foil|ฟอยล์/i.test(note || '') && !/non-?foil/i.test(note || '');
+  const p = tag == null ? null : tcgPrints(c, tag)[0];
+  return p ? (foil ? p.F ?? p.N : p.N ?? p.F) : null;
+}
+// The cheapest a card can be had for on TCGplayer, any printing or finish: what a deck is counted at.
+function tcgCheapest(c) {
+  const vs = [...tcgNo(c), ...(TCG.byKey.get(c.k) || [])].flatMap(p => [p.N, p.F]).filter(v => v != null);
+  return vs.length ? Math.min(...vs) : null;
+}
+// A deck list's TCGplayer value in baht; miss = cards without a price (left out, so the value is a lower bound).
+function tcgDeck(list) {
+  let usd = 0, miss = 0;
+  list.forEach(l => { const u = l.c ? tcgCheapest(l.c) : null; if (u == null) miss += l.qty; else usd += u * l.qty; });
+  return usd ? { thb: Math.round(usd * TCG.fx), miss } : null;
+}
+// A listing's TCGplayer value in baht: a card in its own printing (foil when its version says so), a deck from its list.
+// null when there's nothing to compare (other products, unknown cards, prices not loaded).
+function tcgValue(x) {
+  if (!TCG.ok) return null;
+  let v = tcgMemo.get(x);
+  if (v === undefined) {
+    const usd = x.c ? tcgUsd(x.c, x.note) : null;
+    v = x.c ? (usd == null ? null : { thb: Math.round(usd * TCG.fx), miss: 0 }) : x.p && x.p.list.length ? tcgDeck(x.p.list) : null;
+    tcgMemo.set(x, v);
+  }
+  return v;
+}
+// How much cheaper the shop is, in percent (0 when it isn't, or there's nothing to compare).
+const tcgSave = x => { const v = tcgValue(x); return v && x.price != null && v.thb > x.price ? Math.round((v.thb - x.price) / v.thb * 100) : 0; };
+// Under a tile's price: what TCGplayer asks, with the saving. Customers see it where the shop is cheaper; the shopkeeper always, as a guide.
+function tcgLine(x) {
+  const v = tcgValue(x), pct = tcgSave(x);
+  if (!v || (!pct && !K.on)) return '';
+  return `<div class="tcg"><span>TCGplayer <span class="num">${money(v.thb)}${v.miss ? '+' : ''}</span></span>${pct ? `<span class="save">${t('save', pct)}</span>` : ''}</div>`;
+}
+// In the details: the comparison with where the price comes from.
+function tcgBox(x) {
+  const v = tcgValue(x); if (!v) return '';
+  const pct = tcgSave(x), d = /^(\d{4})-(\d\d)-(\d\d)/.exec(TCG.updated);
+  const when = d ? new Date(+d[1], d[2] - 1, +d[3]).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  return `<div class="tcgbox"><div class="row"><span>${x.p ? t('tcgDeck', deckSize(x.p.list) - v.miss) : t('tcgCard')}</span><span class="num">${money(v.thb)}</span>
+      ${pct ? `<span class="save">${t('tcgSave', pct, money(v.thb - x.price))}</span>` : ''}</div>
+    <p class="small muted">${x.p ? t('tcgDeckNote') + ' ' + (v.miss ? t('tcgMissing', v.miss) + ' ' : '') : ''}${esc(t('tcgNote', when, '฿' + TCG.fx.toFixed(2)))}</p></div>`;
+}
+
 async function load() {
   try {
     const [j, stock, tiers] = await Promise.all([
@@ -1086,6 +1190,7 @@ function tile(x, pop = false) {
       : `<div class="sub">${x.p ? prodTag(x.p) : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>`}
     ${x.descr ? `<div class="desc" title="${esc(x.descr)}">${esc(x.descr)}</div>` : ''}
     <div class="buy">${K.on ? keeperTag(x) : priceTag(x) + (n ? stepper(x, n) : '')}</div>
+    ${tcgLine(x)}
   </article>`;
 }
 function renderGrid() {
@@ -1210,6 +1315,11 @@ function renderCart() {
   $('#cartTotal').textContent = s.priced ? money(s.total) : s.count ? '—' : money(0);
   $('#cartUnpriced').hidden = !s.unpriced;
   $('#cartUnpriced').textContent = counted('toPrice', s.unpriced, items);
+  // What the same priced items would cost on TCGplayer, when the list comes out cheaper here.
+  const vs = items.map(({ x, q }) => ({ v: tcgValue(x), x, q })).filter(i => i.v && i.x.price != null);
+  const saved = vs.reduce((a, i) => a + (i.v.thb - i.x.price) * i.q, 0);
+  $('#cartSave').hidden = !(saved > 0);
+  $('#cartSave').textContent = saved > 0 ? t('cartSave', money(saved)) : '';
   $('#toReview').disabled = !s.count;
   $('#clearCart').hidden = !s.count;
   $('#mbCount').textContent = s.count ? counted('count', s.count, items) : t('myList');
@@ -1353,7 +1463,8 @@ function openDeckView(key) {
 function dvBuy() {
   const el = $('#dvBuy'), x = dvKey && DB.byKey.get(dvKey); if (!el || !x) return;
   const n = inCart(x.key);
-  el.innerHTML = `<span class="row" data-key="${esc(x.key)}">${x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`}
+  const pct = tcgSave(x);
+  el.innerHTML = `<span class="row" data-key="${esc(x.key)}">${x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`}${pct ? `<span class="save">${t('save', pct)}</span>` : ''}
     ${K.on || x.qty === 0 ? (x.qty === 0 ? `<b class="bad-t">${t('soldOut')}</b>` : '') : n ? stepper(x, n) : `<button type="button" class="btn sm primary" data-act="add">${t('add')}</button>`}</span>`;
 }
 const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
@@ -1439,7 +1550,7 @@ function renderDetail() {
       <div class="dinfo"><h2>${esc(p.name)}</h2>
         <div class="tags">${lv ? `<span class="lvb lv-${lv}">${t('lv_' + lv)}</span>` : ''}${styleChip(p.style)}<span>${prodTag(p)}</span></div>
         ${p.tagList.length ? `<div class="dtags">${p.tagList.map(tagBtn).join('')}</div>` : ''}
-        ${p.isDeck ? tierLine(p) : ''}${shopDesc(x)}${dbuy(x)}${deckList(p.list, x.key)}</div>`;
+        ${p.isDeck ? tierLine(p) : ''}${shopDesc(x)}${dbuy(x)}${tcgBox(x)}${deckList(p.list, x.key)}</div>`;
     return;
   }
   const c = x.c, wide = landscape(c);
@@ -1455,6 +1566,7 @@ function renderDetail() {
       <div class="small muted">${esc(c.r)} · ${cardNo(c)} · ${c.s.map(s => esc(SET_NAMES[s] || s)).join(', ')}</div>
       ${shopDesc(x)}
       ${dbuy(x)}
+      ${tcgBox(x)}
     </div>`;
 }
 
@@ -1593,7 +1705,7 @@ function openEditor(cardId) {
 function renderEditor() {
   const c = E.c;
   $('#edBody').innerHTML = `<div class="dlg-head"><h2 id="edTitle">${t('eTitle')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
-    <div class="ed-card">${thumb(c, 56)}<div><b>${esc(c.n)}</b><div class="small muted">${cardNo(c)} · ${esc(c.r)}</div></div></div>
+    <div class="ed-card">${thumb(c, 56)}<div><b>${esc(c.n)}</b><div class="small muted">${cardNo(c)} · ${esc(c.r)}</div>${edTcg(c)}</div></div>
     <div class="ed-rows">
       <div class="ed-h"><span>${t('eNote')}</span><span>${t('ePrice')} (${esc(SHOP_CONFIG.currency)})</span><span>${t('eQty')}</span><span></span></div>
       ${E.rows.map((r, i) => `<div class="ed-row" data-i="${i}">
@@ -1607,6 +1719,15 @@ function renderEditor() {
     <div><button type="button" class="btn link" data-ed="add">+ ${t('eAdd')}</button></div>
     <p class="small muted">${t('eHint')}</p>
     <div class="ed-foot"><span class="small" id="edMsg" role="status"></span><button type="button" class="btn" data-close>${t('eCancel')}</button><button type="button" class="btn primary" data-ed="save">${t('eSave')}</button></div>`;
+}
+// A pricing guide in the stock editor: the card's TCGplayer price in baht, plain and in the other printings TCGplayer sells.
+function edTcg(c) {
+  if (!TCG.ok) return '';
+  const parts = [['', t('tcgN')], ...TCG_TAGS.map(([, tag]) => [tag, tag])].map(([tag, label]) => {
+    const p = tcgPrints(c, tag)[0], usd = p && (p.N ?? p.F);
+    return usd == null ? '' : `${esc(label)} <b class="num">${money(Math.round(usd * TCG.fx))}</b>`;
+  }).filter(Boolean);
+  return parts.length ? `<div class="small">TCGplayer: ${parts.join(' · ')}</div>` : '';
 }
 function edMsg(m, bad = true) { const el = $('#edMsg'); if (el) { el.textContent = m; el.className = 'small' + (bad ? ' bad-t' : ''); } }
 async function saveEditor() {
@@ -1757,8 +1878,8 @@ function pedPicture(shown) {
   return cover ? thumb(cover) : ICON_BOX;
 }
 function deckCount() {
-  const list = parseDeck(P.deck);
-  return list.length ? esc(t('pDeckCount', deckSize(list), list.filter(l => !l.c).length)) + ' · ' + t('pDeckHint') : '';
+  const list = parseDeck(P.deck), v = TCG.ok && list.length ? tcgDeck(list) : null;
+  return list.length ? esc(t('pDeckCount', deckSize(list), list.filter(l => !l.c).length)) + (v ? ' · ' + esc(t('pDeckTcg', money(v.thb) + (v.miss ? '+' : ''))) : '') + ' · ' + t('pDeckHint') : '';
 }
 function pedMsg(m, bad = true) { const el = $('#pedMsg'); if (el) { el.textContent = m; el.className = 'small' + (bad ? ' bad-t' : ''); } }
 async function shrinkPhoto(file, max = 1200) {
@@ -2015,6 +2136,7 @@ addEventListener('resize', setHead);
 setHead();
 setMode();
 load();
+loadTcg();
 </script>
 </body>
 </html>
