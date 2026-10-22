@@ -159,6 +159,38 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .dom.on svg { width: 12px; height: 12px; }
 .lvb { font-weight: 700; color: var(--ink); border-left: 3px solid var(--lc); padding-left: 7px; }
 
+/* why Chinese-print cards: the banner on top of the Decks tab */
+.why { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 12px; }
+.why h2 { font-family: var(--f-display); font-size: 18px; letter-spacing: .02em; }
+.why ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 16px; }
+.why li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 2px 10px; align-content: start; font-size: 13.5px; color: var(--muted); }
+.why li svg { grid-row: span 2; width: 34px; height: 34px; padding: 7px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
+.why li b { color: var(--ink); font-size: 14.5px; }
+@media (max-width: 900px) { .why ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .why ul { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+body.keeper .why { display: none; }
+
+/* one-page deck picture, as in Riftcheese: every card with its count, on the Legend's colors */
+#deckview { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; }
+.dv { height: 100%; background: var(--bg); display: flex; flex-direction: column; }
+.dv-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.dv-bar h2 { font-size: 18px; overflow-wrap: anywhere; }
+.dv-bar .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.dv-scroll { flex: 1; overflow: auto; padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 0px)); }
+.dv-sheet { max-width: 1000px; margin: 0 auto; border-radius: 12px; padding: 24px 24px 34px; display: grid; gap: 30px; }
+.dv-grid { display: grid; gap: 28px 14px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.dv-h { color: #fff; font-size: 20px; font-weight: 700; margin: 0 0 -14px; text-shadow: 0 1px 3px rgba(0, 0, 0, .45); }
+.dv-card { position: relative; display: block; }
+.dv-img { display: block; position: relative; aspect-ratio: 200 / 279; border-radius: 8px; overflow: hidden; background: #1D222D; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
+.dv-img > .cimg.fluid { border-radius: 0; }
+/* Battlefields are landscape cards; they stand upright here like the rest. */
+.dv-img.bf > .cimg { position: absolute; width: 139.5%; max-width: none; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); }
+.dv-img.dv-miss { color: #fff; font-size: 13px; font-weight: 600; padding: 10px; overflow-wrap: anywhere; line-height: 1.3; }
+.dv-q { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); background: #171B24; color: #fff; border: 2px solid rgba(255, 255, 255, .85); border-radius: 8px; padding: 2px 10px; font-weight: 700; font-size: 14px; white-space: nowrap; }
+@media (max-width: 860px) { .dv-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .dv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 10px; } .dv-sheet { padding: 14px 12px 26px; gap: 26px; } .dv-q { font-size: 12px; padding: 1px 7px; } }
+.deck-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+
 /* the meta tier list */
 .tl-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; }
 .tl-head h2 { font-family: var(--f-display); font-size: 21px; letter-spacing: .02em; }
@@ -382,6 +414,12 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     <section class="kp" id="keeper" hidden></section>
     <ol class="steps"><li><b>1</b><span data-t="step1"></span></li><li><b>2</b><span data-t="step2"></span></li><li><b>3</b><span data-t="step3"></span></li></ol>
     <section class="view" id="decksView" hidden>
+      <section class="why" aria-labelledby="whyTitle"><h2 id="whyTitle" data-t="whyTitle"></h2><ul>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 20h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why1h"></b><span data-t="why1"></span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8zM7.5 8.5h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why2h"></b><span data-t="why2"></span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6zM8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why3h"></b><span data-t="why3"></span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why4h"></b><span data-t="why4"></span></li>
+      </ul></section>
       <div class="levels" id="levels" role="group" data-t-label="levels"></div>
       <div class="filters" id="dFilters">
         <div class="frow dfrow">
@@ -461,6 +499,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
 <dialog id="editor" aria-labelledby="edTitle"><div class="dlg" id="edBody"></div></dialog>
 <dialog id="peditor" aria-labelledby="pedTitle"><div class="dlg" id="pedBody"></div></dialog>
 <dialog id="teditor" aria-labelledby="teTitle"><div class="dlg" id="teBody"></div></dialog>
+<dialog id="deckview" aria-labelledby="dvTitle"><div class="dv" id="dvBody"></div></dialog>
 <input type="file" id="photoFile" accept="image/*" hidden>
 <input type="file" id="importFile" accept=".csv,text/csv" hidden>
 
@@ -496,6 +535,13 @@ const LANG = {
   en: {
     tagline: 'Ready-to-play Riftbound decks and singles · order through LINE',
     step1: 'Tap a deck or card to add it to your list', step2: 'Check your list', step3: 'Send it to us on LINE. We reply with the total, payment and shipping.',
+    whyTitle: 'Why Chinese-print cards?',
+    why1h: 'Tournament legal', why1: 'Official Riftbound cards, accepted at sanctioned events. Play them in identical opaque sleeves, like any deck.',
+    why2h: 'Much cheaper', why2: 'The same cards and the same game for far less than English prints.',
+    why3h: '100% genuine', why3: 'Guaranteed real product, from a certified shop.',
+    why4h: 'Easy to read', why4: 'Every deck here shows its cards in English, so you know what each one does.',
+    dvOpen: 'See the whole deck on one page', dvMain: n => `${n} cards`, dvSide: 'Sideboard', dvPng: 'Save as image', dvMaking: 'Making the image…',
+    dvFail: 'Couldn’t make the image here. Take a screenshot instead.',
     tabsLabel: 'Shop sections', tabDecks: 'Decks', tabCards: 'Singles & more', tabTiers: 'Tier list',
     levels: 'Deck levels', lv_budget: 'Budget Starter', lv_mid: 'Mid-Level', lv_top: 'Tournament Winner', lv_ask: 'Ask for price',
     lvFor_budget: 'Your first deck, ready to play. For players who don’t have a deck yet.',
@@ -587,6 +633,13 @@ const LANG = {
   th: {
     tagline: 'เด็ค Riftbound พร้อมเล่นและการ์ดแยกใบ · สั่งซื้อผ่าน LINE',
     step1: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: 'ส่งรายการให้เราทาง LINE แล้วเราจะแจ้งยอดชำระและการจัดส่ง',
+    whyTitle: 'ทำไมต้องการ์ดพิมพ์จีน?',
+    why1h: 'ใช้แข่งได้', why1: 'การ์ด Riftbound ของแท้ ใช้ในงานแข่งที่ได้รับการรับรองได้ ใส่สลีฟทึบแบบเดียวกันทั้งเด็คเหมือนเด็คทั่วไป',
+    why2h: 'ราคาถูกกว่ามาก', why2: 'การ์ดเหมือนกัน เล่นได้เหมือนกัน แต่ราคาถูกกว่าการ์ดพิมพ์อังกฤษมาก',
+    why3h: 'ของแท้ 100%', why3: 'รับประกันสินค้าของแท้ จากร้านที่ได้รับการรับรอง',
+    why4h: 'อ่านง่าย', why4: 'ทุกเด็คในร้านแสดงการ์ดเป็นภาษาอังกฤษ จึงรู้ว่าการ์ดแต่ละใบทำอะไร',
+    dvOpen: 'ดูการ์ดทั้งเด็คในหน้าเดียว', dvMain: n => `${n} ใบ`, dvSide: 'Sideboard', dvPng: 'บันทึกเป็นรูปภาพ', dvMaking: 'กำลังสร้างรูป…',
+    dvFail: 'สร้างรูปในเครื่องนี้ไม่ได้ ให้แคปหน้าจอแทน',
     tabsLabel: 'หมวดของร้าน', tabDecks: 'เด็คพร้อมเล่น', tabCards: 'การ์ดและสินค้าอื่น', tabTiers: 'Tier list',
     levels: 'ระดับเด็ค', lv_budget: 'เด็คเริ่มต้นราคาประหยัด', lv_mid: 'เด็คระดับกลาง', lv_top: 'เด็คแชมป์ทัวร์นาเมนต์', lv_ask: 'สอบถามราคา',
     lvFor_budget: 'เด็คแรกของคุณ พร้อมเล่นทันที สำหรับคนที่ยังไม่มีเด็ค',
@@ -1143,6 +1196,7 @@ function setQty(key, q) {
   if (q) S.cart[key] = q; else delete S.cart[key];
   saveCart(); refreshTile(key); renderCart();
   if (S.detail === key) renderDetail();
+  if (dvKey === key) dvBuy();
   if ($('#review').open) renderReview();
 }
 function renderCart() {
@@ -1249,15 +1303,132 @@ function dbuy(x) {
       </div>`;
 }
 // A deck's cards by section, each with a small picture.
-function deckList(list) {
+function deckList(list, key) {
   if (!list.length) return '';
   const groups = [];
   list.forEach(l => { let g = groups.find(x => x.name === l.section); if (!g) groups.push(g = { name: l.section, lines: [] }); g.lines.push(l); });
-  return `<div class="deck"><b class="deck-h">${t('deckList', deckSize(list))}</b>${groups.map(g => `<div>
+  return `<div class="deck"><div class="deck-h"><b>${t('deckList', deckSize(list))}</b><button type="button" class="btn sm primary" data-dv="${esc(key)}">${t('dvOpen')}</button></div>${groups.map(g => `<div>
     ${g.name ? `<div class="deck-t">${esc(g.name)} · ${deckSize(g.lines)}</div>` : ''}
     <ul>${g.lines.map(l => `<li${l.c ? '' : ' class="miss"'}>${l.c ? thumb(l.c, 26) : '<span class="cimg blank" style="width:26px;height:36px"></span>'}<span class="num">${l.qty}</span><span title="${esc(l.name)}">${esc(l.name)}</span></li>`).join('')}</ul></div>`).join('')}</div>`;
 }
-const shopDesc = x => x.descr ? `<p class="sdesc"><b>${t('eDesc')}</b>${esc(x.descr)}</p>` : '';
+// ---------- deck on one page ----------
+// Every card in a deck with its count, on its Legend's colors, as in Riftcheese: Legend, runes and battlefields on top;
+// then the Chosen Champion and the main deck (units, spells, gear, each by energy); then the sideboard. Saves as a PNG to share.
+function deckSheet(list) {
+  const TOP = ['Legend', 'Rune', 'Battlefield'], rank = c => !c ? 3 : c.t === 'Unit' ? 0 : c.t === 'Spell' ? 1 : c.t === 'Gear' ? 2 : 3;
+  const order = (a, b) => rank(a.c) - rank(b.c) || ((a.c || {}).e ?? 99) - ((b.c || {}).e ?? 99) || a.name.localeCompare(b.name);
+  const top = l => ['Legend', 'Runes', 'Battlefields'].includes(l.section) || (!l.section && l.c && TOP.includes(l.c.t));  // a list without headings: by card type
+  const topRank = l => { const i = l.c ? TOP.indexOf(l.c.t) : -1; return i < 0 ? 3 : i; };
+  return {
+    top: list.filter(top).sort((a, b) => topRank(a) - topRank(b)),
+    main: [...list.filter(l => l.section === 'Champion'), ...list.filter(l => !top(l) && !['Champion', 'Sideboard'].includes(l.section)).sort(order)],
+    side: list.filter(l => l.section === 'Sideboard').sort(order),
+  };
+}
+// The background runs between the Legend's two domain colors.
+function sheetColors(p) {
+  const ds = ((p.legend || {}).d || []).filter(d => DOMAINS.includes(d) && d !== 'Colorless');
+  const css = getComputedStyle(document.documentElement), col = d => css.getPropertyValue('--' + d.toLowerCase()).trim();
+  return ds.length ? [col(ds[ds.length > 1 ? 1 : 0]), col(ds[0])] : ['#3A4252', '#171B24'];
+}
+let dvKey = null;  // the deck on show
+function openDeckView(key) {
+  const x = DB.byKey.get(key); if (!x || !x.p) return;
+  dvKey = key;
+  const p = x.p, s = deckSheet(p.list), [c1, c2] = sheetColors(p);
+  const tile = l => `<span class="dv-card" title="${esc(l.name)}">${l.c ? `<span class="dv-img${l.c.t === 'Battlefield' ? ' bf' : ''}">${thumb(l.c)}</span>` : `<span class="dv-img dv-miss">${esc(l.name)}</span>`}<span class="dv-q num">x${l.qty}</span></span>`;
+  const grid = ls => ls.length ? `<div class="dv-grid">${ls.map(tile).join('')}</div>` : '';
+  $('#dvBody').innerHTML = `<div class="dv-bar">
+      <div style="min-width:0"><div class="small muted">${[p.isDeck && t('lv_' + deckLevel(p)), t('dvMain', deckSize(p.list))].filter(Boolean).join(' · ')}</div><h2 id="dvTitle">${esc(p.name)}</h2></div>
+      <div class="row"><span id="dvBuy"></span><button type="button" class="btn sm" data-dvpng>${t('dvPng')}</button><button type="button" class="btn sm" data-close>${t('close')}</button></div>
+    </div>
+    <div class="dv-scroll"><div class="dv-sheet" style="background:linear-gradient(135deg, ${c1}, ${c2})">
+      ${grid(s.top)}${grid(s.main)}${s.side.length ? `<h3 class="dv-h">${t('dvSide')}</h3>${grid(s.side)}` : ''}
+    </div></div>`;
+  dvBuy();
+  if (!$('#deckview').open) $('#deckview').showModal();
+  $('#dvBody [data-close]').focus();
+}
+// The price and add button in the bar (kept up to date as the deck goes in and out of the customer's list).
+function dvBuy() {
+  const el = $('#dvBuy'), x = dvKey && DB.byKey.get(dvKey); if (!el || !x) return;
+  const n = inCart(x.key);
+  el.innerHTML = `<span class="row" data-key="${esc(x.key)}">${x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`}
+    ${K.on || x.qty === 0 ? (x.qty === 0 ? `<b class="bad-t">${t('soldOut')}</b>` : '') : n ? stepper(x, n) : `<button type="button" class="btn sm primary" data-act="add">${t('add')}</button>`}</span>`;
+}
+const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+// The same page drawn on a canvas at the card pictures' own size, with the shop's name, saved (or shared, on a phone) as a PNG.
+async function saveDeckPNG(btn) {
+  const x = DB.byKey.get(dvKey); if (!x) return;
+  const p = x.p, s = deckSheet(p.list), [c1, c2] = sheetColors(p);
+  const W = 200, H = 279, GX = 22, GY = 46, PAD = 44, COLS = 6, HEAD = 100, GAP = 34, SUB = 58;
+  const font = getComputedStyle(document.body).fontFamily;
+  btn.disabled = true; btn.textContent = t('dvMaking');
+  try {
+    const sheets = new Map();
+    const need = [...new Set([...s.top, ...s.main, ...s.side].filter(l => l.c).map(l => l.c.im[0]))];
+    await Promise.all(need.map(async k => sheets.set(k, await loadImg(DB.sheets[k].f))));
+    if (document.fonts) await document.fonts.ready;
+    const blocks = [s.top, s.main, s.side].map((list, i) => ({ list, title: i === 2 ? t('dvSide') : '' })).filter(b => b.list.length);
+    const gridH = list => Math.ceil(list.length / COLS) * (H + GY) - GY;
+    const width = PAD * 2 + COLS * W + (COLS - 1) * GX;
+    const height = PAD + HEAD + blocks.reduce((a, b, i) => a + (i ? GAP : 0) + (b.title ? SUB : 0) + gridH(b.list), 0) + PAD + 16;
+    const cv = Object.assign(document.createElement('canvas'), { width, height }), ctx = cv.getContext('2d');
+    const bg = ctx.createLinearGradient(0, 0, width, height); bg.addColorStop(0, c1); bg.addColorStop(1, c2);
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, width, height);
+    const text = (s, tx, ty, f, align = 'left') => {
+      ctx.save(); ctx.font = f; ctx.fillStyle = '#fff'; ctx.textAlign = align;
+      ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 1;
+      ctx.fillText(s, tx, ty); ctx.restore();
+    };
+    text(p.name, PAD, PAD + 40, `700 40px ${font}`);
+    text(p.list.filter(l => ['Legend', 'Champion'].includes(l.section)).map(l => l.name).join(' · '), PAD, PAD + 78, `500 22px ${font}`);
+    text(SHOP_CONFIG.name, width - PAD, PAD + 40, `600 24px ${font}`, 'right');
+    const drawCard = (l, X, Y) => {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+      roundRect(ctx, X, Y, W, H, 10); ctx.fillStyle = '#1D222D'; ctx.fill();
+      ctx.shadowColor = 'transparent'; ctx.clip();
+      const c = l.c, img = c && sheets.get(c.im[0]);
+      if (img) {
+        const sh = DB.sheets[c.im[0]], sw = img.naturalWidth / sh.c, shH = img.naturalHeight / sh.r, i = c.im[1], sx = (i % sh.c) * sw, sy = Math.floor(i / sh.c) * shH;
+        // Landscape battlefields turn upright, like on the page.
+        if (sw > shH) { ctx.translate(X + W / 2, Y + H / 2); ctx.rotate(-Math.PI / 2); ctx.drawImage(img, sx, sy, sw, shH, -H / 2, -W / 2, H, W); }
+        else ctx.drawImage(img, sx, sy, sw, shH, X, Y, W, H);
+      } else {
+        ctx.font = `600 18px ${font}`; ctx.fillStyle = '#fff';
+        let line = '', ly = Y + 32;
+        l.name.split(/\s+/).forEach(w => { const s = line ? line + ' ' + w : w; if (ctx.measureText(s).width > W - 24 && line) { ctx.fillText(line, X + 12, ly); ly += 24; line = w; } else line = s; });
+        ctx.fillText(line, X + 12, ly);
+      }
+      ctx.restore();
+      const q = 'x' + l.qty; ctx.font = `700 22px ${font}`;
+      const bw = Math.max(54, ctx.measureText(q).width + 28), bh = 34, bx = X + (W - bw) / 2, by = Y + H - 18;
+      roundRect(ctx, bx, by, bw, bh, 8); ctx.fillStyle = '#171B24'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.stroke();
+      ctx.save(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(q, X + W / 2, by + bh / 2 + 1); ctx.restore();
+    };
+    let y = PAD + HEAD;
+    blocks.forEach((b, i) => {
+      if (i) y += GAP;
+      if (b.title) { text(b.title, PAD, y + 34, `700 30px ${font}`); y += SUB; }
+      b.list.forEach((l, j) => drawCard(l, PAD + (j % COLS) * (W + GX), y + Math.floor(j / COLS) * (H + GY)));
+      y += gridH(b.list);
+    });
+    const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+    if (!blob) throw new Error('png');
+    const name = `${p.name.replace(/[\\\/:*?"<>|]+/g, '').trim() || 'Deck'}.png`, file = new File([blob], name, { type: 'image/png' });
+    if (onPhone && navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: p.name }).catch(() => {});
+    else { const url = URL.createObjectURL(blob); Object.assign(document.createElement('a'), { href: url, download: name }).click(); setTimeout(() => URL.revokeObjectURL(url), 2000); }
+  } catch { toast(t('dvFail')); }
+  finally { if (btn.isConnected) { btn.disabled = false; btn.textContent = t('dvPng'); } }
+}
+
+const shopDesc = x => x.descr ?`<p class="sdesc"><b>${t('eDesc')}</b>${esc(x.descr)}</p>` : '';
 function renderDetail() {
   const x = DB.byKey.get(S.detail); if (!x) return;
   const body = $('#detailBody'), close = `<button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button>`;
@@ -1268,7 +1439,7 @@ function renderDetail() {
       <div class="dinfo"><h2>${esc(p.name)}</h2>
         <div class="tags">${lv ? `<span class="lvb lv-${lv}">${t('lv_' + lv)}</span>` : ''}${styleChip(p.style)}<span>${prodTag(p)}</span></div>
         ${p.tagList.length ? `<div class="dtags">${p.tagList.map(tagBtn).join('')}</div>` : ''}
-        ${p.isDeck ? tierLine(p) : ''}${shopDesc(x)}${dbuy(x)}${deckList(p.list)}</div>`;
+        ${p.isDeck ? tierLine(p) : ''}${shopDesc(x)}${dbuy(x)}${deckList(p.list, x.key)}</div>`;
     return;
   }
   const c = x.c, wide = landscape(c);
@@ -1806,6 +1977,9 @@ $('#dStyles').addEventListener('click', e => {
   const s = b.dataset.style; S.d.style = S.d.style === s ? '' : s; renderDecks(); $(`#dStyles [data-style="${s}"]`).focus();
 });
 $('#dClear').addEventListener('click', () => { S.d = blankDeckFilter(); renderDecks(); });
+document.addEventListener('click', e => { const b = e.target.closest('[data-dv]'); if (b) openDeckView(b.dataset.dv); });
+$('#dvBody').addEventListener('click', e => { const b = e.target.closest('[data-dvpng]'); if (b && !b.disabled) saveDeckPNG(b); });
+$('#deckview').addEventListener('close', () => { if (!$('#deckview').open) { dvKey = null; $('#dvBody').innerHTML = ''; } });
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-tag],[data-legend]'); if (!b) return;
   if (b.dataset.tag != null) S.d.tag = S.d.tag === b.dataset.tag ? '' : b.dataset.tag;
