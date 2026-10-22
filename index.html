@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Jake's Card Shop</title>
-<meta name="description" content="Riftbound singles. Pick the cards you want and send the list to the shop on LINE.">
+<meta name="description" content="Ready-to-play Riftbound decks, singles and the current meta tier list. Pick what you want and send the list to the shop on LINE.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14l-12 7L4 23V9z' fill='%2310131A' stroke='%2346C3C7' stroke-width='2'/%3E%3Cpath d='M16 8v16M10 12l6 4 6-4M10 20l6-4 6 4' fill='none' stroke='%23D9A84C' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#ECEFF3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#10131A" media="(prefers-color-scheme: dark)">
@@ -61,6 +61,12 @@ p { margin: 0; }
   .brand p { display: none; }
 }
 .brand p { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* section tabs, under the header row */
+.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs a { padding: 6px 14px 9px; font-weight: 600; font-size: 15px; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
 
 /* controls */
 input[type=text], input[type=search], input[type=password], select, textarea {
@@ -96,7 +102,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 /* page */
 .shop { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
-.browse { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; align-content: start; }
+.browse, .view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; align-content: start; }
 @media (min-width: 1000px) {
   .shop { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; padding-bottom: 32px; }
   .cart { position: sticky; top: calc(var(--head) + 16px); max-height: calc(100vh - var(--head) - 32px); }
@@ -117,6 +123,58 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .chk { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .chk input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
 .resbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13.5px; color: var(--muted); }
+.frow.dfrow { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.frow.dfrow .q { grid-column: auto; }
+@media (max-width: 560px) { .frow.dfrow { grid-template-columns: minmax(0, 1fr); } }
+.dom i.c { border-radius: 50%; transform: none; background: var(--sc); }
+
+/* decks: the three levels, the shelves under them, and a deck's style and tags */
+.lv-budget { --lc: var(--calm); } .lv-mid { --lc: var(--mind); } .lv-top { --lc: var(--gold); } .lv-ask { --lc: var(--colorless); }
+.st-aggro { --sc: var(--fury); } .st-midrange { --sc: var(--calm); } .st-control { --sc: var(--mind); } .st-combo { --sc: var(--chaos); }
+.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.lvl { display: grid; gap: 3px; align-content: start; text-align: left; background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--lc); border-radius: var(--r); padding: 12px 14px; cursor: pointer; color: var(--ink); }
+.lvl:hover { border-color: var(--muted); border-top-color: var(--lc); }
+.lvl[aria-pressed="true"] { background: var(--panel-2); box-shadow: inset 0 0 0 2px var(--lc); }
+.lvl b { font-family: var(--f-display); font-size: 16.5px; letter-spacing: .02em; line-height: 1.2; }
+.lvl .num { font-weight: 600; font-size: 14px; }
+.lvl .for { font-size: 13px; color: var(--muted); }
+.lvl .n { font-size: 12.5px; font-weight: 600; color: var(--muted); margin-top: 4px; }
+@media (max-width: 760px) { .levels { gap: 6px; } .lvl { padding: 9px 10px; } .lvl b { font-size: 13.5px; } .lvl .num { font-size: 12px; } .lvl .for, .lvl .n { display: none; } }
+.shelf { display: grid; gap: 12px; }
+.shelf + .shelf { margin-top: 14px; }
+.shelf-h { display: flex; align-items: baseline; gap: 2px 10px; flex-wrap: wrap; border-bottom: 2px solid var(--lc); padding-bottom: 6px; }
+.shelf-h h2 { font-family: var(--f-display); font-size: 18px; letter-spacing: .02em; }
+.shelf-h .num { font-weight: 600; font-size: 13.5px; }
+.shelf-h .n { margin-left: auto; font-size: 13px; color: var(--muted); }
+.shelf-h .for { flex-basis: 100%; font-size: 13px; color: var(--muted); display: none; }
+@media (max-width: 760px) { .shelf-h .for { display: block; } }
+@media (min-width: 561px) { .cards.decks { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
+.style { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+.style i { width: 8px; height: 8px; border-radius: 50%; background: var(--sc); flex: none; }
+.dsub { display: flex; align-items: center; gap: 2px 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); min-height: 18px; }
+.dtags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { border: 0; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.tag:hover { filter: brightness(.96); }
+.tag[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.dom.on svg { width: 12px; height: 12px; }
+.lvb { font-weight: 700; color: var(--ink); border-left: 3px solid var(--lc); padding-left: 7px; }
+
+/* the meta tier list */
+.tl-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; }
+.tl-head h2 { font-family: var(--f-display); font-size: 21px; letter-spacing: .02em; }
+.tl-note { white-space: pre-line; font-size: 14.5px; border-left: 3px solid var(--gold); padding: 2px 0 2px 10px; }
+.tl { display: grid; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--panel); }
+.tl-row { display: grid; grid-template-columns: 96px minmax(0, 1fr); }
+.tl-row + .tl-row { border-top: 1px solid var(--line); }
+.tl-tier { display: grid; place-items: center; padding: 10px 6px; background: var(--tc); color: #14181F; font-family: var(--f-display); font-weight: 700; font-size: 17px; text-align: center; overflow-wrap: anywhere; }
+.tl-decks { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; padding: 10px; }
+.tl-deck { display: flex; gap: 10px; align-items: flex-start; background: var(--panel-2); border-radius: 6px; padding: 8px; min-width: 0; }
+.tl-deck > div { display: grid; gap: 3px; justify-items: start; min-width: 0; }
+.tl-deck b { font-size: 14.5px; line-height: 1.25; }
+.tl-deck .cimg { border-radius: 4px; }
+.tl-deck .btn.link { padding: 2px 0; font-size: 13px; }
+.tl-empty { padding: 12px; color: var(--muted); font-size: 13.5px; }
+@media (max-width: 560px) { .tl-row { grid-template-columns: minmax(0, 1fr); } .tl-tier { place-items: center start; padding: 6px 12px; font-size: 15px; } .tl-decks { grid-template-columns: minmax(0, 1fr); } }
 
 /* card grid */
 .cards { display: grid; gap: 16px 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
@@ -285,6 +343,20 @@ body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps { d
 .two-num { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
 @media (max-width: 520px) { .ped { grid-template-columns: minmax(0, 1fr); } .ped-photo { grid-template-columns: 96px minmax(0, 1fr); align-items: center; } .ped-img { width: 96px; } }
 .btn.danger { color: var(--loss); }
+.two-sel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 10px; }
+@media (max-width: 520px) { .two-sel { grid-template-columns: minmax(0, 1fr); } }
+/* the tier list editor: one box per tier, one row per deck */
+#teditor { width: min(920px, calc(100% - 24px)); }
+.te-tier { border: 1px solid var(--line); border-left: 6px solid var(--tc); border-radius: var(--r); padding: 10px; display: grid; gap: 8px; }
+.te-th { display: flex; gap: 6px; align-items: center; }
+.te-th input { max-width: 220px; font-weight: 700; }
+.te-deck { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.3fr) minmax(0, .9fr) minmax(0, .9fr) auto; gap: 6px; align-items: center; }
+.te-deck + .te-deck { border-top: 1px dashed var(--line); padding-top: 8px; }
+.te-deck .te-note { grid-column: 1 / -1; }
+.te-btns { display: flex; gap: 2px; justify-content: flex-end; }
+.x.sm { width: 30px; height: 30px; font-weight: 700; }
+.x:disabled { opacity: .35; cursor: not-allowed; }
+@media (max-width: 640px) { .te-deck { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .te-btns { grid-column: 1 / -1; } }
 
 footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
 @media (max-width: 999px) { footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); } .shop { padding-bottom: 8px; } }
@@ -301,6 +373,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     <a class="btn sm" id="addFriend" target="_blank" rel="noopener" data-t-label="addFriend" hidden><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9l-.6 2.7c-.1.5.4.8.8.6 2.7-1.6 6.4-4 8.4-6.2C20.9 14.6 22 12.9 22 11c0-4.4-4.5-8-10-8Z" fill="var(--line-green)"/></svg><span data-t="addFriend"></span></a>
     <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div>
   </div>
+  <nav class="wrap tabs" data-t-label="tabsLabel"><a href="#decks" data-tab="decks" data-t="tabDecks"></a><a href="#cards" data-tab="cards" data-t="tabCards"></a><a href="#tiers" data-tab="tiers" data-t="tabTiers"></a></nav>
 </header>
 
 <main class="wrap shop">
@@ -308,6 +381,20 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     <div class="notice" id="notSetup" hidden></div>
     <section class="kp" id="keeper" hidden></section>
     <ol class="steps"><li><b>1</b><span data-t="step1"></span></li><li><b>2</b><span data-t="step2"></span></li><li><b>3</b><span data-t="step3"></span></li></ol>
+    <section class="view" id="decksView" hidden>
+      <div class="levels" id="levels" role="group" data-t-label="levels"></div>
+      <div class="filters" id="dFilters">
+        <div class="frow dfrow">
+          <input class="q" type="search" id="dQ" data-t-ph="dSearch" autocomplete="off" enterkeyhint="search">
+          <select id="dLegend" aria-label="Legend"></select>
+        </div>
+        <div class="doms" id="dStyles" role="group" data-t-label="pStyle"></div>
+      </div>
+      <div class="resbar"><span id="dCount" aria-live="polite"></span><button type="button" class="btn link" id="dClear" data-t="clearFilters" hidden></button></div>
+      <div id="deckShelves"></div>
+    </section>
+    <section class="view" id="tiersView" hidden></section>
+    <section class="view" id="cardsView" hidden>
     <div class="filters" id="filters">
       <div class="frow">
         <input class="q" type="search" id="fQ" data-t-ph="search" autocomplete="off" enterkeyhint="search">
@@ -324,6 +411,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     <div class="resbar"><span id="resCount" aria-live="polite"></span><button type="button" class="btn link" id="fClear" data-t="clearFilters" hidden></button></div>
     <div class="cards" id="grid"><div class="state" data-t="loading"></div></div>
     <button type="button" class="btn more" id="more" data-t="more" hidden></button>
+    </section>
   </div>
 
   <aside class="cart" id="cart" aria-labelledby="cartTitle">
@@ -372,6 +460,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
 <dialog id="detail"><div class="dlg detail" id="detailBody"></div></dialog>
 <dialog id="editor" aria-labelledby="edTitle"><div class="dlg" id="edBody"></div></dialog>
 <dialog id="peditor" aria-labelledby="pedTitle"><div class="dlg" id="pedBody"></div></dialog>
+<dialog id="teditor" aria-labelledby="teTitle"><div class="dlg" id="teBody"></div></dialog>
 <input type="file" id="photoFile" accept="image/*" hidden>
 <input type="file" id="importFile" accept=".csv,text/csv" hidden>
 
@@ -399,12 +488,39 @@ const SHOP_CONFIG = {
   },
   stockFile: 'stock.csv',  // read when there is no cloud stock (not set up, or unreachable); see scripts/make_stock_csv.py
   showAllCards: false,          // true: customers also see unlisted cards (as Ask price); false: only what's listed, sold out included
+  // Deck levels by price: up to the first number is Budget Starter, up to the second Mid-Level, above that Tournament Winner.
+  deckLevels: [1000, 5000],
 };
 
 const LANG = {
   en: {
-    tagline: 'Riftbound singles · order through LINE',
-    step1: 'Tap cards to add them to your list', step2: 'Check your list', step3: 'Send it to us on LINE. We reply with the total, payment and shipping.',
+    tagline: 'Ready-to-play Riftbound decks and singles · order through LINE',
+    step1: 'Tap a deck or card to add it to your list', step2: 'Check your list', step3: 'Send it to us on LINE. We reply with the total, payment and shipping.',
+    tabsLabel: 'Shop sections', tabDecks: 'Decks', tabCards: 'Singles & more', tabTiers: 'Tier list',
+    levels: 'Deck levels', lv_budget: 'Budget Starter', lv_mid: 'Mid-Level', lv_top: 'Tournament Winner', lv_ask: 'Ask for price',
+    lvFor_budget: 'Your first deck, ready to play. For players who don’t have a deck yet.',
+    lvFor_mid: 'Built to win games at events: cheaper takes on strong decks, or top lists that are nearly complete.',
+    lvFor_top: 'Tier 1 lists that won tournaments, card for card.',
+    upTo: v => `Up to ${v}`, over: v => `Over ${v}`,
+    nDecks: n => `${n} deck${n === 1 ? '' : 's'}`, nCards: n => `${n} cards`, deck: 'Deck',
+    st_aggro: 'Aggro', st_midrange: 'Midrange', st_control: 'Control', st_combo: 'Combo',
+    dSearch: 'Search deck, card or #tag', allLegends: 'All Legends',
+    noDeckMatch: 'No decks match these filters.', noDecksLevel: 'No decks at this level right now. Check back soon, or ask us on LINE.', noDecksYet: 'No decks for sale yet. Check back soon!',
+    tlTitle: 'Meta tier list', tlUpdated: d => `Updated ${d}`, tlEmpty: 'The tier list is coming soon.',
+    tlHow: 'The top row is the strongest in the current meta. Tap “See … in the shop” under a deck to find the decks we sell with that Legend.',
+    tlShop: n => `See ${n} deck${n === 1 ? '' : 's'} in the shop →`, tlMeta: 'Tier list', tlSee: 'See the tier list',
+    tlEdit: 'Edit tier list', teNote: 'Note (optional)', teNotePh: 'e.g. After the Bangkok Regional, October 2026',
+    teTierName: 'Tier name', teUp: 'Move up', teDown: 'Move down', teDelTier: 'Delete this tier', teMove: 'Move to tier',
+    teDelTierAsk: (n, k) => `Delete ${n} and the ${k} deck${k === 1 ? '' : 's'} in it?`,
+    tePickLegend: 'Legend…', teName: 'Deck name', teNamePh: 'Deck name, e.g. Kennen Combo',
+    teEntryNotePh: 'Note for customers (optional), e.g. Strong against Aggro', teAdd: n => `Add a deck to ${n}`, teAddTier: 'Add a tier',
+    teHint: 'Pick each deck’s Legend so customers can jump to the decks you sell with it. Empty tiers are hidden in the shop. Saving shows the new list right away.',
+    kAddDeck: '+ Add a deck', kTierHint: 'Keep the tier list in step with the current meta. Customers see it in the Tier list tab.',
+    kDeckHint: (a, b) => `Tap a deck to change it. The price sets its level: up to ${a} is Budget Starter, up to ${b} Mid-Level, above that Tournament Winner.`,
+    kNeedSql: 'The shop database needs an update for deck styles, tags and the tier list: in Supabase → SQL Editor, run supabase/shop.sql again, then reload this page.',
+    pKind: 'What is it?', pKindDeck: 'Deck', pKindOther: 'Other product', pTitleNewDeck: 'New deck', pTitleDeck: 'Edit deck', pDeckNamePh: 'e.g. Kennen Combo',
+    pStyle: 'Style', pTags: 'Tags', pTagsPh: '#kennen #highroll',
+    pLevel: (n, r) => `Level: <b>${n}</b> (${r}), set by the price.`, pLevelAsk: 'The price sets the level. Without a price, the deck shows under Ask for price.',
     search: 'Search card name or text', allSets: 'All sets', allTypes: 'All types', allRarities: 'All rarities',
     sortNum: 'Newest set first', sortName: 'Name A–Z', sortLow: 'Price: low to high', sortHigh: 'Price: high to low',
     clearFilters: 'Clear filters', more: 'Show more',
@@ -413,11 +529,11 @@ const LANG = {
     askPrice: 'Ask price', soldOut: 'Sold out', left: n => `${n} left`,
     addX: n => `Add ${n} to your list`, details: 'Details', add: 'Add to list', inList: n => `${n} in your list`,
     added: (n, q) => `Added ${n}` + (q > 1 ? ` (${q})` : ''), maxed: n => `We only have ${n}`,
-    myList: 'Your list', empty: 'Your list is empty. Tap a card to add it.', count: n => `${n} card${n === 1 ? '' : 's'}`,
+    myList: 'Your list', empty: 'Your list is empty. Tap a deck or card to add it.', count: n => `${n} card${n === 1 ? '' : 's'}`,
     total: 'Total', toPrice: n => `+ ${n} card${n === 1 ? '' : 's'} to be priced`,
     countItems: n => `${n} item${n === 1 ? '' : 's'}`, toPriceItems: n => `+ ${n} item${n === 1 ? '' : 's'} to be priced`, resultsItems: n => `${n.toLocaleString('en-US')} item${n === 1 ? '' : 's'}`,
     review: 'Review and send', clear: 'Clear list', clearAsk: 'Remove every card from your list?', close: 'Close',
-    viewList: 'View list', tapCards: 'Tap cards to add them', less: 'One less', plus: 'One more',
+    viewList: 'View list', tapCards: 'Tap a deck or card to add it', less: 'One less', plus: 'One more',
     reviewTitle: 'Check your order', yourName: 'Your name (optional)', note: 'Note for us (optional)', notePh: 'Shipping or pickup, card condition, questions…',
     send: 'Send order on LINE', copy: 'Copy order text', copied: 'Order copied', preview: 'Message preview',
     howOA: 'LINE opens a chat with us with your order already typed. Tap Send there and we’ll reply with the total, payment and shipping.',
@@ -445,7 +561,7 @@ const LANG = {
     pChoose: 'Choose a photo', pChange: 'Change photo', pRemovePhoto: 'Remove photo', pDelete: 'Delete product',
     pDeleteAsk: n => `Delete ${n} from the shop?`, pDeleted: 'Product deleted', pNeedName: 'Give the product a name.',
     pPhotoFail: m => `Couldn’t use this photo: ${m}`, pHint: 'No price shows Ask price. Quantity 0 shows Sold out; blank shows no number.',
-    deckTag: n => `Deck · ${n} cards`, deckList: n => `Deck list · ${n} cards`, pDeck: 'Deck list (for decks)',
+    deckTag: n => `Deck · ${n} cards`, deckList: n => `Deck list · ${n} cards`, pDeck: 'Deck list',
     pDeckPh: 'Paste the deck list, one card per line:\nLegend:\n1 Kai\'Sa, Daughter of the Void [OGN-247]\nMain Deck:\n3 Falling Star [OGN-029]',
     pDeckCount: (n, bad) => `${n} cards` + (bad ? ` · ${bad === 1 ? '1 line matches' : bad + ' lines match'} no card` : ''),
     pDeckHint: 'Customers see every card in the deck with its picture. Without a photo, the Legend is the deck’s picture.',
@@ -469,8 +585,32 @@ const LANG = {
     sUnmatched: n => n === 1 ? '1 stock row matches no card' : `${n} stock rows match no card`,
   },
   th: {
-    tagline: 'การ์ด Riftbound แยกใบ · สั่งซื้อผ่าน LINE',
-    step1: 'แตะการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: 'ส่งรายการให้เราทาง LINE แล้วเราจะแจ้งยอดชำระและการจัดส่ง',
+    tagline: 'เด็ค Riftbound พร้อมเล่นและการ์ดแยกใบ · สั่งซื้อผ่าน LINE',
+    step1: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: 'ส่งรายการให้เราทาง LINE แล้วเราจะแจ้งยอดชำระและการจัดส่ง',
+    tabsLabel: 'หมวดของร้าน', tabDecks: 'เด็คพร้อมเล่น', tabCards: 'การ์ดและสินค้าอื่น', tabTiers: 'Tier list',
+    levels: 'ระดับเด็ค', lv_budget: 'เด็คเริ่มต้นราคาประหยัด', lv_mid: 'เด็คระดับกลาง', lv_top: 'เด็คแชมป์ทัวร์นาเมนต์', lv_ask: 'สอบถามราคา',
+    lvFor_budget: 'เด็คแรกของคุณ พร้อมเล่นทันที สำหรับคนที่ยังไม่มีเด็ค',
+    lvFor_mid: 'พร้อมลุ้นชนะในงานแข่ง: เด็คแรงฉบับประหยัด หรือเด็คท็อปที่เกือบครบ',
+    lvFor_top: 'ลิสต์ระดับ Tier 1 ที่ชนะทัวร์นาเมนต์ ครบทุกใบตามลิสต์',
+    upTo: v => `ไม่เกิน ${v}`, over: v => `มากกว่า ${v}`,
+    nDecks: n => `${n} เด็ค`, nCards: n => `${n} ใบ`, deck: 'เด็ค',
+    dSearch: 'ค้นหาเด็ค การ์ด หรือ #แท็ก', allLegends: 'ทุก Legend',
+    noDeckMatch: 'ไม่พบเด็คที่ตรงกับตัวกรอง', noDecksLevel: 'ตอนนี้ยังไม่มีเด็คในระดับนี้ แวะมาดูใหม่เร็ว ๆ นี้ หรือสอบถามเราทาง LINE', noDecksYet: 'ยังไม่มีเด็ควางขาย แวะมาดูใหม่เร็ว ๆ นี้',
+    tlTitle: 'Tier list เมต้าปัจจุบัน', tlUpdated: d => `อัปเดต ${d}`, tlEmpty: 'Tier list กำลังจะมาเร็ว ๆ นี้',
+    tlHow: 'แถวบนสุดคือเด็คที่แรงที่สุดในเมต้าตอนนี้ แตะ “ดูเด็คในร้าน” เพื่อดูเด็คที่ร้านขายซึ่งใช้ Legend นั้น',
+    tlShop: n => `ดูเด็คในร้าน (${n}) →`, tlMeta: 'Tier list', tlSee: 'ดู Tier list',
+    tlEdit: 'แก้ไข Tier list', teNote: 'หมายเหตุ (ไม่บังคับ)', teNotePh: 'เช่น อัปเดตหลังงาน Bangkok Regional ตุลาคม 2026',
+    teTierName: 'ชื่อระดับ', teUp: 'เลื่อนขึ้น', teDown: 'เลื่อนลง', teDelTier: 'ลบระดับนี้', teMove: 'ย้ายไประดับ',
+    teDelTierAsk: (n, k) => `ลบ ${n} และเด็คในระดับนี้ ${k} เด็คใช่ไหม`,
+    tePickLegend: 'เลือก Legend…', teName: 'ชื่อเด็ค', teNamePh: 'ชื่อเด็ค เช่น Kennen Combo',
+    teEntryNotePh: 'หมายเหตุถึงลูกค้า (ไม่บังคับ) เช่น ได้เปรียบเด็ค Aggro', teAdd: n => `เพิ่มเด็คใน ${n}`, teAddTier: 'เพิ่มระดับ',
+    teHint: 'เลือก Legend ของแต่ละเด็ค เพื่อให้ลูกค้ากดไปดูเด็คที่ร้านขายซึ่งใช้ Legend นั้นได้ ระดับที่ไม่มีเด็คจะไม่แสดงในร้าน บันทึกแล้วจะแสดงทันที',
+    kAddDeck: '+ เพิ่มเด็ค', kTierHint: 'อัปเดต Tier list ให้ตรงกับเมต้าปัจจุบัน ลูกค้าจะเห็นในแท็บ Tier list',
+    kDeckHint: (a, b) => `แตะเด็คเพื่อแก้ไข ราคากำหนดระดับของเด็ค: ไม่เกิน ${a} เป็นเด็คเริ่มต้น ไม่เกิน ${b} เป็นเด็คระดับกลาง มากกว่านั้นเป็นเด็คแชมป์ทัวร์นาเมนต์`,
+    kNeedSql: 'ฐานข้อมูลร้านต้องอัปเดตเพื่อใช้สไตล์เด็ค แท็ก และ Tier list: เปิด Supabase → SQL Editor แล้วรัน supabase/shop.sql อีกครั้ง จากนั้นโหลดหน้านี้ใหม่',
+    pKind: 'ประเภทสินค้า', pKindDeck: 'เด็ค', pKindOther: 'สินค้าอื่น', pTitleNewDeck: 'เด็คใหม่', pTitleDeck: 'แก้ไขเด็ค', pDeckNamePh: 'เช่น Kennen Combo',
+    pStyle: 'สไตล์', pTags: 'แท็ก',
+    pLevel: (n, r) => `ระดับ: <b>${n}</b> (${r}) ตามราคา`, pLevelAsk: 'ราคากำหนดระดับของเด็ค ถ้าไม่ใส่ราคา เด็คจะอยู่ในหมวด สอบถามราคา',
     search: 'ค้นหาชื่อการ์ดหรือข้อความบนการ์ด', allSets: 'ทุกชุด', allTypes: 'ทุกประเภท', allRarities: 'ทุกความหายาก',
     sortNum: 'ชุดใหม่ล่าสุดก่อน', sortName: 'ชื่อ A–Z', sortLow: 'ราคา: ต่ำไปสูง', sortHigh: 'ราคา: สูงไปต่ำ',
     clearFilters: 'ล้างตัวกรอง', more: 'ดูเพิ่ม',
@@ -479,11 +619,11 @@ const LANG = {
     askPrice: 'สอบถามราคา', soldOut: 'หมด', left: n => `เหลือ ${n}`,
     addX: n => `เพิ่ม ${n} ลงรายการ`, details: 'รายละเอียด', add: 'เพิ่มลงรายการ', inList: n => `อยู่ในรายการ ${n} ใบ`,
     added: (n, q) => `เพิ่ม ${n} แล้ว` + (q > 1 ? ` (${q} ใบ)` : ''), maxed: n => `มีของแค่ ${n} ใบ`,
-    myList: 'รายการของคุณ', empty: 'ยังไม่มีการ์ดในรายการ แตะการ์ดเพื่อเพิ่ม', count: n => `${n} ใบ`,
+    myList: 'รายการของคุณ', empty: 'ยังไม่มีสินค้าในรายการ แตะเด็คหรือการ์ดเพื่อเพิ่ม', count: n => `${n} ใบ`,
     total: 'รวม', toPrice: n => `+ อีก ${n} ใบรอแจ้งราคา`,
     countItems: n => `${n} ชิ้น`, toPriceItems: n => `+ อีก ${n} ชิ้นรอแจ้งราคา`, resultsItems: n => `${n.toLocaleString('en-US')} รายการ`,
     review: 'ตรวจรายการและส่ง', clear: 'ล้างรายการ', clearAsk: 'ลบการ์ดทั้งหมดออกจากรายการใช่ไหม', close: 'ปิด',
-    viewList: 'ดูรายการ', tapCards: 'แตะการ์ดเพื่อเพิ่มลงรายการ', less: 'ลดหนึ่งใบ', plus: 'เพิ่มหนึ่งใบ',
+    viewList: 'ดูรายการ', tapCards: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', less: 'ลดหนึ่งใบ', plus: 'เพิ่มหนึ่งใบ',
     reviewTitle: 'ตรวจสอบคำสั่งซื้อ', yourName: 'ชื่อของคุณ (ไม่บังคับ)', note: 'ข้อความถึงร้าน (ไม่บังคับ)', notePh: 'จัดส่งหรือรับเอง สภาพการ์ด หรือคำถามอื่น ๆ',
     send: 'ส่งคำสั่งซื้อทาง LINE', copy: 'คัดลอกรายการ', copied: 'คัดลอกรายการแล้ว', preview: 'ตัวอย่างข้อความ',
     howOA: 'LINE จะเปิดแชตกับร้านโดยพิมพ์รายการไว้ให้แล้ว กดส่งในแชต แล้วร้านจะแจ้งยอดชำระและการจัดส่ง',
@@ -511,7 +651,7 @@ const LANG = {
     pChoose: 'เลือกรูป', pChange: 'เปลี่ยนรูป', pRemovePhoto: 'ลบรูป', pDelete: 'ลบสินค้า',
     pDeleteAsk: n => `ลบ ${n} ออกจากร้านใช่ไหม`, pDeleted: 'ลบสินค้าแล้ว', pNeedName: 'ใส่ชื่อสินค้าก่อน',
     pPhotoFail: m => `ใช้รูปนี้ไม่ได้: ${m}`, pHint: 'ไม่ใส่ราคาจะแสดงว่า สอบถามราคา จำนวน 0 แสดงว่า หมด เว้นว่างจะไม่แสดงจำนวน',
-    deckTag: n => `เด็ค · ${n} ใบ`, deckList: n => `การ์ดในเด็ค · ${n} ใบ`, pDeck: 'รายการการ์ดในเด็ค (สำหรับเด็ค)',
+    deckTag: n => `เด็ค · ${n} ใบ`, deckList: n => `การ์ดในเด็ค · ${n} ใบ`, pDeck: 'รายการการ์ดในเด็ค',
     pDeckPh: 'วางรายการเด็ค บรรทัดละหนึ่งการ์ด:\nLegend:\n1 Kai\'Sa, Daughter of the Void [OGN-247]\nMain Deck:\n3 Falling Star [OGN-029]',
     pDeckCount: (n, bad) => `${n} ใบ` + (bad ? ` · ${bad} บรรทัดไม่ตรงกับการ์ดใบใด` : ''),
     pDeckHint: 'ลูกค้าจะเห็นการ์ดทุกใบในเด็คพร้อมรูป ถ้าไม่ใส่รูป จะใช้รูป Legend เป็นรูปของเด็ค',
@@ -542,6 +682,10 @@ const TYPES = ['Legend', 'Unit', 'Spell', 'Gear', 'Battlefield', 'Rune'];
 const DOMAINS = ['Fury', 'Calm', 'Mind', 'Body', 'Chaos', 'Order', 'Colorless'];
 const RARITIES = ['Common', 'Uncommon', 'Rare', 'Epic', 'Promo'];
 const PAGE = 60, MAX_COPIES = 99, PRODUCTS = '_products', PRODUCT_BUCKET = 'shop';
+const TABS = ['decks', 'cards', 'tiers'];  // the page's sections: #decks, #cards, #tiers (#keeper/decks… in the shopkeeper zone)
+const LEVELS = ['budget', 'mid', 'top'];   // deck levels, by price (SHOP_CONFIG.deckLevels); a deck without a price is 'ask'
+const STYLES = ['aggro', 'midrange', 'control', 'combo'];
+const TIER_COLORS = ['#E2574C', '#EE9A3E', '#E3C04B', '#7DC36B', '#5AA9DD', '#A98BD9', '#9AA2B0'];  // top tier first
 
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
@@ -574,7 +718,7 @@ function thumb(c, w = 0) {
 const landscape = c => { const sh = DB.sheets[c.im[0]]; return sh.w > sh.h; };
 // Listings are cards (x.c) or the shopkeeper's own products (x.p); these read either.
 const nameOf = x => x.p ? x.p.name : x.c.n;
-const prodTag = p => p.list.length ? t('deckTag', deckSize(p.list)) : t('prodTag');
+const prodTag = p => p.list.length ? t('deckTag', deckSize(p.list)) : t(p.isDeck ? 'deck' : 'prodTag');
 const itemRef = x => x.p ? prodTag(x.p) : cardNo(x.c) + (x.note ? ' · ' + x.note : '');
 const ICON_BOX = '<svg width="40%" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5zM3 7.5 12 12l9-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
 const photoUrl = path => `${SHOP_CONFIG.cloud.url}/storage/v1/object/public/${PRODUCT_BUCKET}/${path.split('/').map(encodeURIComponent).join('/')}`;
@@ -596,6 +740,19 @@ function parseDeck(text) {
 }
 const deckSize = list => list.reduce((a, l) => a + l.qty, 0);
 const deckCover = list => (list.find(l => l.c && l.section === 'Legend') || list.find(l => l.c && l.section === 'Champion') || list.find(l => l.c) || {}).c || null;
+const legendOf = list => (list.find(l => l.c && l.section === 'Legend') || {}).c || null;
+// "Ahri - Nine-Tailed Fox", and "Renekton - Butcher of the Sands" for Legends whose name leaves out the champion.
+const legendLabel = c => c.g && c.g[0] && !norm(c.n).startsWith(norm(c.g[0])) ? `${c.g[0]} - ${c.n}` : c.n;
+// A deck's level comes from its price; its tags are words customers can tap ("#kennen #highroll" is kept as "kennen highroll").
+const deckLevel = p => p.price == null ? 'ask' : p.price <= SHOP_CONFIG.deckLevels[0] ? 'budget' : p.price <= SHOP_CONFIG.deckLevels[1] ? 'mid' : 'top';
+function levelRange(l) {
+  const [a, b] = SHOP_CONFIG.deckLevels;
+  return l === 'budget' ? t('upTo', money(a)) : l === 'mid' ? `${money(a + 1)} – ${money(b)}` : l === 'top' ? t('over', money(b)) : '';
+}
+const parseTags = s => [...new Set(String(s || '').toLowerCase().split(/[\s,]+/).map(w => w.replace(/[^\p{L}\p{M}\p{N}_-]/gu, '').slice(0, 30)).filter(Boolean))].slice(0, 20);
+const styleChip = s => STYLES.includes(s) ? `<span class="style st-${s}"><i></i>${t('st_' + s)}</span>` : '';
+const tagBtn = tag => `<button type="button" class="tag" data-tag="${esc(tag)}" aria-pressed="${S.d.tag === tag}">#${esc(tag)}</button>`;
+const tierColor = i => TIER_COLORS[Math.min(i, TIER_COLORS.length - 1)];
 // A product's photo in a card-shaped frame; a deck without one shows its Legend, anything else a drawn box. w = 0 fills the container's width.
 function pthumb(p, w = 0) {
   if (!p.image && p.cover) return thumb(p.cover, w);
@@ -649,9 +806,13 @@ function qrSvg(text) {
 // (normal and foil). Its key is the card id, plus the note for extra versions, so lists survive price changes.
 // rows are the stock rows that match a card: { c, price, qty, note, descr }; products are the shopkeeper's own items.
 // stock.source is 'cloud', 'file' or 'none'.
+// tiers is the meta tier list (see loadTiers).
 const DB = { ok: false, failed: false, sheets: [], imgBase: '', cards: [], byId: new Map(), byName: new Map(), byNo: new Map(), rows: [], products: [],
-  listings: [], byKey: new Map(), stocked: false, stock: { source: '', error: '', unmatched: [] } };
-const S = { cart: store.get('rbshop.cart', {}), f: { q: '', set: '', type: '', rar: '', dom: new Set(), stock: false, sort: 'num' }, list: [], shown: PAGE, ref: '', detail: null };
+  listings: [], byKey: new Map(), stocked: false, stock: { source: '', error: '', unmatched: [] }, tiers: { note: '', tiers: [], updated: '', missing: false } };
+// f filters the cards, d the decks (d.legend is a Legend's card key, so every printing of it counts).
+const blankDeckFilter = () => ({ q: '', level: '', style: '', tag: '', legend: '' });
+const S = { cart: store.get('rbshop.cart', {}), tab: 'decks', f: { q: '', set: '', type: '', rar: '', dom: new Set(), stock: false, sort: 'num' }, d: blankDeckFilter(),
+  list: [], shown: PAGE, ref: '', detail: null };
 
 // Excel saves plain "CSV" in the computer's own encoding (windows-874 on Thai Windows) unless "CSV UTF-8" is picked.
 function decodeCsv(buf) { try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch { return new TextDecoder('windows-874').decode(buf); } }
@@ -718,7 +879,8 @@ async function loadStock() {
       DB.stock.source = 'cloud';
       return {
         rows: rows.map(x => ({ id: x.card_id, name: '', price: numOrNull(x.price), qty: x.qty, note: x.note || '', descr: x.descr || '', line: 0, listed: true })),
-        products: products.map(x => ({ id: x.id, name: x.name, price: numOrNull(x.price), qty: x.qty, descr: x.descr || '', image: x.image || '', sort: x.sort || 0, deck: x.deck || '' })),
+        products: products.map(x => ({ id: x.id, name: x.name, price: numOrNull(x.price), qty: x.qty, descr: x.descr || '', image: x.image || '', sort: x.sort || 0, deck: x.deck || '',
+          kind: x.kind || '', style: x.style || '', tags: x.tags || '' })),
       };
     } catch (e) { DB.stock.error = e.message || String(e); }
   }
@@ -728,7 +890,10 @@ async function loadStock() {
 }
 function setStock({ rows, products }) {
   DB.rows = []; DB.stock.unmatched = []; DB.products = products;
-  products.forEach(p => { p.list = parseDeck(p.deck); p.cover = deckCover(p.list); });
+  products.forEach(p => {
+    p.list = parseDeck(p.deck); p.cover = deckCover(p.list); p.legend = legendOf(p.list); p.tagList = parseTags(p.tags);
+    p.isDeck = p.kind === 'deck' || p.list.length > 0;  // a deck list makes a product a deck; kind marks one without a list
+  });
   rows.forEach(r => {
     if (!r.listed) return;  // a blank row: not on sale
     const c = rowCard(r);
@@ -749,13 +914,31 @@ function buildListings() {
   DB.listings = out; DB.byKey = new Map(out.map(x => [x.key, x])); DB.stocked = out.some(x => x.listed);
 }
 
+// The meta tier list, kept in the cloud as the shop_docs row 'tierlist':
+// { note, tiers: [{ name, decks: [{ name, legend (a Legend's card id), style, note }] }] }, top tier first.
+function cleanTiers(d) {
+  const s = (v, n) => String(v ?? '').trim().slice(0, n), obj = v => v && typeof v === 'object';
+  const tiers = (obj(d) && Array.isArray(d.tiers) ? d.tiers : []).filter(obj).map(x => ({ name: s(x.name, 16),
+    decks: (Array.isArray(x.decks) ? x.decks : []).filter(obj).map(e => ({ name: s(e.name, 60), legend: s(e.legend, 40), style: STYLES.includes(e.style) ? e.style : '', note: s(e.note, 200) })) }));
+  return { note: s(obj(d) && d.note, 600), tiers };
+}
+// missing: the table isn't there yet (supabase/shop.sql hasn't been run again since it was added). Never throws.
+async function loadTiers() {
+  if (!cloudReady()) return { ...cleanTiers(null), updated: '', missing: false };
+  try {
+    const row = (await fetchTable('shop_docs', 'id,data,updated_at', 'id')).find(r => r.id === 'tierlist');
+    return { ...cleanTiers(row && row.data), updated: row ? row.updated_at : '', missing: false };
+  } catch (e) { return { ...cleanTiers(null), updated: '', missing: /shop_docs|HTTP 404/.test(e.message || '') }; }
+}
+
 async function load() {
   try {
-    const [j, stock] = await Promise.all([
+    const [j, stock, tiers] = await Promise.all([
       fetch('cards/cards.json').then(r => { if (!r.ok) throw 0; return r.json(); }),
       loadStock(),
+      loadTiers(),
     ]);
-    DB.sheets = j.sheets; DB.imgBase = j.imgBase;
+    DB.sheets = j.sheets; DB.imgBase = j.imgBase; DB.tiers = tiers;
     // Some Legends are listed twice, by title only ("Matriarch of War") and in full ("Ambessa - Matriarch of War"); keep the full one.
     const legends = j.cards.filter(c => c.t === 'Legend');
     const alias = new Set(legends.filter(c => !c.k.includes(' - ') && legends.some(x => x.k.endsWith(' - ' + c.k))).map(c => c.k));
@@ -780,7 +963,8 @@ function hasText(x, q) {
   const words = norm(q).replace(/[\[\]]/g, '').split(' ').filter(Boolean);
   let h = searchText.get(x);
   if (h == null) {
-    const c = x.c, parts = x.p ? [x.p.name, x.descr, ...x.p.list.map(l => l.name)] : [c.n, c.id, cardNo(c), c.st, c.t, ...c.d, ...(c.g || []), readable(c.x), x.note, x.descr];
+    const c = x.c, parts = x.p ? [x.p.name, x.descr, x.p.style, ...x.p.tagList.map(g => '#' + g), ...x.p.list.map(l => l.name)]
+      : [c.n, c.id, cardNo(c), c.st, c.t, ...c.d, ...(c.g || []), readable(c.x), x.note, x.descr];
     h = norm(parts.join(' ').replace(/[\[\]]/g, '')); searchText.set(x, h);
   }
   return words.every(w => h.includes(w));
@@ -790,7 +974,7 @@ function visible() {
   const xs = DB.listings.filter(x => {
     const c = x.c;
     if (f.stock && !x.listed) return false;  // the shopkeeper's "Listed only"
-    if (x.p) return !(f.set || f.rar || f.dom.size || (f.type && f.type !== PRODUCTS)) && (!f.q || hasText(x, f.q));  // products have no set, type or domain
+    if (x.p) return !x.p.isDeck && !(f.set || f.rar || f.dom.size || (f.type && f.type !== PRODUCTS)) && (!f.q || hasText(x, f.q));  // decks have their own tab; products have no set, type or domain
     if (f.type === PRODUCTS) return false;
     if (f.set && !c.s.includes(f.set)) return false;
     if (f.type && c.t !== f.type) return false;
@@ -810,7 +994,7 @@ function renderFilters() {
     .sort((a, b) => { const i = s => { const k = SET_ORDER.indexOf(s.toLowerCase()); return k < 0 ? 99 : k; }; return i(a) - i(b); });
   const opts = (all, list, cur, label = v => v) => `<option value="">${esc(all)}</option>` + list.map(v => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(label(v))}</option>`).join('');
   $('#fSet').innerHTML = opts(t('allSets'), sets, S.f.set, s => `${SET_NAMES[s]} (${s})`);
-  $('#fType').innerHTML = opts(t('allTypes'), [...(DB.products.length ? [PRODUCTS] : []), ...TYPES], S.f.type, v => v === PRODUCTS ? t('typeProducts') : v);
+  $('#fType').innerHTML = opts(t('allTypes'), [...(DB.products.some(p => !p.isDeck) ? [PRODUCTS] : []), ...TYPES], S.f.type, v => v === PRODUCTS ? t('typeProducts') : v);
   $('#fRar').innerHTML = opts(t('allRarities'), RARITIES.filter(r => DB.listings.some(x => x.c && x.c.r === r)), S.f.rar);
   $('#fSort').innerHTML = [['num', 'sortNum'], ['name', 'sortName'], ...(DB.stocked ? [['low', 'sortLow'], ['high', 'sortHigh']] : [])]
     .map(([v, k]) => `<option value="${v}"${v === S.f.sort ? ' selected' : ''}>${esc(t(k))}</option>`).join('');
@@ -844,7 +1028,9 @@ function tile(x, pop = false) {
     </button>
     <button type="button" class="info" data-act="info" aria-label="${esc(t('details') + ': ' + label)}">${ICON_INFO}</button>
     <div class="nm" title="${esc(label)}">${esc(label)}</div>
-    <div class="sub">${x.p ? prodTag(x.p) : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>
+    ${x.p && x.p.isDeck ? `<div class="dsub">${styleChip(x.p.style)}${x.p.list.length ? `<span>${t('nCards', deckSize(x.p.list))}</span>` : ''}</div>`
+      + (x.p.tagList.length ? `<div class="dtags">${x.p.tagList.map(tagBtn).join('')}</div>` : '')
+      : `<div class="sub">${x.p ? prodTag(x.p) : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>`}
     ${x.descr ? `<div class="desc" title="${esc(x.descr)}">${esc(x.descr)}</div>` : ''}
     <div class="buy">${K.on ? keeperTag(x) : priceTag(x) + (n ? stepper(x, n) : '')}</div>
   </article>`;
@@ -855,7 +1041,7 @@ function renderGrid() {
   S.list = visible();
   $('#resCount').textContent = counted('results', S.list.length, S.list);
   $('#fClear').hidden = !filtered();
-  g.innerHTML = S.list.length ? S.list.slice(0, S.shown).map(x => tile(x)).join('') : `<div class="state">${t(DB.listings.length ? 'noMatch' : 'nothingYet')}</div>`;
+  g.innerHTML = S.list.length ? S.list.slice(0, S.shown).map(x => tile(x)).join('') : `<div class="state">${t(filtered() ? 'noMatch' : 'nothingYet')}</div>`;
   $('#more').hidden = S.shown >= S.list.length;
 }
 function showMore() {
@@ -864,11 +1050,77 @@ function showMore() {
   S.shown += PAGE;
   $('#more').hidden = S.shown >= S.list.length;
 }
-function refreshTile(key) {
-  const g = $('#grid'), sel = `[data-key="${CSS.escape(key)}"]`, el = g.querySelector(sel); if (!el) return;
-  const a = document.activeElement, act = a && el.contains(a) ? a.dataset.act : null;
+function refreshTile(key) {  // a card's tile is in the card grid, a deck's on its shelf
+  const sel = `.tile[data-key="${CSS.escape(key)}"]`, el = document.querySelector(sel); if (!el) return;
+  const a = document.activeElement, act = a && el.contains(a) ? a.dataset.act : null, box = el.parentNode;
   el.outerHTML = tile(DB.byKey.get(key), true);
-  if (act) { const nt = g.querySelector(sel); (nt.querySelector(`[data-act="${act}"]:not(:disabled)`) || nt.querySelector('.pic')).focus({ preventScroll: true }); }
+  if (act) { const nt = box.querySelector(sel); (nt.querySelector(`[data-act="${act}"]:not(:disabled)`) || nt.querySelector('.pic')).focus({ preventScroll: true }); }
+}
+
+// ---------- decks ----------
+// The Decks tab: the three levels (they filter too), then a shelf of decks per level, cheapest first and sold out last.
+const deckFiltered = () => Object.values(S.d).some(Boolean);
+function visibleDecks() {
+  const d = S.d;
+  return DB.listings.filter(x => x.p && x.p.isDeck
+    && (!d.level || deckLevel(x.p) === d.level)
+    && (!d.style || x.p.style === d.style || x.p.tagList.includes(d.style))
+    && (!d.tag || x.p.tagList.includes(d.tag))
+    && (!d.legend || (x.p.legend && x.p.legend.k === d.legend))
+    && (!d.q || hasText(x, d.q)))
+    .sort((a, b) => (a.qty === 0) - (b.qty === 0) || (a.price ?? 0) - (b.price ?? 0));
+}
+function renderDecks() {
+  $('#levels').hidden = $('#dFilters').hidden = !DB.ok;
+  if (!DB.ok) { $('#deckShelves').innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; $('#dCount').textContent = ''; return; }
+  const all = DB.listings.filter(x => x.p && x.p.isDeck), xs = visibleDecks(), d = S.d;
+  $('#levels').innerHTML = LEVELS.map(l => `<button type="button" class="lvl lv-${l}" data-level="${l}" aria-pressed="${d.level === l}">
+      <b>${t('lv_' + l)}</b><span class="num">${esc(levelRange(l))}</span><span class="for">${t('lvFor_' + l)}</span>
+      <span class="n">${t('nDecks', all.filter(x => deckLevel(x.p) === l).length)}</span></button>`).join('');
+  const legends = [...new Map(all.filter(x => x.p.legend).map(x => [x.p.legend.k, x.p.legend])).values()].sort((a, b) => legendLabel(a).localeCompare(legendLabel(b)));
+  $('#dLegend').innerHTML = `<option value="">${esc(t('allLegends'))}</option>` + legends.map(c => `<option value="${esc(c.k)}"${c.k === d.legend ? ' selected' : ''}>${esc(legendLabel(c))}</option>`).join('');
+  $('#dLegend').hidden = !legends.length && !d.legend;
+  $('#dQ').style.gridColumn = $('#dLegend').hidden ? '1 / -1' : '';
+  if (document.activeElement !== $('#dQ')) $('#dQ').value = d.q;
+  $('#dStyles').innerHTML = STYLES.map(s => `<button type="button" class="dom" data-style="${s}" aria-pressed="${d.style === s}"><i class="c st-${s}"></i>${t('st_' + s)}</button>`).join('')
+    + (d.tag ? `<button type="button" class="dom on" data-tag="${esc(d.tag)}" aria-pressed="true" aria-label="#${esc(d.tag)} · ${esc(t('clearFilters'))}">#${esc(d.tag)} ${ICON_X}</button>` : '');
+  $('#dCount').textContent = t('nDecks', xs.length);
+  $('#dClear').hidden = !deckFiltered();
+  const shelves = [...LEVELS, 'ask'].filter(l => !d.level || d.level === l).map(l => [l, xs.filter(x => deckLevel(x.p) === l)]).filter(([l, ys]) => ys.length || d.level === l);
+  $('#deckShelves').innerHTML = !shelves.length ? `<div class="state">${t(all.length ? 'noDeckMatch' : 'noDecksYet')}</div>`
+    : shelves.map(([l, ys]) => `<section class="shelf lv-${l}">
+      <div class="shelf-h"><h2>${t('lv_' + l)}</h2>${l === 'ask' ? '' : `<span class="num">${esc(levelRange(l))}</span>`}<span class="n">${t('nDecks', ys.length)}</span>${l === 'ask' ? '' : `<p class="for">${t('lvFor_' + l)}</p>`}</div>
+      ${ys.length ? `<div class="cards decks">${ys.map(x => tile(x)).join('')}</div>` : `<div class="state">${t(Object.entries(d).some(([k, v]) => v && k !== 'level') ? 'noDeckMatch' : 'noDecksLevel')}</div>`}
+    </section>`).join('');
+}
+// Show the Decks tab with the filters as they are now.
+const showDecks = () => { if (S.tab === 'decks') renderDecks(); else location.hash = tabHref('decks'); };
+
+// ---------- tier list ----------
+// Each deck in it shows its Legend and links to the decks on sale with that Legend. Empty tiers are left out for customers.
+function renderTiers() {
+  const el = $('#tiersView');
+  if (!DB.ok) { el.innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; return; }
+  const tl = DB.tiers, decks = DB.listings.filter(x => x.p && x.p.isDeck && x.p.legend);
+  const when = tl.updated ? new Date(tl.updated).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  const entry = e => {
+    const c = DB.byId.get(e.legend), n = c ? decks.filter(x => x.p.legend.k === c.k).length : 0;
+    return `<article class="tl-deck">${c ? thumb(c, 48) : `<span class="cimg pimg" style="width:48px;height:67px;flex:none" aria-hidden="true">${ICON_BOX}</span>`}<div>
+      <b>${esc(e.name || (c ? legendLabel(c) : ''))}</b>${styleChip(e.style)}${c && e.name ? `<span class="small muted">${esc(legendLabel(c))}</span>` : ''}
+      ${e.note ? `<span class="small">${esc(e.note)}</span>` : ''}${n ? `<button type="button" class="btn link" data-legend="${esc(c.k)}">${t('tlShop', n)}</button>` : ''}</div></article>`;
+  };
+  const rows = tl.tiers.map((x, i) => x.decks.length || K.on ? `<div class="tl-row"><div class="tl-tier" style="--tc:${tierColor(i)}">${esc(x.name)}</div>
+      <div class="tl-decks">${x.decks.map(entry).join('') || `<p class="tl-empty">—</p>`}</div></div>` : '').join('');
+  el.innerHTML = `<div class="tl-head"><div><h2>${t('tlTitle')}</h2>${when ? `<p class="small muted">${t('tlUpdated', esc(when))}</p>` : ''}</div></div>
+    ${tl.note ? `<p class="tl-note">${esc(tl.note)}</p>` : ''}
+    ${rows ? `<div class="tl">${rows}</div><p class="small muted">${t('tlHow')}</p>` : `<div class="state">${t('tlEmpty')}</div>`}`;
+}
+// For a deck's details: where its Legend stands in the tier list.
+function tierLine(p) {
+  if (!p.legend) return '';
+  const hits = [];
+  DB.tiers.tiers.forEach(x => x.decks.forEach(e => { const c = DB.byId.get(e.legend); if (c && c.k === p.legend.k) hits.push(`<b>${esc(x.name)}</b> · ${esc(e.name)}`); }));
+  return hits.length ? `<p class="small">${t('tlMeta')}: ${hits.join(', ')} <a class="btn link" href="${tabHref('tiers')}">${t('tlSee')}</a></p>` : '';
 }
 
 // ---------- the customer's list ----------
@@ -1010,9 +1262,13 @@ function renderDetail() {
   const x = DB.byKey.get(S.detail); if (!x) return;
   const body = $('#detailBody'), close = `<button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button>`;
   if (x.p) {
+    const p = x.p, lv = p.isDeck ? deckLevel(p) : '';
     body.className = 'dlg detail';
-    body.innerHTML = `${close}<div class="big pbig">${x.p.image ? `<img src="${esc(photoUrl(x.p.image))}" alt="${esc(x.p.name)}">` : pthumb(x.p)}</div>
-      <div class="dinfo"><h2>${esc(x.p.name)}</h2><div class="tags"><span>${prodTag(x.p)}</span></div>${shopDesc(x)}${dbuy(x)}${deckList(x.p.list)}</div>`;
+    body.innerHTML = `${close}<div class="big pbig">${p.image ? `<img src="${esc(photoUrl(p.image))}" alt="${esc(p.name)}">` : pthumb(p)}</div>
+      <div class="dinfo"><h2>${esc(p.name)}</h2>
+        <div class="tags">${lv ? `<span class="lvb lv-${lv}">${t('lv_' + lv)}</span>` : ''}${styleChip(p.style)}<span>${prodTag(p)}</span></div>
+        ${p.tagList.length ? `<div class="dtags">${p.tagList.map(tagBtn).join('')}</div>` : ''}
+        ${p.isDeck ? tierLine(p) : ''}${shopDesc(x)}${dbuy(x)}${deckList(p.list)}</div>`;
     return;
   }
   const c = x.c, wide = landscape(c);
@@ -1053,11 +1309,16 @@ const ICON_TRASH = '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden=
 const K = { on: false, sb: null, starting: false, user: null, state: 'connecting', msg: '', busy: false, lastUser: '' };
 let E = null;  // the card in the stock editor: { c, orig: its notes as saved, rows: [{ note, price, qty }], busy }
 
+// The address says the tab and whether this is the shopkeeper zone: #cards, #keeper, #keeper/tiers… (no tab: the decks).
+const tabHref = tab => '#' + (K.on ? 'keeper/' : '') + tab;
 function setMode() {
-  K.on = location.hash === '#keeper';
+  const [a = '', b = ''] = location.hash.slice(1).split('/'), was = K.on, tab = S.tab;
+  K.on = a === 'keeper';
+  S.tab = TABS.includes(K.on ? b : a) ? (K.on ? b : a) : 'decks';
   document.body.classList.toggle('keeper', K.on);
   if (K.on) openSheet(false);
-  if (DB.ok) { buildListings(); S.f.stock = false; S.shown = PAGE; }
+  if (DB.ok && K.on !== was) { buildListings(); S.f.stock = false; S.shown = PAGE; }
+  if (S.tab !== tab || K.on !== was) { if ($('#detail').open) $('#detail').close(); scrollTo(0, 0); }
   renderAll();
   if (K.on) keeperInit();
 }
@@ -1137,12 +1398,15 @@ function renderKeeper() {
   else if (st === 'notable') body = `${signedIn}<p>${t('kNoTable')}</p><div class="row">${btn('retry', t('kCheck'))}</div>`;
   else if (st === 'nokeeper') body = `${signedIn}<p>${t('kNotKeeper')}</p><pre class="sql">${esc(keeperSql())}</pre><div class="row">${btn('copysql', t('kCopy'))}${btn('retry', t('kCheck'))}</div>`;
   else {
-    const L = DB.listings.filter(x => x.listed);
+    const L = DB.listings.filter(x => x.listed), main = (k, label) => `<button type="button" class="btn sm primary" data-k="${k}"${K.busy ? ' disabled' : ''}>${label}</button>`;
+    const [hint, acts] = S.tab === 'decks' ? [t('kDeckHint', money(SHOP_CONFIG.deckLevels[0]), money(SHOP_CONFIG.deckLevels[1])), main('newdeck', t('kAddDeck'))]
+      : S.tab === 'tiers' ? [t('kTierHint'), main('tiers', t('tlEdit'))]
+      : [t('kTapHint'), main('newprod', t('kAddProduct')) + btn('export', t('kExport')) + btn('import', K.busy ? t('kWorking') : t('kImport'))];
     body = `${signedIn}<p class="kstats">${t('kStats', L.length, L.filter(x => x.price != null).length, L.filter(x => x.qty === 0).length)}</p>
-      <p class="muted">${t('kTapHint')}</p>
-      <div class="row"><button type="button" class="btn sm primary" data-k="newprod"${K.busy ? ' disabled' : ''}>${t('kAddProduct')}</button>${btn('export', t('kExport'))}${btn('import', K.busy ? t('kWorking') : t('kImport'))}</div>`;
+      ${DB.tiers.missing ? `<p class="notice">${t('kNeedSql')}</p>` : ''}
+      <p class="muted">${esc(hint)}</p><div class="row">${acts}</div>`;
   }
-  el.innerHTML = `<div class="kp-head"><h2>${t('kTitle')}</h2><a class="btn link" href="#">${t('kBack')}</a></div>${body}${setupCheck(el.querySelector('.setup')?.open)}`;
+  el.innerHTML = `<div class="kp-head"><h2>${t('kTitle')}</h2><a class="btn link" href="#${S.tab}">${t('kBack')}</a></div>${body}${setupCheck(el.querySelector('.setup')?.open)}`;
 }
 
 // The stock editor: one row per version of the card (normal, Foil…), each with a price and a number of copies.
@@ -1193,6 +1457,8 @@ async function saveEditor() {
   if (err) return edMsg(t('eFail', err));
   $('#editor').close(); toast(t('eSaved'));
 }
+// A save's error as the shopkeeper should read it: a column or table that isn't there yet means supabase/shop.sql needs running again.
+const saveError = e => !e ? 'not allowed' : e.code === 'PGRST204' || e.code === 'PGRST205' || /schema cache|does not exist/i.test(e.message || '') ? t('kNeedSql') : e.message || String(e);
 // Sends changes to the cloud stock, then reloads it. Returns an error message, or '' when saved.
 async function saveStock(changes, removed) {
   try { const { error } = await K.sb.rpc('shop_stock_save', { changes, removed }); if (error) throw error; }
@@ -1245,6 +1511,8 @@ $('#keeper').addEventListener('click', async e => {
   else if (k === 'export') exportCsv();
   else if (k === 'import') $('#importFile').click();
   else if (k === 'newprod') openProductEditor(null);
+  else if (k === 'newdeck') openProductEditor(null, 'deck');
+  else if (k === 'tiers') openTierEditor();
 });
 $('#importFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) importCsv(f); });
 $('#edBody').addEventListener('input', e => {
@@ -1266,33 +1534,46 @@ $('#editor').addEventListener('close', () => { if (!$('#editor').open) E = null;
 
 // The product editor: the shopkeeper's own items (boxes, packs, sleeves…) with a photo, price, quantity and description.
 // Photos are shrunk to 1200px JPEGs in the browser and kept in the public "shop" storage bucket (supabase/shop.sql).
-let P = null;  // the product being edited: { id (null for a new one), name, price, qty, descr, image, blob, preview, drop, busy }
-function openProductEditor(id) {
+// A deck (kind 'deck') also has a style, tags and a deck list; its level comes from the price.
+let P = null;  // the product being edited: { id (null for a new one), kind, name, price, qty, descr, image, deck, style, tags, had, blob, preview, drop, busy }
+function openProductEditor(id, kind = 'other') {
   if (K.state !== 'keeper') { toast(t('kSignInFirst')); $('#keeper').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   const p = id ? DB.products.find(x => x.id === id) : null;
-  P = { id: p ? p.id : null, name: p ? p.name : '', price: p ? (p.price ?? '') : '', qty: p ? (p.qty ?? '') : '', descr: p ? p.descr : '', image: p ? p.image : '',
-    deck: p ? p.deck : '', hadDeck: !!(p && p.deck),
+  P = { id: p ? p.id : null, kind: p ? (p.isDeck ? 'deck' : 'other') : kind, name: p ? p.name : '', price: p ? (p.price ?? '') : '', qty: p ? (p.qty ?? '') : '', descr: p ? p.descr : '', image: p ? p.image : '',
+    deck: p ? p.deck : '', hadDeck: !!(p && p.deck), style: p ? p.style : '', tags: p ? p.tagList.map(g => '#' + g).join(' ') : '',
+    had: { kind: !!(p && p.kind), style: !!(p && p.style), tags: !!(p && p.tags) },  // which of the newer columns it has filled in
     blob: null, preview: '', drop: false, busy: false };
   if ($('#detail').open) $('#detail').close();
   renderProductEditor(); $('#peditor').showModal();
 }
+function pedLevel() {
+  const v = cleanPrice(P.price); if (!/^\d+(\.\d{1,2})?$/.test(v)) return t('pLevelAsk');
+  const l = deckLevel({ price: +v });
+  return t('pLevel', t('lv_' + l), esc(levelRange(l)));
+}
 function renderProductEditor() {
-  const shown = P.preview || (P.image && !P.drop ? photoUrl(P.image) : '');
-  $('#pedBody').innerHTML = `<div class="dlg-head"><h2 id="pedTitle">${t(P.id ? 'pTitle' : 'pTitleNew')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
+  const shown = P.preview || (P.image && !P.drop ? photoUrl(P.image) : ''), deck = P.kind === 'deck';
+  $('#pedBody').innerHTML = `<div class="dlg-head"><h2 id="pedTitle">${t(deck ? (P.id ? 'pTitleDeck' : 'pTitleNewDeck') : (P.id ? 'pTitle' : 'pTitleNew'))}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
+    <div><div class="seg" role="group" aria-label="${esc(t('pKind'))}"><button type="button" data-pe="kdeck" aria-pressed="${deck}">${t('pKindDeck')}</button><button type="button" data-pe="kother" aria-pressed="${!deck}">${t('pKindOther')}</button></div></div>
     <div class="ped">
       <div class="ped-photo">
         <div class="ped-img">${pedPicture(shown)}</div>
         <div class="row"><button type="button" class="btn sm" data-pe="photo">${t(shown ? 'pChange' : 'pChoose')}</button>${shown ? `<button type="button" class="btn sm link" data-pe="nophoto">${t('pRemovePhoto')}</button>` : ''}</div>
       </div>
       <div class="ped-fields">
-        <label class="field"><span>${t('pName')}</span><input type="text" data-pf="name" value="${esc(P.name)}" maxlength="80" placeholder="${esc(t('pNamePh'))}"></label>
+        <label class="field"><span>${t('pName')}</span><input type="text" data-pf="name" value="${esc(P.name)}" maxlength="80" placeholder="${esc(t(deck ? 'pDeckNamePh' : 'pNamePh'))}"></label>
         <div class="two-num">
           <label class="field"><span>${t('ePrice')} (${esc(SHOP_CONFIG.currency)})</span><input type="text" data-pf="price" value="${esc(P.price)}" inputmode="decimal" placeholder="${esc(t('askPrice'))}"></label>
           <div class="field"><span>${t('eQty')}</span><div><span class="qty"><button type="button" data-pe="dec" aria-label="${esc(t('less'))}">−</button><input type="text" data-pf="qty" value="${esc(P.qty)}" inputmode="numeric" aria-label="${esc(t('eQty'))}"><button type="button" data-pe="inc" aria-label="${esc(t('plus'))}">+</button></span></div></div>
         </div>
+        ${deck ? `<div class="small" id="pedLevel">${pedLevel()}</div>
+        <div class="two-sel">
+          <label class="field"><span>${t('pStyle')}</span><select data-pf="style"><option value="">—</option>${STYLES.map(s => `<option value="${s}"${s === P.style ? ' selected' : ''}>${t('st_' + s)}</option>`).join('')}</select></label>
+          <label class="field"><span>${t('pTags')}</span><input type="text" data-pf="tags" value="${esc(P.tags)}" maxlength="300" placeholder="${esc(t('pTagsPh'))}" autocapitalize="none" spellcheck="false"></label>
+        </div>` : ''}
         <label class="field"><span>${t('eDesc')}</span><textarea data-pf="descr" rows="4" maxlength="1000" placeholder="${esc(t('eDescPh'))}">${esc(P.descr)}</textarea></label>
-        <label class="field"><span>${t('pDeck')}</span><textarea data-pf="deck" rows="5" maxlength="4000" placeholder="${esc(t('pDeckPh'))}" spellcheck="false">${esc(P.deck)}</textarea></label>
-        <div class="small muted" id="pedDeck">${deckCount()}</div>
+        ${deck ? `<label class="field"><span>${t('pDeck')}</span><textarea data-pf="deck" rows="5" maxlength="4000" placeholder="${esc(t('pDeckPh'))}" spellcheck="false">${esc(P.deck)}</textarea></label>
+        <div class="small muted" id="pedDeck">${deckCount()}</div>` : ''}
       </div>
     </div>
     <p class="small muted">${t('pHint')}</p>
@@ -1301,7 +1582,7 @@ function renderProductEditor() {
 // The picture in the product editor: the photo, else a deck's Legend, else a drawn box.
 function pedPicture(shown) {
   if (shown) return `<img src="${esc(shown)}" alt="">`;
-  const cover = deckCover(parseDeck(P.deck));
+  const cover = P.kind === 'deck' && deckCover(parseDeck(P.deck));
   return cover ? thumb(cover) : ICON_BOX;
 }
 function deckCount() {
@@ -1334,13 +1615,17 @@ async function saveProduct() {
       image = uploaded;
     }
     const row = { name, price: price ? +price : null, qty: qty ? +qty : null, descr: cur.descr.trim().slice(0, 1000), image, updated_at: new Date().toISOString() };
-    if (cur.deck.trim() || cur.hadDeck) row.deck = cur.deck.trim().slice(0, 4000);  // only sent when used, so saving works before the deck column exists
+    const deck = cur.kind === 'deck', list = deck ? cur.deck.trim().slice(0, 4000) : '';
+    if (list || cur.hadDeck) row.deck = list;  // only sent when used, so saving works before the deck column exists
+    // The same for the newer columns. kind is only needed for a deck without a list: a list makes it a deck anyway.
+    const more = { kind: deck && !list ? 'deck' : '', style: deck ? cur.style : '', tags: deck ? parseTags(cur.tags).join(' ').slice(0, 300) : '' };
+    Object.entries(more).forEach(([k, v]) => { if (v || cur.had[k]) row[k] = v; });
     const res = cur.id ? await K.sb.from('shop_products').update(row).eq('id', cur.id).select('id') : await K.sb.from('shop_products').insert(row).select('id');
     if (res.error) throw res.error;
     if (!res.data || !res.data.length) throw new Error('not allowed');  // the access rules let nothing through
   } catch (e) {
     if (uploaded) bucket.remove([uploaded]).catch(() => {});
-    cur.busy = false; save.disabled = false; pedMsg(t('eFail', e.message || String(e)));
+    cur.busy = false; save.disabled = false; pedMsg(t('eFail', saveError(e)));
     return;
   }
   if (cur.image && cur.image !== image) bucket.remove([cur.image]).catch(() => {});  // the photo it replaced
@@ -1369,6 +1654,7 @@ $('#photoFile').addEventListener('change', async e => {
 $('#pedBody').addEventListener('input', e => {
   const f = e.target.dataset.pf; if (!P || !f) return;
   P[f] = e.target.value;
+  if (f === 'price' && P.kind === 'deck') $('#pedLevel').innerHTML = pedLevel();
   if (f === 'deck') {
     $('#pedDeck').innerHTML = deckCount();
     if (!P.preview && (!P.image || P.drop)) $('#pedBody .ped-img').innerHTML = pedPicture('');
@@ -1379,6 +1665,7 @@ $('#pedBody').addEventListener('click', e => {
   const b = e.target.closest('[data-pe]'); if (!b || !P) return;
   const act = b.dataset.pe;
   if (act === 'photo') $('#photoFile').click();
+  else if (act === 'kdeck' || act === 'kother') { P.kind = act === 'kdeck' ? 'deck' : 'other'; renderProductEditor(); }
   else if (act === 'nophoto') { if (P.preview) URL.revokeObjectURL(P.preview); Object.assign(P, { blob: null, preview: '', drop: true }); renderProductEditor(); }
   else if (act === 'dec' || act === 'inc') { const inp = $('#pedBody [data-pf="qty"]'); inp.value = P.qty = String(Math.max(0, (parseInt(inp.value, 10) || 0) + (act === 'inc' ? 1 : -1))); }
   else if (act === 'save') saveProduct();
@@ -1386,15 +1673,101 @@ $('#pedBody').addEventListener('click', e => {
 });
 $('#peditor').addEventListener('close', () => { if ($('#peditor').open) return; if (P && P.preview) URL.revokeObjectURL(P.preview); P = null; });
 
+// The tier list editor: tiers top to bottom, each with its decks in order. The whole list is saved at once.
+let TL = null;  // the tier list being edited: { note, tiers: [{ name, decks: [{ name, legend, style, note }] }], busy }
+const tierName = (x, i) => x.name.trim() || `Tier ${i + 1}`;
+function openTierEditor() {
+  if (K.state !== 'keeper') { toast(t('kSignInFirst')); $('#keeper').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  const cur = cleanTiers(DB.tiers);
+  if (!cur.tiers.length) cur.tiers = [1, 2, 3].map(n => ({ name: `Tier ${n}`, decks: [] }));
+  TL = { ...cur, busy: false };
+  renderTierEditor(); $('#teditor').showModal();
+}
+function renderTierEditor() {
+  const legends = DB.cards.filter(c => c.t === 'Legend').sort((a, b) => legendLabel(a).localeCompare(legendLabel(b)));
+  const opts = (list, cur, first) => `<option value="">${esc(first)}</option>` + list.map(([v, label]) => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(label)}</option>`).join('');
+  const legendList = legends.map(c => [c.id, legendLabel(c)]), styleList = STYLES.map(s => [s, t('st_' + s)]);
+  const small = (act, label, icon, off) => `<button type="button" class="x sm" data-te="${act}" aria-label="${esc(label)}" title="${esc(label)}"${off ? ' disabled' : ''}>${icon}</button>`;
+  $('#teBody').innerHTML = `<div class="dlg-head"><h2 id="teTitle">${t('tlEdit')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
+    <label class="field"><span>${t('teNote')}</span><textarea data-tf="note" rows="2" maxlength="600" placeholder="${esc(t('teNotePh'))}">${esc(TL.note)}</textarea></label>
+    ${TL.tiers.map((x, i) => `<section class="te-tier" data-ti="${i}" style="--tc:${tierColor(i)}">
+      <div class="te-th"><input type="text" data-tf="tname" value="${esc(x.name)}" maxlength="16" placeholder="Tier ${i + 1}" aria-label="${esc(t('teTierName'))}">
+        ${small('tup', t('teUp'), '↑', !i)}${small('tdown', t('teDown'), '↓', i === TL.tiers.length - 1)}${small('tdel', t('teDelTier'), ICON_TRASH)}</div>
+      ${x.decks.map((e, j) => `<div class="te-deck" data-di="${j}">
+        <select data-tf="legend" aria-label="Legend">${opts(legendList, e.legend, t('tePickLegend'))}</select>
+        <input type="text" data-tf="name" value="${esc(e.name)}" maxlength="60" placeholder="${esc(t('teNamePh'))}" aria-label="${esc(t('teName'))}">
+        <select data-tf="style" aria-label="${esc(t('pStyle'))}">${opts(styleList, e.style, t('pStyle') + '…')}</select>
+        <select data-tf="tier" aria-label="${esc(t('teMove'))}">${TL.tiers.map((y, k) => `<option value="${k}"${k === i ? ' selected' : ''}>${esc(tierName(y, k))}</option>`).join('')}</select>
+        <span class="te-btns">${small('up', t('teUp'), '↑', !j)}${small('down', t('teDown'), '↓', j === x.decks.length - 1)}${small('del', t('eRemove'), ICON_TRASH)}</span>
+        <input type="text" class="te-note" data-tf="enote" value="${esc(e.note)}" maxlength="200" placeholder="${esc(t('teEntryNotePh'))}">
+      </div>`).join('')}
+      <div><button type="button" class="btn link" data-te="add">+ ${esc(t('teAdd', tierName(x, i)))}</button></div>
+    </section>`).join('')}
+    <div><button type="button" class="btn sm" data-te="addtier">+ ${t('teAddTier')}</button></div>
+    <p class="small muted">${t('teHint')}</p>
+    <div class="ed-foot"><span class="small" id="teMsg" role="status"></span><button type="button" class="btn" data-close>${t('eCancel')}</button><button type="button" class="btn primary" data-te="save">${t('eSave')}</button></div>`;
+}
+function teMsg(m, bad = true) { const el = $('#teMsg'); if (el) { el.textContent = m; el.className = 'small' + (bad ? ' bad-t' : ''); } }
+async function saveTiers() {
+  const cur = TL; if (!cur || cur.busy) return;
+  const data = cleanTiers({ note: cur.note, tiers: cur.tiers.map((x, i) => ({ name: tierName(x, i),
+    decks: x.decks.map(e => { const c = DB.byId.get(e.legend); return { ...e, name: e.name.trim() || (c ? (c.g && c.g[0]) || c.n : '') }; }).filter(e => e.name) })) });
+  const save = $('#teBody [data-te="save"]');
+  cur.busy = true; save.disabled = true; teMsg(t('eSaving'), false);
+  const res = await K.sb.from('shop_docs').upsert({ id: 'tierlist', data, updated_at: new Date().toISOString() }).select('id').then(r => r, e => ({ error: e }));
+  if (res.error || !res.data || !res.data.length) { cur.busy = false; save.disabled = false; return teMsg(t('eFail', saveError(res.error))); }
+  DB.tiers = await loadTiers();
+  if (TL === cur) $('#teditor').close();
+  renderAll(); toast(t('eSaved'));
+}
+$('#teBody').addEventListener('input', e => {
+  const f = e.target.dataset.tf; if (!TL || !f) return;
+  const ti = e.target.closest('[data-ti]'), di = e.target.closest('[data-di]'), i = ti ? +ti.dataset.ti : -1, tier = TL.tiers[i], ent = tier && di ? tier.decks[+di.dataset.di] : null;
+  const v = e.target.value;
+  if (f === 'note') TL.note = v;
+  else if (f === 'tname') {  // the tier's new name in the move-to lists and its add button, without redrawing what's being typed in
+    tier.name = v;
+    $('#teBody').querySelectorAll(`select[data-tf="tier"] option[value="${i}"]`).forEach(o => { o.textContent = tierName(tier, i); });
+    ti.querySelector('[data-te="add"]').textContent = '+ ' + t('teAdd', tierName(tier, i));
+  } else if (f === 'tier') { tier.decks.splice(+di.dataset.di, 1); TL.tiers[+v].decks.push(ent); renderTierEditor(); }
+  else if (f === 'legend') {  // a new deck is named after its champion until it's given a name
+    ent.legend = v;
+    const c = DB.byId.get(v), name = di.querySelector('[data-tf="name"]');
+    if (c && !ent.name.trim()) name.value = ent.name = (c.g && c.g[0]) || c.n;
+  } else if (f === 'name' || f === 'style') ent[f] = v;
+  else if (f === 'enote') ent.note = v;
+});
+$('#teBody').addEventListener('click', e => {
+  const b = e.target.closest('[data-te]'); if (!b || !TL || b.disabled) return;
+  const ti = b.closest('[data-ti]'), di = b.closest('[data-di]'), i = ti ? +ti.dataset.ti : -1, j = di ? +di.dataset.di : -1, act = b.dataset.te;
+  const swap = (a, x, y) => { [a[x], a[y]] = [a[y], a[x]]; };
+  if (act === 'save') return saveTiers();
+  if (act === 'addtier') TL.tiers.push({ name: '', decks: [] });
+  else if (act === 'tup' || act === 'tdown') swap(TL.tiers, i, act === 'tup' ? i - 1 : i + 1);
+  else if (act === 'tdel') { const x = TL.tiers[i]; if (x.decks.length && !confirm(t('teDelTierAsk', tierName(x, i), x.decks.length))) return; TL.tiers.splice(i, 1); }
+  else if (act === 'add') TL.tiers[i].decks.push({ name: '', legend: '', style: '', note: '' });
+  else if (act === 'up' || act === 'down') swap(TL.tiers[i].decks, j, act === 'up' ? j - 1 : j + 1);
+  else if (act === 'del') TL.tiers[i].decks.splice(j, 1);
+  renderTierEditor();
+  if (act === 'add') $(`#teBody [data-ti="${i}"] [data-di="${TL.tiers[i].decks.length - 1}"] select`).focus();
+  else if (act === 'addtier') $(`#teBody [data-ti="${TL.tiers.length - 1}"] input`).focus();
+});
+$('#teditor').addEventListener('close', () => { if (!$('#teditor').open) TL = null; });
+
 
 function renderAll() {
   $('#shopName').textContent = SHOP_CONFIG.name;
   document.title = SHOP_CONFIG.name;
   const af = $('#addFriend'); af.hidden = !lineReady(); if (lineReady()) af.href = lineAddUrl();
   applyLang();
+  document.querySelectorAll('[data-tab]').forEach(a => { a.href = tabHref(a.dataset.tab); if (a.dataset.tab === S.tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  TABS.forEach(tab => { $(`#${tab}View`).hidden = S.tab !== tab; });
+  $('.steps').hidden = S.tab === 'tiers';
   if (DB.ok) renderFilters();
   $('#filters').hidden = !DB.ok;
-  renderKeeper(); renderGrid(); renderCart();
+  renderKeeper();
+  if (S.tab === 'decks') renderDecks(); else if (S.tab === 'tiers') renderTiers(); else renderGrid();
+  renderCart();
   if (S.detail && $('#detail').open) renderDetail();
   if ($('#review').open) renderReview();
 }
@@ -1421,6 +1794,25 @@ $('#fDoms').addEventListener('click', e => {
   b.setAttribute('aria-pressed', S.f.dom.has(d)); S.shown = PAGE; renderGrid();
 });
 $('#fClear').addEventListener('click', () => { S.f = defaults(); S.shown = PAGE; renderFilters(); renderGrid(); });
+// Deck filters. Tags (on decks and in a deck's details) and the tier list's Legends lead to the Decks tab, filtered.
+$('#dQ').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.d.q = e.target.value; renderDecks(); }, 120); });
+$('#dLegend').addEventListener('change', e => { S.d.legend = e.target.value; renderDecks(); });
+$('#levels').addEventListener('click', e => {
+  const b = e.target.closest('[data-level]'); if (!b) return;
+  const l = b.dataset.level; S.d.level = S.d.level === l ? '' : l; renderDecks(); $(`#levels [data-level="${l}"]`).focus();
+});
+$('#dStyles').addEventListener('click', e => {
+  const b = e.target.closest('[data-style]'); if (!b) return;
+  const s = b.dataset.style; S.d.style = S.d.style === s ? '' : s; renderDecks(); $(`#dStyles [data-style="${s}"]`).focus();
+});
+$('#dClear').addEventListener('click', () => { S.d = blankDeckFilter(); renderDecks(); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-tag],[data-legend]'); if (!b) return;
+  if (b.dataset.tag != null) S.d.tag = S.d.tag === b.dataset.tag ? '' : b.dataset.tag;
+  else S.d = { ...blankDeckFilter(), legend: b.dataset.legend };
+  if ($('#detail').open) $('#detail').close();
+  showDecks();
+});
 $('#more').addEventListener('click', showMore);
 new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) showMore(); }, { rootMargin: '800px 0px' }).observe($('#more'));
 $('#mbOpen').addEventListener('click', () => openSheet(true));
@@ -1440,7 +1832,8 @@ $('#sendLine').addEventListener('click', e => {
 });
 $('#copyOrder').addEventListener('click', async () => { if (await copyText(orderText())) { toast(t('copied')); $('#sent').hidden = false; } });
 document.querySelectorAll('dialog').forEach(d => {
-  d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+  // A click beside a dialog closes it, except the tier list editor's, which holds too much work to lose to a stray click.
+  d.addEventListener('click', e => { if ((e.target === d && d.id !== 'teditor') || e.target.closest('[data-close]')) d.close(); });
   d.addEventListener('close', () => { if (d.id === 'detail') S.detail = null; });
 });
 addEventListener('hashchange', setMode);

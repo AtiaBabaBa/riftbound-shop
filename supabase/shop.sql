@@ -1,4 +1,4 @@
--- Riftbound shop (index.html): prices, stock and products, edited in the shopkeeper zone (#keeper).
+-- Riftbound shop (index.html): prices, stock, products (decks included) and the meta tier list, edited in the shopkeeper zone (#keeper).
 -- Run once in Supabase → SQL Editor → New query → paste → Run. Safe to run again.
 -- Then make your account the shopkeeper with the line at the bottom (the shopkeeper zone shows it filled in).
 
@@ -28,6 +28,19 @@ create table if not exists public.shop_products (
 );
 -- For decks: the deck list, one card per line ("3 Falling Star [OGN-029]" under "Legend:", "Main Deck:"… headings).
 alter table public.shop_products add column if not exists deck text not null default '' check (char_length(deck) <= 4000);
+-- Decks (the Decks tab): kind 'deck' marks a deck without a deck list (a list makes a product a deck anyway); style is how
+-- it plays ('aggro', 'midrange', 'control', 'combo'); tags are extra words customers can tap, like 'kennen highroll'.
+alter table public.shop_products add column if not exists kind text not null default '' check (char_length(kind) <= 20);
+alter table public.shop_products add column if not exists style text not null default '' check (char_length(style) <= 20);
+alter table public.shop_products add column if not exists tags text not null default '' check (char_length(tags) <= 300);
+
+-- Pages the shopkeeper edits as a whole. 'tierlist' is the meta tier list (the Tier list tab):
+-- { note, tiers: [{ name, decks: [{ name, legend, style, note }] }] }, top tier first.
+create table if not exists public.shop_docs (
+  id         text primary key check (char_length(id) between 1 and 40),
+  data       jsonb not null default '{}'::jsonb check (pg_column_size(data) <= 200000),
+  updated_at timestamptz not null default now()
+);
 
 -- Accounts allowed to change the shop. Nobody can add themselves: rows are added here in the SQL Editor.
 create table if not exists public.shop_keepers (
@@ -37,8 +50,9 @@ create table if not exists public.shop_keepers (
 alter table public.shop_stock enable row level security;
 alter table public.shop_products enable row level security;
 alter table public.shop_keepers enable row level security;
-grant select on public.shop_stock, public.shop_products to anon, authenticated;
-grant insert, update, delete on public.shop_stock, public.shop_products to authenticated;
+alter table public.shop_docs enable row level security;
+grant select on public.shop_stock, public.shop_products, public.shop_docs to anon, authenticated;
+grant insert, update, delete on public.shop_stock, public.shop_products, public.shop_docs to authenticated;
 grant select on public.shop_keepers to authenticated;
 
 -- Is the signed-in account a shopkeeper?
@@ -66,6 +80,15 @@ create policy "shop_products read" on public.shop_products for select to anon, a
 create policy "shop_products keeper insert" on public.shop_products for insert to authenticated with check (public.is_shop_keeper());
 create policy "shop_products keeper update" on public.shop_products for update to authenticated using (public.is_shop_keeper()) with check (public.is_shop_keeper());
 create policy "shop_products keeper delete" on public.shop_products for delete to authenticated using (public.is_shop_keeper());
+
+drop policy if exists "shop_docs read" on public.shop_docs;
+drop policy if exists "shop_docs keeper insert" on public.shop_docs;
+drop policy if exists "shop_docs keeper update" on public.shop_docs;
+drop policy if exists "shop_docs keeper delete" on public.shop_docs;
+create policy "shop_docs read" on public.shop_docs for select to anon, authenticated using (true);
+create policy "shop_docs keeper insert" on public.shop_docs for insert to authenticated with check (public.is_shop_keeper());
+create policy "shop_docs keeper update" on public.shop_docs for update to authenticated using (public.is_shop_keeper()) with check (public.is_shop_keeper());
+create policy "shop_docs keeper delete" on public.shop_docs for delete to authenticated using (public.is_shop_keeper());
 
 -- A signed-in account can see whether it is a shopkeeper (the zone checks this), and nothing more.
 drop policy if exists "shop_keepers own select" on public.shop_keepers;
