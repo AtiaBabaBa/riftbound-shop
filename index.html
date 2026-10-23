@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Jake's Card Shop</title>
 <meta name="description" content="Ready-to-play Riftbound decks, singles and the current meta tier list. Pick what you want and send the list to the shop on LINE.">
+<!-- link previews on LINE, Facebook and X; og.png comes from scripts/make_og_image.py -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jake's Card Shop">
+<meta property="og:title" content="Jake's Card Shop · Riftbound decks and singles">
+<meta property="og:description" content="Ready-to-play Riftbound decks, singles and the current meta tier list. Pick what you want and send the list to the shop on LINE.">
+<meta property="og:url" content="https://atiabababa.github.io/riftbound-shop/">
+<meta property="og:image" content="https://atiabababa.github.io/riftbound-shop/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jake's Card Shop: Riftbound Legend cards beside the shop name">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="th_TH">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14l-12 7L4 23V9z' fill='%2310131A' stroke='%2346C3C7' stroke-width='2'/%3E%3Cpath d='M16 8v16M10 12l6 4 6-4M10 20l6-4 6 4' fill='none' stroke='%23D9A84C' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#ECEFF3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#10131A" media="(prefers-color-scheme: dark)">
@@ -355,7 +368,7 @@ details.pv pre { margin: 8px 0 0; padding: 10px 12px; background: var(--panel-2)
 
 .ok-t { color: var(--accent); font-weight: 600; } .bad-t { color: var(--loss); font-weight: 600; }
 
-/* shopkeeper zone (shop.html#keeper): the customer's list gives way to the keeper panel */
+/* shopkeeper zone (index.html#keeper): the customer's list gives way to the keeper panel */
 body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps { display: none !important; }
 @media (min-width: 1000px) { body.keeper .shop { grid-template-columns: minmax(0, 1fr); } }
 .kp { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 10px; font-size: 14px; }
@@ -655,7 +668,7 @@ const LANG = {
     tooLong: 'This list is too long for a QR code.',
     desktop: id => `Or copy the order and paste it into your LINE chat with us (${id}).`,
     sent: 'Sent it? Clear your list to start a new one.', addFriend: 'Add us on LINE',
-    notSetup: 'Setup needed: put your LINE ID in <code>SHOP_CONFIG</code> at the top of the script in <code>shop.html</code>. Until then orders can’t be sent.',
+    notSetup: 'Setup needed: put your LINE ID in <code>SHOP_CONFIG</code> at the top of the script in <code>index.html</code>. Until then orders can’t be sent.',
     msgTitle: 'Riftbound order', msgTotal: 'Total', msgName: 'Name', msgNote: 'Note',
     linePrice: (each, sum, q) => q > 1 ? `${each} each = ${sum}` : each,
     cost: 'Cost', power: 'Power', might: 'Might',
@@ -686,7 +699,7 @@ const LANG = {
     kShow_hidden: n => `Hidden: not cheaper than TCGplayer (${n})`, kShow_notcg: n => `No TCGplayer price (${n})`, kShow_noprice: n => `No price, Ask price (${n})`,
     kMin: 'Min ฿', kMax: 'Max ฿', sortOver: 'Price vs TCGplayer: most above first',
     kNotListed: 'Not listed', kInStock: n => `${n} in stock`, kEdit: 'Edit price and stock',
-    kNoCloud: 'Cloud stock isn’t set up: fill in SHOP_CONFIG.cloud in shop.html.',
+    kNoCloud: 'Cloud stock isn’t set up: fill in SHOP_CONFIG.cloud in index.html.',
     kOffline: 'Couldn’t reach the cloud service. Check your connection.',
     kBadLogin: 'Username or password is wrong.', kRate: 'Too many attempts. Wait a minute and try again.', kFail: m => `Couldn’t sign in: ${m}`,
     kSignInFirst: 'Sign in to change stock',
@@ -694,7 +707,7 @@ const LANG = {
     eAdd: 'Add a version (Foil, Alt art…)', eHint: 'No price shows Ask price. Quantity 0 shows Sold out; blank shows no number. Clear a whole row to take it off sale.',
     eSave: 'Save', eCancel: 'Cancel', eSaving: 'Saving…', eSaved: 'Saved', eRemove: 'Remove this version',
     eDup: 'Two versions have the same name.', eBadPrice: 'Prices are numbers, like 120.', eBadQty: 'Copies are whole numbers, like 4.', eFail: m => `Couldn’t save: ${m}`,
-    sTitle: 'Setup check', sLine: id => `Orders go to LINE: ${id}`, sNoLine: 'LINE isn’t set: put your LINE ID in SHOP_CONFIG in shop.html.',
+    sTitle: 'Setup check', sLine: id => `Orders go to LINE: ${id}`, sNoLine: 'LINE isn’t set: put your LINE ID in SHOP_CONFIG in index.html.',
     sCloud: 'Stock is read from the cloud, so changes show in the shop right away.', sFile: f => `Stock is read from ${f} in the repository.`,
     sNone: 'No stock list yet: every card shows Ask price.', sCloudErr: m => `cloud stock couldn’t be read: ${m}`,
     sUnmatched: n => n === 1 ? '1 stock row matches no card' : `${n} stock rows match no card`,
@@ -763,7 +776,7 @@ const LANG = {
     tooLong: 'รายการยาวเกินกว่าจะทำเป็น QR code ได้',
     desktop: id => `หรือคัดลอกรายการแล้ววางในแชต LINE กับร้าน (${id})`,
     sent: 'ส่งแล้วใช่ไหม? ล้างรายการเพื่อเริ่มรายการใหม่', addFriend: 'เพิ่มเพื่อนใน LINE',
-    notSetup: 'ยังตั้งค่าไม่ครบ: ใส่ LINE ID ของร้านใน <code>SHOP_CONFIG</code> ที่ส่วนบนของสคริปต์ใน <code>shop.html</code> ก่อน จึงจะส่งคำสั่งซื้อได้',
+    notSetup: 'ยังตั้งค่าไม่ครบ: ใส่ LINE ID ของร้านใน <code>SHOP_CONFIG</code> ที่ส่วนบนของสคริปต์ใน <code>index.html</code> ก่อน จึงจะส่งคำสั่งซื้อได้',
     msgTitle: 'คำสั่งซื้อ Riftbound', msgTotal: 'รวม', msgName: 'ชื่อ', msgNote: 'หมายเหตุ',
     linePrice: (each, sum, q) => q > 1 ? `ใบละ ${each} = ${sum}` : each,
     cost: 'ค่าร่าย', power: 'พาวเวอร์', might: 'ไมต์',
@@ -794,7 +807,7 @@ const LANG = {
     kShow_hidden: n => `ซ่อนอยู่: ไม่ถูกกว่า TCGplayer (${n})`, kShow_notcg: n => `ไม่มีราคา TCGplayer (${n})`, kShow_noprice: n => `ไม่มีราคา สอบถามราคา (${n})`,
     kMin: 'ต่ำสุด ฿', kMax: 'สูงสุด ฿', sortOver: 'ราคาเทียบ TCGplayer: แพงกว่ามากสุดก่อน',
     kNotListed: 'ยังไม่ลงขาย', kInStock: n => `มี ${n} ชิ้น`, kEdit: 'แก้ไขราคาและสต็อก',
-    kNoCloud: 'ยังไม่ได้ตั้งค่าสต็อกบนคลาวด์: ใส่ค่าใน SHOP_CONFIG.cloud ใน shop.html',
+    kNoCloud: 'ยังไม่ได้ตั้งค่าสต็อกบนคลาวด์: ใส่ค่าใน SHOP_CONFIG.cloud ใน index.html',
     kOffline: 'เชื่อมต่อบริการคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต',
     kBadLogin: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', kRate: 'ลองหลายครั้งเกินไป รอสักครู่แล้วลองใหม่', kFail: m => `เข้าสู่ระบบไม่สำเร็จ: ${m}`,
     kSignInFirst: 'เข้าสู่ระบบก่อนจึงจะแก้ไขสต็อกได้',
@@ -802,7 +815,7 @@ const LANG = {
     eAdd: 'เพิ่มเวอร์ชัน (Foil, Alt art…)', eHint: 'ไม่ใส่ราคาจะแสดงว่า สอบถามราคา จำนวน 0 แสดงว่า หมด เว้นว่างจะไม่แสดงจำนวน ล้างทั้งแถวเพื่อเลิกขาย',
     eSave: 'บันทึก', eCancel: 'ยกเลิก', eSaving: 'กำลังบันทึก…', eSaved: 'บันทึกแล้ว', eRemove: 'ลบเวอร์ชันนี้',
     eDup: 'มีสองเวอร์ชันที่ชื่อซ้ำกัน', eBadPrice: 'ราคาต้องเป็นตัวเลข เช่น 120', eBadQty: 'จำนวนต้องเป็นจำนวนเต็ม เช่น 4', eFail: m => `บันทึกไม่สำเร็จ: ${m}`,
-    sTitle: 'ตรวจการตั้งค่า', sLine: id => `คำสั่งซื้อส่งไปที่ LINE: ${id}`, sNoLine: 'ยังไม่ได้ตั้ง LINE: ใส่ LINE ID ใน SHOP_CONFIG ใน shop.html',
+    sTitle: 'ตรวจการตั้งค่า', sLine: id => `คำสั่งซื้อส่งไปที่ LINE: ${id}`, sNoLine: 'ยังไม่ได้ตั้ง LINE: ใส่ LINE ID ใน SHOP_CONFIG ใน index.html',
     sCloud: 'สต็อกอ่านจากคลาวด์ การเปลี่ยนแปลงจึงแสดงในร้านทันที', sFile: f => `สต็อกอ่านจากไฟล์ ${f} ใน repository`,
     sNone: 'ยังไม่มีรายการสต็อก การ์ดทุกใบแสดงว่า สอบถามราคา', sCloudErr: m => `อ่านสต็อกจากคลาวด์ไม่ได้: ${m}`,
     sUnmatched: n => `${n} แถวในสต็อกไม่ตรงกับการ์ดใบใด`,
@@ -1320,9 +1333,12 @@ function renderDecks() {
   $('#levels').hidden = $('#dFilters').hidden = !DB.ok;
   if (!DB.ok) { $('#deckShelves').innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; $('#dCount').textContent = ''; return; }
   const all = DB.listings.filter(x => x.p && x.p.isDeck), xs = visibleDecks(), d = S.d;
-  $('#levels').innerHTML = LEVELS.map(l => `<button type="button" class="lvl lv-${l}" data-level="${l}" aria-pressed="${d.level === l}">
+  // A level with no decks gets no box, unless it's the one picked (so it can be unpicked); the shopkeeper sees all three.
+  const lvs = LEVELS.map(l => [l, all.filter(x => deckLevel(x.p) === l).length]).filter(([l, n]) => n || K.on || d.level === l);
+  $('#levels').style.gridTemplateColumns = `repeat(${lvs.length}, minmax(0, 1fr))`;
+  $('#levels').innerHTML = lvs.map(([l, n]) => `<button type="button" class="lvl lv-${l}" data-level="${l}" aria-pressed="${d.level === l}">
       <b>${t('lv_' + l)}</b><span class="num">${esc(levelRange(l))}</span><span class="for">${t('lvFor_' + l)}</span>
-      <span class="n">${t('nDecks', all.filter(x => deckLevel(x.p) === l).length)}</span></button>`).join('');
+      <span class="n">${t('nDecks', n)}</span></button>`).join('');
   const legends = [...new Map(all.filter(x => x.p.legend).map(x => [x.p.legend.k, x.p.legend])).values()].sort((a, b) => legendLabel(a).localeCompare(legendLabel(b)));
   $('#dLegend').innerHTML = `<option value="">${esc(t('allLegends'))}</option>` + legends.map(c => `<option value="${esc(c.k)}"${c.k === d.legend ? ' selected' : ''}>${esc(legendLabel(c))}</option>`).join('');
   $('#dLegend').hidden = !legends.length && !d.legend;
@@ -1670,7 +1686,7 @@ function applyLang() {
   $('#notSetup').hidden = lineReady();
   $('#notSetup').innerHTML = t('notSetup');
 }
-// ---------- shopkeeper zone (shop.html#keeper) ----------
+// ---------- shopkeeper zone (index.html#keeper) ----------
 // Sign in with a Riftcheese account (the same accounts and saved sign-in as riftbound-prep.html), then tap a card to set its
 // price and stock. Saves go to the cloud stock through shop_stock_save (supabase/shop.sql), which only shopkeepers may use.
 const SB_LIB = { src: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js', sri: 'sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok' };

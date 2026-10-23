@@ -63,6 +63,7 @@ Prices are TCGplayer market prices in US dollars with the dollar-to-baht rate, f
 - `supabase/shop.sql` – the stock, product, tier list (`shop_docs`) and shopkeeper tables, the photo bucket and who may change what.
 - `stock.csv` – a fallback price list, read only until `supabase/shop.sql` has been run or when the cloud can't be reached. `python scripts/make_stock_csv.py` writes it (one row per card) and adds rows for new cards while keeping what's filled in.
 - `cards/` – card data (`cards.json`) and picture sheets, copied from Riftcheese. Copy them again when new sets are added there.
+- `og.png` – the picture LINE, Facebook and X show when the shop link is shared (the `og:` tags at the top of `index.html`). `python scripts/make_og_image.py` draws it again. If the shop moves to its own domain, change the two addresses in those tags.
 
 ## Credits
 
