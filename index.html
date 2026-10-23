@@ -33,7 +33,7 @@
   --bg: #EDECE6; --panel: #F8F7F2; --panel-2: #E4E2D8; --ink: #3A1F01; --muted: #76664F; --line: #D3CDBD;
   --accent: #3A1F01; --accent-ink: #FFFFFF; --accent-soft: #FFF0B3; --yellow: #FECF0A; --gold: #8A5A00;
   --warn: #A0520A; --warn-bg: #FBE7C2; --loss: #B0362E; --loss-bg: #F6DFDB;
-  --on-ink: #FFFFFF; --on-ink-muted: #E9DCC8; --ink-hover: #57320A; --raised: #FFFFFF; --on-yellow: #3A1F01;
+  --on-ink: #FFFFFF; --on-ink-muted: #E9DCC8; --ink-hover: #57320A; --raised: #FFFFFF; --on-yellow: #3A1F01; --cart-ic: #3A1F01;
   --shade: 58 31 1; --speck: #3A1F01; --speck-a: 1; --speck-far: #8A5A00; --save: #2C7A43;
   --fury: #D2453A; --calm: #3B9855; --mind: #3874C6; --body: #DE872B; --chaos: #8C4DC2; --order: #C29C1E; --colorless: #8B93A1;
   --line-green: #06C755; --line-green-ink: #FFFFFF;
@@ -51,7 +51,7 @@
   --bg: #17120C; --panel: #211A12; --panel-2: #2C2318; --ink: #F3E9D8; --muted: #B7A78E; --line: #45392B;
   --accent: #F3E9D8; --accent-ink: #17120C; --accent-soft: #3D3214; --gold: #E2B44E;
   --warn: #F0A55A; --warn-bg: #3A2A16; --loss: #F08378; --loss-bg: #3D1F1B;
-  --on-ink: #17120C; --on-ink-muted: #4A3B28; --ink-hover: #FFF6E6; --raised: #2E251A;
+  --on-ink: #17120C; --on-ink-muted: #4A3B28; --ink-hover: #FFF6E6; --raised: #2E251A; --cart-ic: #FFFFFF;
   --shade: 0 0 0; --speck: #F3E9D8; --speck-a: .35; --speck-far: #FECF0A; --save: #7FD493;
   color-scheme: dark;
 } }
@@ -59,7 +59,7 @@
   --bg: #17120C; --panel: #211A12; --panel-2: #2C2318; --ink: #F3E9D8; --muted: #B7A78E; --line: #45392B;
   --accent: #F3E9D8; --accent-ink: #17120C; --accent-soft: #3D3214; --gold: #E2B44E;
   --warn: #F0A55A; --warn-bg: #3A2A16; --loss: #F08378; --loss-bg: #3D1F1B;
-  --on-ink: #17120C; --on-ink-muted: #4A3B28; --ink-hover: #FFF6E6; --raised: #2E251A;
+  --on-ink: #17120C; --on-ink-muted: #4A3B28; --ink-hover: #FFF6E6; --raised: #2E251A; --cart-ic: #FFFFFF;
   --shade: 0 0 0; --speck: #F3E9D8; --speck-a: .35; --speck-far: #FECF0A; --save: #7FD493;
   color-scheme: dark;
 }
@@ -175,6 +175,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .dd-menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; }
 .domset { display: inline-flex; align-items: center; gap: 2px; height: 36px; padding: 0 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); }
 .domset button { display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 5px; background: none; cursor: pointer; padding: 0; opacity: .55; }
+.domset button .dic { display: block; }
 .domset button i { width: 11px; height: 11px; border-radius: 2px; transform: rotate(45deg); background: var(--dc); box-shadow: 0 0 0 2px rgb(0 0 0 / .15); }
 .domset button:hover { opacity: .9; }
 .domset button[aria-pressed="true"] { opacity: 1; background: var(--panel); box-shadow: inset 0 0 0 2px var(--dc); }
@@ -264,7 +265,23 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .why li b { color: var(--ink); font-size: 14.5px; }
 @media (max-width: 900px) { .why ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 420px) { .why ul { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
-body.keeper .why { display: none; }
+body.keeper .why, body.keeper [data-tab="home"] { display: none; }
+/* Home: the promotion slider, then why Chinese-print cards */
+#homeView { gap: 22px; }
+.ph { display: grid; gap: 14px; background: var(--panel); border: 2px solid var(--ink); border-radius: 22px; padding: 18px 18px 20px; min-width: 0; }
+.ph-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.ph-kick { display: inline-block; background: var(--yellow); color: var(--on-yellow); border-radius: 999px; padding: 3px 12px; font-family: var(--f-display); font-weight: 800; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.ph h2 { font-size: 34px; font-weight: 800; margin-top: 6px; line-height: 1.05; }
+.ph-sub { color: var(--muted); font-size: 14.5px; margin-top: 4px; }
+.ph-nav { display: flex; gap: 8px; flex: none; }
+.ph-nav .ibtn:disabled { opacity: .35; cursor: default; }
+.slider { display: grid; grid-auto-flow: column; grid-auto-columns: 200px; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+  overscroll-behavior-x: contain; padding: 8px 2px 6px; margin-inline: -2px; }
+.slider::-webkit-scrollbar { display: none; }
+.slider > .tile { scroll-snap-align: start; }
+.slider > .state { grid-column: auto; width: 100%; }
+#phAll { justify-self: start; }
+@media (max-width: 560px) { .ph { padding: 14px 12px 16px; } .ph h2 { font-size: 26px; } .ph-nav { display: none; } .slider { grid-auto-columns: calc(50% - 7px); gap: 14px; } #phAll { justify-self: stretch; } }
 
 /* one-page deck picture, as in Riftcheese: every card with its count, on the Legend's colors */
 #deckview { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; }
@@ -304,7 +321,17 @@ body.keeper .why { display: none; }
 .tl-deck[data-tl] { cursor: pointer; }
 .tl-deck[data-tl]:hover { box-shadow: 0 0 0 2px var(--accent); }
 .tl-empty { padding: 12px; color: var(--muted); font-size: 13.5px; }
-@media (max-width: 560px) { .tl-row { grid-template-columns: minmax(0, 1fr); } .tl-tier { place-items: center start; padding: 6px 12px; font-size: 15px; } .tl-decks { grid-template-columns: minmax(0, 1fr); } }
+.tl-pic { display: block; flex: none; padding: 0; border: 0; background: none; border-radius: 4px; }
+button.tl-pic { cursor: pointer; }
+button.tl-pic:hover .cimg { box-shadow: 0 0 0 2px var(--accent); }
+/* phones: each tier is a row of Legend pictures; the names and notes are in the tooltip and on the Decks tab */
+@media (max-width: 560px) {
+  .tl-row { grid-template-columns: 62px minmax(0, 1fr); }
+  .tl-tier { padding: 6px 4px; font-size: 15px; }
+  .tl-decks { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; }
+  .tl-deck { padding: 0; background: none !important; }
+  .tl-deck > div { display: none; }
+}
 
 /* card grid */
 .cards { display: grid; gap: 16px 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
@@ -394,6 +421,7 @@ body.keeper .why { display: none; }
   box-shadow: 0 8px 24px rgb(var(--shade) / .22); text-align: left; max-width: calc(100vw - 36px); }
 .fab:hover { box-shadow: 0 10px 28px rgb(var(--shade) / .3); }
 .fab-ic { position: relative; display: grid; place-items: center; width: 58px; height: 58px; flex: none; }
+.fab-ic { color: var(--cart-ic); }
 .fab-ic svg { width: 40px; height: 40px; }
 .fab-n { position: absolute; top: -1px; right: -5px; min-width: 25px; height: 25px; padding: 0 6px; border-radius: 13px; background: var(--yellow); color: var(--on-yellow);
   font-family: var(--f-display); font-weight: 800; font-size: 15px; display: grid; place-items: center; }
@@ -458,6 +486,7 @@ details.pv pre { margin: 8px 0 0; padding: 10px 12px; background: var(--panel-2)
 .dinfo h2 { font-size: 21px; line-height: 1.2; padding-right: 40px; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13.5px; color: var(--muted); align-items: center; }
 .tags .d { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--ink); }
+.tags .d .dic { flex: none; }
 .tags .d i { width: 9px; height: 9px; border-radius: 2px; transform: rotate(45deg); display: inline-block; }
 .dinfo h2.cname { font-family: var(--f-cname); font-weight: 700; font-size: 24px; letter-spacing: .01em; }
 .cgroups { display: flex; flex-wrap: wrap; gap: 5px; margin-top: -4px; }
@@ -739,7 +768,7 @@ footer { color: var(--muted); }
 <header class="top" id="top">
   <div class="wrap top-row">
     <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div>
-    <a class="badge" href="#decks" aria-label="Jake's Card Shop">
+    <a class="badge" href="#home" aria-label="Jake's Card Shop">
       <span class="badge-bar"><span>Riftbound</span><i aria-hidden="true"></i><span>Card shop</span></span>
       <span class="badge-disc"><svg width="58" height="58" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 27.5 9v14L16 29.5 4.5 23V9z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 8.5v15M10.5 12.2l5.5 3.6 5.5-3.6M10.5 19.8l5.5-3.6 5.5 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
@@ -766,20 +795,28 @@ footer { color: var(--muted); }
       <path d="M190 64c10-6 22-2 26 8M186 52c16-12 38-6 44 10" stroke-width="2.4"/>
     </g></svg>
   </div>
-  <nav class="wrap tabs pills" data-t-label="tabsLabel"><a href="#decks" data-tab="decks" data-t="tabDecks"></a><a href="#cards" data-tab="cards" data-t="tabCards"></a><a href="#tiers" data-tab="tiers" data-t="tabTiers"></a></nav>
+  <nav class="wrap tabs pills" data-t-label="tabsLabel"><a href="#home" data-tab="home" data-t="tabHome"></a><a href="#decks" data-tab="decks" data-t="tabDecks"></a><a href="#cards" data-tab="cards" data-t="tabCards"></a><a href="#tiers" data-tab="tiers" data-t="tabTiers"></a></nav>
 </header>
 
 <main class="wrap shop">
   <div class="browse">
     <div class="notice" id="notSetup" hidden></div>
     <section class="kp" id="keeper" hidden></section>
-    <section class="view" id="decksView" hidden>
+    <section class="view" id="homeView" hidden>
+      <section class="ph" aria-labelledby="phTitle">
+        <div class="ph-head"><div><span class="ph-kick" data-t="phKick"></span><h2 id="phTitle" data-t="phTitle"></h2><p class="ph-sub" id="phSub"></p></div>
+          <div class="ph-nav"><button type="button" class="ibtn" id="phPrev" data-t-label="phPrev"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="ibtn" id="phNext" data-t-label="phNext"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
+        <div class="slider" id="phTrack"></div>
+        <a class="btn primary" id="phAll" href="#decks" data-t="phAll"></a>
+      </section>
       <section class="why" aria-labelledby="whyTitle"><h2 id="whyTitle" data-t="whyTitle"></h2><ul>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 20h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why1h"></b><span data-t="why1"></span></li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8zM7.5 8.5h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why2h"></b><span data-t="why2"></span></li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6zM8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why3h"></b><span data-t="why3"></span></li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><b data-t="why4h"></b><span data-t="why4"></span></li>
       </ul></section>
+    </section>
+    <section class="view" id="decksView" hidden>
       <div class="levels" id="levels" role="group" data-t-label="levels"></div>
       <div class="filters" id="dFilters">
         <div class="frow dfrow">
@@ -923,6 +960,7 @@ const SHOP_CONFIG = {
   // true: customers don't see singles that cost the same or more here than on TCGplayer (the shopkeeper zone still shows
   // them, marked). Prices change daily, so a card comes back by itself once it's cheaper again.
   hideNotCheaper: true,
+  minSave: 10,  // the smallest saving, in percent, that gets a "Save X%" chip; smaller savings show just the TCGplayer price
   shipping: 50,  // shipping per order, added to the total (0 = free shipping). The return policy is shipNote/retTitle… in LANG.
   // Card fonts: files of the fonts printed on the cards, if you have a licence to put them on the web (they aren't free).
   // Put the .woff2 files in fonts/ and their paths here. Empty: visitors with the font installed see it, others a stand-in.
@@ -937,6 +975,8 @@ const LANG = {
   en: {
     tagline: 'Ready-to-play Riftbound decks and singles · order through LINE', heroTitle: 'Ready to play?',
     step1: 'Tap a deck or card to add it to your list', step2: 'Check your list', step3: () => `Send it to us on LINE. Shipping is ${SHOP_CONFIG.shipping ? money(SHOP_CONFIG.shipping) : 'free'}; we reply with how to pay.`,
+    phKick: 'Promotion', phTitle: 'Budget decks, ready to play', phSub: (n, v) => `${n} deck${n === 1 ? '' : 's'} from ${v}. Slide to see them all.`,
+    phAll: 'See all budget decks', phPrev: 'Previous decks', phNext: 'Next decks',
     whyTitle: 'Why Chinese-print cards?',
     why1h: 'Tournament legal', why1: 'Official Riftbound cards, accepted at sanctioned events. Play them in identical opaque sleeves, like any deck.',
     why2h: 'Much cheaper', why2: 'The same cards and the same game for far less than English prints. Each deck and card shows its TCGplayer price next to ours.',
@@ -950,7 +990,7 @@ const LANG = {
     why4h: 'Easy to read', why4: 'Every deck here shows its cards in English, so you know what each one does.',
     dvOpen: 'See the whole deck on one page', dvMain: n => `${n} cards`, dvSide: 'Sideboard', dvPng: 'Save as image', dvMaking: 'Making the image…',
     dvFail: 'Couldn’t make the image here. Take a screenshot instead.',
-    tabsLabel: 'Shop sections', tabDecks: 'Decks', tabCards: 'Singles & more', tabTiers: 'Tier list',
+    tabsLabel: 'Shop sections', tabHome: 'Home', tabDecks: 'Decks', tabCards: 'Singles & more', tabTiers: 'Tier list',
     levels: 'Deck levels', lv_budget: 'Budget Starter', lv_mid: 'Mid-Level', lv_top: 'Tournament Winner', lv_ask: 'Ask for price',
     lvFor_budget: 'Your first deck, ready to play. For players who don’t have a deck yet.',
     lvFor_mid: 'Built to win games at events: cheaper takes on strong decks, or top lists that are nearly complete.',
@@ -1063,6 +1103,8 @@ const LANG = {
   th: {
     tagline: 'เด็ค Riftbound พร้อมเล่นและการ์ดแยกใบ · สั่งซื้อผ่าน LINE', heroTitle: 'พร้อมลงสนามหรือยัง?',
     step1: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: () => `ส่งรายการให้เราทาง LINE ค่าส่ง ${SHOP_CONFIG.shipping ? money(SHOP_CONFIG.shipping) : 'ฟรี'} แล้วเราจะแจ้งวิธีชำระเงิน`,
+    phKick: 'โปรโมชัน', phTitle: 'เด็คราคาประหยัด พร้อมเล่น', phSub: (n, v) => `${n} เด็ค เริ่มต้น ${v} เลื่อนดูได้ทั้งหมด`,
+    phAll: 'ดูเด็คราคาประหยัดทั้งหมด', phPrev: 'เด็คก่อนหน้า', phNext: 'เด็คถัดไป',
     whyTitle: 'ทำไมต้องการ์ดพิมพ์จีน?',
     why1h: 'ใช้แข่งได้', why1: 'การ์ด Riftbound ของแท้ ใช้ในงานแข่งที่ได้รับการรับรองได้ ใส่สลีฟทึบแบบเดียวกันทั้งเด็คเหมือนเด็คทั่วไป',
     why2h: 'ราคาถูกกว่ามาก', why2: 'การ์ดเหมือนกัน เล่นได้เหมือนกัน แต่ราคาถูกกว่าการ์ดพิมพ์อังกฤษมาก ทุกเด็คและการ์ดแสดงราคา TCGplayer เทียบกับราคาร้าน',
@@ -1076,7 +1118,7 @@ const LANG = {
     why4h: 'อ่านง่าย', why4: 'ทุกเด็คในร้านแสดงการ์ดเป็นภาษาอังกฤษ จึงรู้ว่าการ์ดแต่ละใบทำอะไร',
     dvOpen: 'ดูการ์ดทั้งเด็คในหน้าเดียว', dvMain: n => `${n} ใบ`, dvSide: 'Sideboard', dvPng: 'บันทึกเป็นรูปภาพ', dvMaking: 'กำลังสร้างรูป…',
     dvFail: 'สร้างรูปในเครื่องนี้ไม่ได้ ให้แคปหน้าจอแทน',
-    tabsLabel: 'หมวดของร้าน', tabDecks: 'เด็คพร้อมเล่น', tabCards: 'การ์ดและสินค้าอื่น', tabTiers: 'Tier list',
+    tabsLabel: 'หมวดของร้าน', tabHome: 'หน้าแรก', tabDecks: 'เด็คพร้อมเล่น', tabCards: 'การ์ดและสินค้าอื่น', tabTiers: 'Tier list',
     levels: 'ระดับเด็ค', lv_budget: 'เด็คเริ่มต้นราคาประหยัด', lv_mid: 'เด็คระดับกลาง', lv_top: 'เด็คแชมป์ทัวร์นาเมนต์', lv_ask: 'สอบถามราคา',
     lvFor_budget: 'เด็คแรกของคุณ พร้อมเล่นทันที สำหรับคนที่ยังไม่มีเด็ค',
     lvFor_mid: 'พร้อมลุ้นชนะในงานแข่ง: เด็คแรงฉบับประหยัด หรือเด็คท็อปที่เกือบครบ',
@@ -1191,7 +1233,7 @@ const TYPES = ['Legend', 'Unit', 'Spell', 'Gear', 'Battlefield', 'Rune'];
 const DOMAINS = ['Fury', 'Calm', 'Mind', 'Body', 'Chaos', 'Order', 'Colorless'];
 const RARITIES = ['Common', 'Uncommon', 'Rare', 'Epic', 'Promo'];
 const PAGE = 60, MAX_COPIES = 99, PRODUCTS = '_products', PRODUCT_BUCKET = 'shop';
-const TABS = ['decks', 'cards', 'tiers'];  // the page's sections: #decks, #cards, #tiers (#keeper/decks… in the shopkeeper zone)
+const TABS = ['home', 'decks', 'cards', 'tiers'];  // the page's sections: #home, #decks, #cards, #tiers (#keeper/decks… in the shopkeeper zone, which has no Home)
 const LEVELS = ['budget', 'mid', 'top'];   // deck levels, by price (SHOP_CONFIG.deckLevels); a deck without a price is 'ask'
 const STYLES = ['aggro', 'midrange', 'control', 'combo'];
 const TIER_COLORS = ['#E2574C', '#EE9A3E', '#E3C04B', '#7DC36B', '#5AA9DD', '#A98BD9', '#9AA2B0'];  // top tier first
@@ -1211,6 +1253,17 @@ const money = v => SHOP_CONFIG.currency + v.toLocaleString('en-US', { maximumFra
 const toNum = s => { const v = parseFloat(String(s).replace(/[^\d.]/g, '')); return s && isFinite(v) ? v : null; };
 const cardNo = c => { const [s, n] = c.id.split('-'); return `${s.toUpperCase()}-${n}`; };
 const domColor = d => `var(--${d.toLowerCase()})`;
+// Each domain's mark, white on its color: flame, leaf, eye, paw, spiral, star (drawn here, after the symbols on the cards).
+const DOMAIN_MARKS = {
+  Fury: '<path d="M12 5.4c.6 2.4 3.7 3.8 3.7 7.5a3.7 3.7 0 0 1-7.4 0c0-1.7.8-2.9 1.8-3.7.1 1.5.8 2.4 1.6 2.5-.4-2.3-.6-4.3.3-6.3z" fill="#fff"/>',
+  Calm: '<path d="M7 16.8C7 11.2 10.4 7.6 17 7.2c-.3 6.6-3.8 10-9.2 10M7.4 16.6l5-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  Mind: '<path d="M4.8 12s2.6-4.3 7.2-4.3 7.2 4.3 7.2 4.3-2.6 4.3-7.2 4.3S4.8 12 4.8 12z" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.1" fill="#fff"/>',
+  Body: '<ellipse cx="12" cy="14.6" rx="3.4" ry="2.7" fill="#fff"/><circle cx="7.9" cy="10.6" r="1.45" fill="#fff"/><circle cx="12" cy="8.4" r="1.5" fill="#fff"/><circle cx="16.1" cy="10.6" r="1.45" fill="#fff"/>',
+  Chaos: '<path d="M12.6 12.1a1 1 0 1 1-1.7-.8 2.6 2.6 0 0 1 3.8 2.4 3.9 3.9 0 0 1-4.7 3.6 5.1 5.1 0 0 1-3.6-5.8 6.1 6.1 0 0 1 6.9-4.8" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>',
+  Order: '<path d="M12 5.2l1.7 5.1 5.1 1.7-5.1 1.7L12 18.8l-1.7-5.1L5.2 12l5.1-1.7z" fill="#fff"/>',
+  Colorless: '<path d="M12 6.6 17.4 12 12 17.4 6.6 12z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>',
+};
+const domIcon = (d, px = 20) => `<svg class="dic" width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="${domColor(d)}"/>${DOMAIN_MARKS[d] || DOMAIN_MARKS.Colorless}</svg>`;
 // Ability text the way players read it: icon codes become words (":rb_might:" → "might", ":rb_energy_2:" → "2 energy").
 function readable(x) {
   return String(x || '').replace(/&(gt|lt|amp|quot|#39);/g, (_, e) => ({ gt: '>', lt: '<', amp: '&', quot: '"', '#39': "'" }[e]))
@@ -1291,6 +1344,7 @@ const lineAddUrl = () => SHOP_CONFIG.lineOA.trim()
   : `https://line.me/ti/p/~${encodeURIComponent(SHOP_CONFIG.lineId.trim())}`;
 // On a computer those links open LINE's home page instead of the app, so there the order link is shown as a QR code
 // to scan with a phone. The QR library loads only then.
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const onPhone = matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 const QR_LIB = { src: 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js', sri: 'sha512-ZDSPMa/JM1D+7kdg2x3BsruQ6T/JpJo3jWDWkCZsP+5yVyp1KfESqLI+7RqB5k24F7p2cV7i2YHh/890y6P6Sw==' };
 const QR_MAX = 1500;  // longer links make codes too dense to scan off a screen
@@ -1512,21 +1566,23 @@ function tcgValue(x) {
 }
 // How much cheaper the shop is, in percent (0 when it isn't, or there's nothing to compare).
 const tcgSave = x => { const v = tcgValue(x); return v && x.price != null && v.thb > x.price ? Math.round((v.thb - x.price) / v.thb * 100) : 0; };
+// The saving to boast about: tcgSave when it reaches SHOP_CONFIG.minSave, else 0.
+const shownSave = x => { const pct = tcgSave(x); return pct >= (SHOP_CONFIG.minSave || 0) ? pct : 0; };
 // A single that costs the same or more here than on TCGplayer, which customers don't see (SHOP_CONFIG.hideNotCheaper).
 // Cards without a price or without a TCGplayer price stay.
 const notCheaper = x => { if (!SHOP_CONFIG.hideNotCheaper || !x.c || x.price == null) return false; const v = tcgValue(x); return !!v && x.price >= v.thb; };
 // Under a tile's price: what TCGplayer asks, with the saving. Customers see it where the shop is cheaper; the shopkeeper always,
 // as a guide, with a note on the cards customers don't see.
 function tcgLine(x) {
-  const v = tcgValue(x), pct = tcgSave(x);
-  if (!v || (!pct && !K.on)) return '';
+  const v = tcgValue(x), pct = shownSave(x);
+  if (!v || (!tcgSave(x) && !K.on)) return '';
   return `<div class="tcg"><span>TCGplayer <span class="num">${money(v.thb)}${v.miss ? '+' : ''}</span></span>${pct ? `<span class="save">${t('save', pct)}</span>` : ''}`
     + `${K.on && notCheaper(x) ? `<span class="bad-t">${t('kHidden', Math.round(vsTcg(x)))}</span>` : ''}</div>`;
 }
 // In the details: the comparison with where the price comes from.
 function tcgBox(x) {
   const v = tcgValue(x); if (!v) return '';
-  const pct = tcgSave(x), d = /^(\d{4})-(\d\d)-(\d\d)/.exec(TCG.updated);
+  const pct = shownSave(x), d = /^(\d{4})-(\d\d)-(\d\d)/.exec(TCG.updated);
   const when = d ? new Date(+d[1], d[2] - 1, +d[3]).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   return `<div class="tcgbox"><div class="row"><span>${x.p ? t('tcgDeck', deckSize(x.p.list) - v.miss) : t('tcgCard')}</span><span class="num">${money(v.thb)}</span>
       ${pct ? `<span class="save">${t('tcgSave', pct, money(v.thb - x.price))}</span>` : ''}</div>
@@ -1635,7 +1691,7 @@ function renderFilters() {
   const picked = types.filter(([k]) => f.types.has(k)).map(([, label]) => label);
   $('#fTypeBtn').textContent = !picked.length ? t('allTypes') : picked.length === 1 ? picked[0] : t('nTypes', picked.length);
   $('#fTypeBtn').classList.toggle('on', picked.length > 0);
-  $('#fDoms').innerHTML = DOMAINS.map(d => `<button type="button" data-dom="${d}" aria-pressed="${f.dom.has(d)}" title="${d}" aria-label="${d}" style="--dc:${domColor(d)}"><i></i></button>`).join('');
+  $('#fDoms').innerHTML = DOMAINS.map(d => `<button type="button" data-dom="${d}" aria-pressed="${f.dom.has(d)}" title="${d}" aria-label="${d}" style="--dc:${domColor(d)}">${domIcon(d, 22)}</button>`).join('');
   $('#fCost').innerHTML = `<option value="">${esc(t('anyCost'))}</option>` + COSTS.map(v => `<option value="${v}"${v === f.cost ? ' selected' : ''}>${esc(t('costN', v))}</option>`).join('');
   $('#fCost').classList.toggle('on', !!f.cost);
   $('#fSort').innerHTML = [['num', 'sortNum'], ['name', 'sortName'], ['cost', 'cost'], ['might', 'might'], ['type', 'sortType'], ['domain', 'sortDomain'],
@@ -1712,11 +1768,12 @@ function showMore() {
   S.shown += PAGE;
   $('#more').hidden = S.shown >= S.list.length;
 }
-function refreshTile(key) {  // a card's tile is in the card grid, a deck's on its shelf
-  const sel = `.tile[data-key="${CSS.escape(key)}"]`, el = document.querySelector(sel); if (!el) return;
-  const a = document.activeElement, act = a && el.contains(a) ? a.dataset.act : null, box = el.parentNode;
-  el.outerHTML = tile(DB.byKey.get(key), true);
-  if (act) { const nt = box.querySelector(sel); (nt.querySelector(`[data-act="${act}"]:not(:disabled)`) || nt.querySelector('.pic')).focus({ preventScroll: true }); }
+function refreshTile(key) {  // a card's tile is in the card grid, a deck's on its shelf and in the Home slider
+  document.querySelectorAll(`.tile[data-key="${CSS.escape(key)}"]`).forEach(el => {
+    const a = document.activeElement, act = a && el.contains(a) ? a.dataset.act : null, box = el.parentNode, i = [...box.children].indexOf(el);
+    el.outerHTML = tile(DB.byKey.get(key), true);
+    if (act) { const nt = box.children[i]; (nt.querySelector(`[data-act="${act}"]:not(:disabled)`) || nt.querySelector('.pic')).focus({ preventScroll: true }); }
+  });
 }
 
 // ---------- decks ----------
@@ -1758,6 +1815,36 @@ function renderDecks() {
       ${ys.length ? `<div class="cards decks">${ys.map(x => tile(x)).join('')}</div>` : `<div class="state">${t(Object.entries(d).some(([k, v]) => v && k !== 'level') ? 'noDeckMatch' : 'noDecksLevel')}</div>`}
     </section>`).join('');
 }
+// ---------- home ----------
+// The first tab: the promotion, for now the budget decks on a slider, then why Chinese-print cards.
+const budgetDecks = () => DB.listings.filter(x => x.p && x.p.isDeck && deckLevel(x.p) === 'budget')
+  .sort((a, b) => (a.qty === 0) - (b.qty === 0) || a.price - b.price);
+function renderHome() {
+  const tr = $('#phTrack');
+  if (!DB.ok) { tr.innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; $('#phSub').textContent = ''; slideArrows(); return; }
+  const xs = budgetDecks();
+  $('#phSub').textContent = xs.length ? t('phSub', xs.length, money(Math.min(...xs.map(x => x.price)))) : '';
+  tr.innerHTML = xs.length ? xs.map(x => tile(x)).join('') : `<div class="state">${t('noDecksLevel')}</div>`;
+  $('#phAll').href = tabHref('decks');
+  slideArrows();
+}
+// The slider moves a screenful of decks per arrow tap, and on its own every few seconds until the visitor touches it.
+function slideBy(dir) {
+  const tr = $('#phTrack'), first = tr.querySelector('.tile'); if (!first) return;
+  const step = first.getBoundingClientRect().width + (parseFloat(getComputedStyle(tr).columnGap) || 0);
+  tr.scrollBy({ left: dir * step * Math.max(1, Math.floor((tr.clientWidth + 1) / step)), behavior: 'smooth' });
+}
+function slideArrows() {
+  const tr = $('#phTrack');
+  $('#phPrev').disabled = tr.scrollLeft < 4;
+  $('#phNext').disabled = tr.scrollLeft + tr.clientWidth >= tr.scrollWidth - 4;
+}
+let phAuto = !reduceMotion;
+function slideOn() {
+  const tr = $('#phTrack');
+  if (!phAuto || S.tab !== 'home' || document.hidden || tr.matches(':hover, :focus-within') || $('#cart').classList.contains('open')) return;
+  if (tr.scrollLeft + tr.clientWidth >= tr.scrollWidth - 4) tr.scrollTo({ left: 0, behavior: 'smooth' }); else slideBy(1);
+}
 // Show the Decks tab with the filters as they are now.
 const showDecks = () => { if (S.tab === 'decks') renderDecks(); else location.hash = tabHref('decks'); };
 
@@ -1770,7 +1857,8 @@ function renderTiers() {
   const when = tl.updated ? new Date(tl.updated).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   const entry = (e, i, j) => {
     const c = DB.byId.get(e.legend), n = c ? decks.filter(x => x.p.legend.k === c.k).length : 0;
-    return `<article class="tl-deck"${K.on ? ` data-tl="${i}.${j}" title="${esc(t('tlEdit'))}"` : ''}>${c ? thumb(c, 48) : `<span class="cimg pimg" style="width:48px;height:67px;flex:none" aria-hidden="true">${ICON_BOX}</span>`}<div>
+    const name = e.name || (c ? legendLabel(c) : ''), pic = c ? thumb(c, 48) : `<span class="cimg pimg" style="width:48px;height:67px;flex:none" aria-hidden="true">${ICON_BOX}</span>`;
+    return `<article class="tl-deck"${K.on ? ` data-tl="${i}.${j}" title="${esc(t('tlEdit'))}"` : ''}>${n && !K.on ? `<button type="button" class="tl-pic" data-legend="${esc(c.k)}" title="${esc(name)}" aria-label="${esc(name)} · ${esc(t('tlShop', n))}">${pic}</button>` : `<span class="tl-pic" title="${esc(name)}">${pic}</span>`}<div>
       <b>${esc(e.name || (c ? legendLabel(c) : ''))}</b>${styleChip(e.style)}${c && e.name ? `<span class="small muted">${esc(legendLabel(c))}</span>` : ''}
       ${e.note ? `<span class="small">${esc(e.note)}</span>` : ''}${n ? `<button type="button" class="btn link" data-legend="${esc(c.k)}">${t('tlShop', n)}</button>` : ''}</div></article>`;
   };
@@ -2035,7 +2123,7 @@ function openDeckView(key) {
 function dvBuy() {
   const el = $('#dvBuy'), x = dvKey && DB.byKey.get(dvKey); if (!el || !x) return;
   const n = inCart(x.key);
-  const pct = tcgSave(x);
+  const pct = shownSave(x);
   el.innerHTML = `<span class="row" data-key="${esc(x.key)}">${x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`}${pct ? `<span class="save">${t('save', pct)}</span>` : ''}
     ${K.on || x.qty === 0 ? (x.qty === 0 ? `<b class="bad-t">${t('soldOut')}</b>` : '') : n ? stepper(x, n) : `<button type="button" class="btn sm primary" data-act="add">${t('add')}</button>`}</span>`;
 }
@@ -2134,7 +2222,7 @@ function renderDetail() {
     <div class="dinfo">
       <h2 class="cname">${esc(c.n)}</h2>
       <div class="cgroups">${[[c.st, c.t].filter(Boolean).join(' '), ...(c.g || [])].map(g => `<span>${esc(g)}</span>`).join('')}</div>
-      <div class="tags">${c.d.map(d => `<span class="d"><i style="background:${domColor(d)}"></i>${d}</span>`).join('')}${stats.length ? `<span>${stats.join(' · ')}</span>` : ''}</div>
+      <div class="tags">${c.d.map(d => `<span class="d">${domIcon(d, 18)}${d}</span>`).join('')}${stats.length ? `<span>${stats.join(' · ')}</span>` : ''}</div>
       ${c.x ? `<p class="ctext">${esc(readable(c.x))}</p>` : ''}
       <div class="small muted">${esc(c.r)} · ${cardNo(c)} · ${c.s.map(s => esc(SET_NAMES[s] || s)).join(', ')}</div>
       ${shopDesc(x)}
@@ -2189,12 +2277,14 @@ const ICON_TRASH = '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden=
 const K = { on: false, sb: null, starting: false, user: null, state: 'connecting', msg: '', busy: false, lastUser: '' };
 let E = null;  // the card in the stock editor: { c, orig: its notes as saved, rows: [{ note, price, qty }], busy }
 
-// The address says the tab and whether this is the shopkeeper zone: #cards, #keeper, #keeper/tiers… (no tab: the decks).
+// The address says the tab and whether this is the shopkeeper zone: #cards, #keeper, #keeper/tiers… (no tab: Home, or the
+// decks for the shopkeeper).
 const tabHref = tab => '#' + (K.on ? 'keeper/' : '') + tab;
 function setMode() {
   const [a = '', b = ''] = location.hash.slice(1).split('/'), was = K.on, tab = S.tab;
   K.on = a === 'keeper';
-  S.tab = TABS.includes(K.on ? b : a) ? (K.on ? b : a) : 'decks';
+  const want = K.on ? b : a;
+  S.tab = TABS.includes(want) && !(K.on && want === 'home') ? want : K.on ? 'decks' : 'home';
   document.body.classList.toggle('keeper', K.on);
   if (K.on) openSheet(false);
   if (DB.ok && K.on !== was) { buildListings(); Object.assign(S.f, { show: '', min: '', max: '' }); if (S.f.sort === 'over') S.f.sort = 'num'; S.shown = PAGE; }
@@ -2748,7 +2838,7 @@ function renderAll() {
   if (DB.ok) renderFilters();
   $('#filters').hidden = !DB.ok;
   renderKeeper();
-  if (S.tab === 'decks') renderDecks(); else if (S.tab === 'tiers') renderTiers(); else renderGrid();
+  if (S.tab === 'home') renderHome(); else if (S.tab === 'decks') renderDecks(); else if (S.tab === 'tiers') renderTiers(); else renderGrid();
   renderCart();
   if (S.detail && $('#detail').open) renderDetail();
   if ($('#review').open) renderReview();
@@ -2790,7 +2880,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.ma
 document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; store.set('rbshop.lang', lang); renderAll(); applyTheme(); }));
 $('#themeBtn').addEventListener('click', toggleTheme);
 darkQuery.addEventListener('change', applyTheme);
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches) addEventListener('scroll', () => { bgFrame ||= requestAnimationFrame(moveBg); }, { passive: true });
+if (!reduceMotion) addEventListener('scroll', () => { bgFrame ||= requestAnimationFrame(moveBg); }, { passive: true });
 let qTimer;
 $('#fQ').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.f.q = e.target.value; S.shown = PAGE; renderGrid(); }, 120); });
 // Card filters: each change redraws the bar (counts, labels) and the cards.
@@ -2848,6 +2938,12 @@ document.addEventListener('click', e => {
 // In the shopkeeper zone, a deck in the tier list opens the editor on it.
 $('#tiersView').addEventListener('click', e => { const d = K.on && !e.target.closest('button, a') && e.target.closest('[data-tl]'); if (d) openTierEditor(...d.dataset.tl.split('.').map(Number)); });
 $('#more').addEventListener('click', showMore);
+$('#phPrev').addEventListener('click', () => { phAuto = false; slideBy(-1); });
+$('#phNext').addEventListener('click', () => { phAuto = false; slideBy(1); });
+$('#phTrack').addEventListener('scroll', slideArrows, { passive: true });
+['pointerdown', 'wheel', 'keydown'].forEach(ev => $('#phTrack').addEventListener(ev, () => { phAuto = false; }, { passive: true }));
+setInterval(slideOn, 5000);
+$('#phAll').addEventListener('click', e => { e.preventDefault(); S.d = { ...blankDeckFilter(), level: 'budget' }; location.hash = tabHref('decks'); });
 new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) showMore(); }, { rootMargin: '800px 0px' }).observe($('#more'));
 $('#mbOpen').addEventListener('click', () => openSheet(true));
 $('#cartClose').addEventListener('click', () => openSheet(false));
