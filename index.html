@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#10131A" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Cinzel:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600&family=Marcellus&family=Cinzel:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: sticky header; card grid on the left, the customer's list on the right (a bottom sheet on phones). */
 :root {
@@ -35,6 +35,10 @@
   --f-display: "Cinzel", "Trajan Pro", Georgia, serif;
   --f-body: "Barlow", "IBM Plex Sans Thai", "Segoe UI", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  /* the fonts printed on the cards (see cardFonts in SHOP_CONFIG), then free stand-ins */
+  --f-cname: "Card Name", "Marcellus", Georgia, "IBM Plex Sans Thai", serif;
+  --f-cgroup: "Card Group", "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-ctext: "Card Text", "Barlow", "IBM Plex Sans Thai", "Segoe UI", sans-serif;
   --r: 8px; --head: 64px;
   color-scheme: light;
 }
@@ -136,6 +140,65 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 /* the shopkeeper's own filters: what to show, and a price range */
 .kfil { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
 .kfil select { width: auto; max-width: 100%; }
+/* the card filter bar */
+.fbar { gap: 10px; }
+.qbox { position: relative; display: block; }
+.qbox svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.qbox .q { padding-left: 36px; height: 42px; font-size: 15px; }
+.tbar { display: flex; align-items: center; justify-content: space-between; gap: 8px 14px; flex-wrap: wrap; }
+.tgroup { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.tsel { width: auto; height: 36px; padding: 0 30px 0 10px; font-weight: 600; font-size: 13.5px; }
+.ibtn { display: inline-grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); color: var(--muted); cursor: pointer; padding: 0; }
+.ibtn:hover, .ibtn[aria-pressed="true"] { color: var(--ink); }
+.vseg { border-radius: 6px; }
+.vseg .ibtn { border: 0; border-radius: 0; width: 34px; height: 34px; background: var(--panel-2); }
+.vseg .ibtn[aria-pressed="true"] { background: var(--panel); color: var(--accent); }
+.allf { gap: 6px; font-size: 14px; }
+.nb { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); font-size: 11.5px; display: inline-grid; place-items: center; }
+.dd { position: relative; }
+.dd-btn { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); cursor: pointer; font-weight: 600; font-size: 13.5px; white-space: nowrap; }
+.dd-btn::after { content: ""; width: 7px; height: 7px; border: solid var(--muted); border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); margin-left: 4px; }
+.dd-btn.on { border-color: var(--accent); color: var(--accent); }
+.dd-menu { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; min-width: 200px; display: grid; padding: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgb(0 0 0 / .28); }
+.dd-menu label { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+.dd-menu label:hover { background: var(--panel-2); }
+.dd-menu input { width: 16px; height: 16px; accent-color: var(--accent); margin: 0; }
+.dd-menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; }
+.domset { display: inline-flex; align-items: center; gap: 2px; height: 36px; padding: 0 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); }
+.domset button { display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 5px; background: none; cursor: pointer; padding: 0; opacity: .55; }
+.domset button i { width: 11px; height: 11px; border-radius: 2px; transform: rotate(45deg); background: var(--dc); box-shadow: 0 0 0 2px rgb(0 0 0 / .15); }
+.domset button:hover { opacity: .9; }
+.domset button[aria-pressed="true"] { opacity: 1; background: var(--panel); box-shadow: inset 0 0 0 2px var(--dc); }
+.domset:has([aria-pressed="true"]) button:not([aria-pressed="true"]) { opacity: .35; }
+.fmore { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+.fmore .kfil { grid-column: 1 / -1; }
+.tsel.on { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 760px) { .fmore { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tgroup.end { width: 100%; } .tgroup.end .allf { margin-left: auto; } }
+/* phones: type and cost side by side, the domains under them, then sort, view and All filters on one line */
+@media (max-width: 560px) {
+  .tgroup { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tgroup .dd-btn, .tgroup .tsel { width: 100%; }
+  .dd-btn { justify-content: space-between; overflow: hidden; }
+  .domset { grid-column: 1 / -1; order: 3; justify-content: space-between; }
+  .tgroup.end { display: flex; flex-wrap: nowrap; }
+  .tgroup.end .tsel { flex: 1 1 auto; min-width: 0; width: auto; }
+  .allf { padding-inline: 2px; }
+}
+/* list view: one card per row */
+.cards.list { grid-template-columns: minmax(0, 1fr); gap: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
+.cards.list .tile { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto auto; grid-template-areas: "pic nm buy step" "pic sub buy step" "pic tcg buy step"; gap: 2px 12px; align-items: center; padding: 8px 12px; }
+.cards.list .tile + .tile { border-top: 1px solid var(--line); }
+.cards.list .picbox { display: contents; }
+.cards.list .pic { grid-area: pic; align-self: start; }
+.cards.list .info, .cards.list .desc, .cards.list .flag { display: none; }
+.cards.list .nm { grid-area: nm; min-height: 0; -webkit-line-clamp: 1; }
+.cards.list .sub { grid-area: sub; }
+.cards.list .tcg { grid-area: tcg; }
+.cards.list .buy { grid-area: buy; min-height: 0; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; }
+.cards.list .step.onpic { position: static; transform: none; grid-area: step; animation: none; background: var(--panel); border-color: var(--line); box-shadow: none; backdrop-filter: none; }
+.cards.list .step.onpic button, .cards.list .step.onpic .qn { color: var(--ink); width: 30px; height: 28px; font-size: 15px; }
+.cards.list .step.onpic .qn { width: 32px; font-size: 14px; }
+@media (max-width: 560px) { .cards.list .tile { grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: "pic nm buy" "pic sub buy" "pic tcg step"; } }
 .prange { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
 .prange input { width: 92px; }
 .chk { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
@@ -251,13 +314,17 @@ body.keeper .why { display: none; }
 .pic:disabled { cursor: default; }
 .pic:disabled .cimg { transform: none; box-shadow: none; }
 .tile.out .pic .cimg { filter: grayscale(1) opacity(.5); }
-.count { position: absolute; top: 7px; left: 7px; min-width: 28px; height: 28px; padding-inline: 7px; border-radius: 14px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; box-shadow: 0 2px 6px rgb(0 0 0 / .3); }
-.count.pop { animation: pop .2s ease-out; }
-@keyframes pop { from { transform: scale(1.45); } }
+/* once a card is in the list, its count sits on the picture: − [n] + */
+.picbox { position: relative; }
+.step.onpic { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); background: rgb(12 14 18 / .84); border-color: rgb(255 255 255 / .22); color: #fff; box-shadow: 0 3px 10px rgb(0 0 0 / .35); backdrop-filter: blur(3px); }
+.step.onpic button { color: #fff; width: 34px; height: 32px; font-size: 19px; }
+.step.onpic .qn { color: #fff; width: 38px; font-size: 15px; }
+.step.onpic.pop { animation: pop .2s ease-out; }
+@keyframes pop { from { transform: translateX(-50%) scale(1.25); } }
 .flag { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); padding: 5px; text-align: center; background: rgb(12 14 18 / .78); color: #fff; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 13px; }
 .info { position: absolute; top: 7px; right: 7px; width: 28px; height: 28px; border-radius: 50%; border: 0; display: grid; place-items: center; background: rgb(12 14 18 / .62); color: #fff; cursor: pointer; padding: 0; }
 .info:hover { background: rgb(12 14 18 / .85); }
-.nm { font-weight: 600; font-size: 14px; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2.5em; }
+.nm { font-family: var(--f-cname); font-weight: 700; font-size: 14.5px; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2.5em; }
 .sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sub b { color: var(--gold); font-weight: 600; }
 .desc { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: -3px; }
@@ -268,7 +335,8 @@ body.keeper .why { display: none; }
 .step { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); flex: none; }
 .step button { width: 30px; height: 28px; border: 0; background: none; cursor: pointer; font-weight: 700; font-size: 17px; line-height: 1; padding: 0; color: var(--ink); border-radius: 999px; }
 .step button:disabled { opacity: .35; cursor: not-allowed; }
-.step .num { min-width: 20px; text-align: center; font-weight: 600; font-size: 14px; }
+.step .qn { width: 32px; min-width: 0; padding: 0; border: 0; border-radius: 4px; background: none; text-align: center; font-weight: 600; font-size: 14px; color: var(--ink); -moz-appearance: textfield; }
+.step .qn:focus { background: rgb(127 127 127 / .18); }
 .more { justify-self: center; }
 .state { padding: 40px 12px; text-align: center; color: var(--muted); grid-column: 1 / -1; }
 
@@ -281,11 +349,14 @@ body.keeper .why { display: none; }
 .ln { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 8px 16px; }
 .ln + .ln { border-top: 1px solid var(--line); }
 .ln .cimg { border-radius: 4px; grid-row: span 2; align-self: start; }
-.ln .t { font-weight: 600; font-size: 14px; line-height: 1.25; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ln .t { font-family: var(--f-cname); font-weight: 700; font-size: 14px; line-height: 1.25; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ln .s { font-size: 12px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ln .amt { text-align: right; font-size: 13.5px; white-space: nowrap; }
 .ln .step { justify-self: end; }
 .cart-foot { border-top: 1px solid var(--line); padding: 12px 16px 14px; display: grid; gap: 10px; background: var(--panel); }
+.sums { display: grid; gap: 3px; font-size: 13.5px; color: var(--muted); }
+.sums div { display: flex; justify-content: space-between; gap: 10px; }
+.sums .disc { color: var(--accent); font-weight: 600; }
 .tot { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .tot b { font-size: 18px; }
 .foot-row { display: flex; justify-content: space-between; align-items: center; }
@@ -320,6 +391,24 @@ dialog::backdrop { background: rgb(6 8 12 / .6); }
 .rev .r { text-align: right; white-space: nowrap; }
 .rev tfoot th { border-bottom: 0; font-size: 15px; }
 .rev tfoot td { border-bottom: 0; padding-top: 0; }
+.rev tfoot .sub td { padding: 3px 4px; color: var(--muted); font-size: 13.5px; }
+.rev tfoot .sub:first-child td { padding-top: 9px; }
+.rev tfoot .sub.disc td { color: var(--accent); font-weight: 600; }
+.rev tfoot .grand th { border-top: 1px solid var(--line); padding-top: 8px; }
+.promo { display: grid; gap: 5px; }
+.promo-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.promo-row input { text-transform: uppercase; font-family: var(--f-mono); letter-spacing: .04em; }
+.promo-row input::placeholder { text-transform: none; font-family: var(--f-body); letter-spacing: 0; }
+.promo-on { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--accent-soft); color: var(--accent); border-radius: 6px; padding: 7px 8px 7px 12px; font-weight: 600; font-size: 14px; }
+.promo-on .num { letter-spacing: .04em; }
+details.policy { border: 1px solid var(--line); border-radius: var(--r); padding: 9px 12px; }
+details.policy summary { cursor: pointer; font-size: 13.5px; font-weight: 600; }
+.policy-body { font-size: 13.5px; line-height: 1.5; display: grid; gap: 8px; }
+details.policy .policy-body { margin-top: 8px; }
+.policy-body h3 { margin: 4px 0 0; font-size: 14px; }
+.policy-body ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.policy-body p { margin: 0; }
+#policyDlg .dlg { max-width: 560px; }
 .two { display: grid; gap: 10px; grid-template-columns: 1fr 1.4fr; align-items: start; }
 @media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
 .how { background: var(--panel-2); border-radius: var(--r); padding: 11px 13px; font-size: 13.5px; display: grid; gap: 6px; }
@@ -346,7 +435,12 @@ details.pv pre { margin: 8px 0 0; padding: 10px 12px; background: var(--panel-2)
 .tags { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13.5px; color: var(--muted); align-items: center; }
 .tags .d { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--ink); }
 .tags .d i { width: 9px; height: 9px; border-radius: 2px; transform: rotate(45deg); display: inline-block; }
-.ctext { font-size: 14.5px; line-height: 1.55; background: var(--panel-2); border-radius: 6px; padding: 10px 12px; }
+.dinfo h2.cname { font-family: var(--f-cname); font-weight: 700; font-size: 24px; letter-spacing: .01em; }
+.cgroups { display: flex; flex-wrap: wrap; gap: 5px; margin-top: -4px; }
+.cgroups span { font-family: var(--f-cgroup); font-weight: 600; font-size: 13.5px; letter-spacing: .06em; text-transform: uppercase; line-height: 1; padding: 4px 8px 3px; border-radius: 3px; background: var(--panel-2); border: 1px solid var(--line); }
+.cgroups span:first-child { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.cstat { font-family: var(--f-cname); font-weight: 700; font-size: 16px; color: var(--ink); }
+.ctext { font-family: var(--f-ctext); font-size: 14.5px; line-height: 1.55; background: var(--panel-2); border-radius: 6px; padding: 10px 12px; }
 .sdesc { font-size: 14.5px; line-height: 1.55; white-space: pre-line; border-left: 3px solid var(--gold); padding: 2px 0 2px 10px; }
 .sdesc b { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .deck { display: grid; gap: 10px; }
@@ -494,16 +588,28 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     </section>
     <section class="view" id="tiersView" hidden></section>
     <section class="view" id="cardsView" hidden>
-    <div class="filters" id="filters">
-      <div class="frow">
-        <input class="q" type="search" id="fQ" data-t-ph="search" autocomplete="off" enterkeyhint="search">
-        <select id="fSet" aria-label="Set"></select>
-        <select id="fType" aria-label="Type"></select>
-        <select id="fRar" aria-label="Rarity"></select>
-        <select id="fSort" aria-label="Sort"></select>
+    <!-- card filters, laid out like Rift Atlas: search; type, domains, cost; sort, view and the rest under All filters -->
+    <div class="filters fbar" id="filters">
+      <label class="qbox"><svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input class="q" type="search" id="fQ" data-t-ph="search" autocomplete="off" enterkeyhint="search"></label>
+      <div class="tbar">
+        <div class="tgroup">
+          <div class="dd" id="fTypeDd"><button type="button" class="dd-btn" id="fTypeBtn" aria-haspopup="true" aria-expanded="false"></button><div class="dd-menu" id="fTypes" hidden></div></div>
+          <div class="domset" id="fDoms" role="group" aria-label="Domains"></div>
+          <select class="tsel" id="fCost" data-t-label="cost"></select>
+        </div>
+        <div class="tgroup end">
+          <select class="tsel" id="fSort" data-t-label="sortBy"></select>
+          <button type="button" class="ibtn" id="fDir"></button>
+          <div class="seg vseg" role="group" data-t-label="view"><button type="button" class="ibtn" data-view="grid" data-t-label="viewGrid"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button><button type="button" class="ibtn" data-view="list" data-t-label="viewList"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+          <button type="button" class="btn link allf" id="fMoreBtn" aria-expanded="false" aria-controls="fMore"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M14 4v6M8 14v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-t="allFilters"></span><span class="nb num" id="fMoreN" hidden></span></button>
+        </div>
       </div>
-      <div class="frow2">
-        <div class="doms" id="fDoms" role="group" aria-label="Domains"></div>
+      <div class="fmore" id="fMore" hidden>
+        <label class="field"><span data-t="fSet"></span><select id="fSet"></select></label>
+        <label class="field"><span data-t="fRar"></span><select id="fRar"></select></label>
+        <label class="field"><span data-t="fGroup"></span><select id="fGroup"></select></label>
+        <label class="field"><span data-t="might"></span><select id="fMight"></select></label>
         <div class="kfil" id="fKeepWrap" hidden>
           <select id="fShow" data-t-label="kShow"></select>
           <span class="prange"><input type="text" id="fMin" inputmode="numeric" data-t-ph="kMin" data-t-label="kMin"><span>–</span><input type="text" id="fMax" inputmode="numeric" data-t-ph="kMax" data-t-label="kMax"></span>
@@ -524,6 +630,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     </div>
     <ul class="lines" id="lines"></ul>
     <div class="cart-foot">
+      <div class="sums" id="cartSums"></div>
       <div class="tot"><span data-t="total"></span><b class="num" id="cartTotal"></b></div>
       <div class="small muted" id="cartUnpriced" hidden></div>
       <div class="small ok-t" id="cartSave" hidden></div>
@@ -533,7 +640,7 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
   </aside>
 </main>
 
-<footer class="wrap"><p data-t="footer"></p></footer>
+<footer class="wrap"><p><button type="button" class="btn link" id="policyOpen" data-t="policyTitle"></button></p><p data-t="footer"></p></footer>
 
 <div class="scrim" id="scrim"></div>
 <div class="mbar" id="mbar">
@@ -546,6 +653,13 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
     <div class="dlg-head"><h2 id="revTitle" data-t="reviewTitle"></h2><span class="ref num" id="revRef"></span>
       <button type="button" class="x" data-close data-t-label="close"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
     <div id="revList"></div>
+    <div class="promo">
+      <label class="field" for="promoIn"><span data-t="promoLabel"></span></label>
+      <div class="promo-row" id="promoRow"><input type="text" id="promoIn" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" data-t-ph="promoPh"><button type="button" class="btn" id="promoApply" data-t="promoApply"></button></div>
+      <div class="promo-on" id="promoOn" hidden></div>
+      <div class="small" id="promoMsg" role="status"></div>
+    </div>
+    <details class="policy"><summary data-t="policyTitle"></summary><div class="policy-body"></div></details>
     <div class="two">
       <label class="field"><span data-t="yourName"></span><input type="text" id="who" autocomplete="name" maxlength="80"></label>
       <label class="field"><span data-t="note"></span><textarea id="note" data-t-ph="notePh" maxlength="600" rows="2"></textarea></label>
@@ -560,6 +674,10 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
   </div>
 </dialog>
 
+<dialog id="policyDlg" aria-labelledby="polTitle"><div class="dlg">
+  <div class="dlg-head"><h2 id="polTitle" data-t="policyTitle"></h2><button type="button" class="x" data-close data-t-label="close"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+  <div class="policy-body"></div>
+</div></dialog>
 <dialog id="detail"><div class="dlg detail" id="detailBody"></div></dialog>
 <dialog id="editor" aria-labelledby="edTitle"><div class="dlg" id="edBody"></div></dialog>
 <dialog id="peditor" aria-labelledby="pedTitle"><div class="dlg" id="pedBody"></div></dialog>
@@ -600,12 +718,20 @@ const SHOP_CONFIG = {
   // true: customers don't see singles that cost the same or more here than on TCGplayer (the shopkeeper zone still shows
   // them, marked). Prices change daily, so a card comes back by itself once it's cheaper again.
   hideNotCheaper: true,
+  shipping: 50,  // shipping per order, added to the total (0 = free shipping). The return policy is shipNote/retTitle… in LANG.
+  // Card fonts: files of the fonts printed on the cards, if you have a licence to put them on the web (they aren't free).
+  // Put the .woff2 files in fonts/ and their paths here. Empty: visitors with the font installed see it, others a stand-in.
+  cardFonts: {
+    name: '',   // Beaufort for LOL Bold: card names, cost and stats, e.g. 'fonts/BeaufortforLOL-Bold.woff2'
+    group: '',  // Univers 59 (Ultra Condensed): card types and groups (ELITE, SPIDER, YETI…)
+    text: '',   // Univers 55 (Roman): card text
+  },
 };
 
 const LANG = {
   en: {
     tagline: 'Ready-to-play Riftbound decks and singles · order through LINE',
-    step1: 'Tap a deck or card to add it to your list', step2: 'Check your list', step3: 'Send it to us on LINE. We reply with the total, payment and shipping.',
+    step1: 'Tap a deck or card to add it to your list', step2: 'Check your list', step3: () => `Send it to us on LINE. Shipping is ${SHOP_CONFIG.shipping ? money(SHOP_CONFIG.shipping) : 'free'}; we reply with how to pay.`,
     whyTitle: 'Why Chinese-print cards?',
     why1h: 'Tournament legal', why1: 'Official Riftbound cards, accepted at sanctioned events. Play them in identical opaque sleeves, like any deck.',
     why2h: 'Much cheaper', why2: 'The same cards and the same game for far less than English prints. Each deck and card shows its TCGplayer price next to ours.',
@@ -647,7 +773,10 @@ const LANG = {
     pStyle: 'Style', pTags: 'Tags', pTagsPh: '#kennen #highroll',
     pLevel: (n, r) => `Level: <b>${n}</b> (${r}), set by the price.`, pLevelAsk: 'The price sets the level. Without a price, the deck shows under Ask for price.',
     search: 'Search card name or text', allSets: 'All sets', allTypes: 'All types', allRarities: 'All rarities',
-    sortNum: 'Newest set first', sortName: 'Name A–Z', sortLow: 'Price: low to high', sortHigh: 'Price: high to low',
+    sortNum: 'Set', sortName: 'Name', sortType: 'Type', sortDomain: 'Domain', sortPrice: 'Price', sortBy: 'Sort by',
+    dirUp: 'Ascending (tap to reverse)', dirDown: 'Descending (tap to reverse)', view: 'View', viewGrid: 'Grid', viewList: 'List',
+    nTypes: n => `${n} types`, anyCost: 'Any cost', costN: v => `Cost ${v}`, anyMight: 'Any might', mightN: v => `Might ${v}`,
+    allFilters: 'All filters', fSet: 'Set', fRar: 'Rarity', fGroup: 'Group', allGroups: 'All groups',
     clearFilters: 'Clear filters', more: 'Show more',
     results: n => `${n.toLocaleString('en-US')} card${n === 1 ? '' : 's'}`,
     noMatch: 'No cards match these filters.', nothingYet: 'Nothing for sale yet. Check back soon!', loading: 'Loading cards…', loadFail: "Couldn't load the card list. Check your connection and reload the page.",
@@ -656,12 +785,26 @@ const LANG = {
     added: (n, q) => `Added ${n}` + (q > 1 ? ` (${q})` : ''), maxed: n => `We only have ${n}`,
     myList: 'Your list', empty: 'Your list is empty. Tap a deck or card to add it.', count: n => `${n} card${n === 1 ? '' : 's'}`,
     total: 'Total', toPrice: n => `+ ${n} card${n === 1 ? '' : 's'} to be priced`,
+    subtotal: 'Subtotal', shipping: 'Shipping', free: 'Free', promo: 'Promo',
+    promoLabel: 'Promo code', promoPh: 'Have a code? Type it here', promoApply: 'Apply', promoRemove: 'Remove', promoChecking: 'Checking…',
+    promoOk: 'Code applied. It’s in your total and in the order we get.', promoBad: 'That code isn’t valid or has ended.',
+    promoOff: 'Promo codes can’t be used right now. Send your order and tell us the code in the note.', promoNet: 'Couldn’t check the code. Check your connection and try again.',
+    promoMin: m => `This code needs an order of ${m} or more (before shipping).`, promoPct: n => `${n}% off`, promoAmt: m => `${m} off`, promoShip: 'free shipping',
+    // The shipping and return policy (ship: the shipping cost, or '' when it's free). Change it to match how you work.
+    policyTitle: 'Shipping and returns',
+    policy: ship => `<h3>Shipping</h3><ul><li>${ship ? `${ship} per order, anywhere in Thailand.` : 'Free, anywhere in Thailand.'}</li>
+      <li>We confirm your order on LINE and send you how to pay. Your cards ship within 2 working days of payment, and we send you the tracking number.</li>
+      <li>Cards are packed with care so they arrive flat and undamaged.</li></ul>
+      <h3>Returns</h3><ul><li><b>Wrong or damaged card:</b> tell us on LINE within 7 days of delivery, with photos (an unboxing video helps). We send the right card or refund you, and we pay the shipping.</li>
+      <li><b>Changed your mind:</b> send it back within 7 days of delivery, unplayed and as it arrived, and we refund the price of the cards once they reach us. You pay the return shipping.</li>
+      <li>Refunds go back the way you paid, within 7 days of the return reaching us.</li></ul>
+      <p class="muted">Questions? Message us on LINE before you order.</p>`,
     countItems: n => `${n} item${n === 1 ? '' : 's'}`, toPriceItems: n => `+ ${n} item${n === 1 ? '' : 's'} to be priced`, resultsItems: n => `${n.toLocaleString('en-US')} item${n === 1 ? '' : 's'}`,
     review: 'Review and send', clear: 'Clear list', clearAsk: 'Remove every card from your list?', close: 'Close',
     viewList: 'View list', tapCards: 'Tap a deck or card to add it', less: 'One less', plus: 'One more',
     reviewTitle: 'Check your order', yourName: 'Your name (optional)', note: 'Note for us (optional)', notePh: 'Shipping or pickup, card condition, questions…',
     send: 'Send order on LINE', copy: 'Copy order text', copied: 'Order copied', preview: 'Message preview',
-    howOA: 'LINE opens a chat with us with your order already typed. Tap Send there and we’ll reply with the total, payment and shipping.',
+    howOA: 'LINE opens a chat with us with your order already typed. Tap Send there and we’ll reply with how to pay.',
     howId: id => `LINE opens with your order typed. Pick us (${id}) from your friends and tap Send. Not friends with us yet? Add us first.`,
     scanOA: 'Scan this with your phone’s camera. LINE opens a chat with us with your order typed; tap Send.',
     scanId: id => `Scan this with your phone’s camera. LINE opens with your order typed: pick us (${id}) from your friends and tap Send.`,
@@ -697,7 +840,7 @@ const LANG = {
     kImported: n => `Saved ${n} row${n === 1 ? '' : 's'}`,
     kShow: 'Show', kShowAll: n => `All cards (${n})`, kShow_listed: n => `Listed only (${n})`, kShow_shown: n => `Shown to customers (${n})`,
     kShow_hidden: n => `Hidden: not cheaper than TCGplayer (${n})`, kShow_notcg: n => `No TCGplayer price (${n})`, kShow_noprice: n => `No price, Ask price (${n})`,
-    kMin: 'Min ฿', kMax: 'Max ฿', sortOver: 'Price vs TCGplayer: most above first',
+    kMin: 'Min ฿', kMax: 'Max ฿', sortOver: 'Price vs TCGplayer',
     kNotListed: 'Not listed', kInStock: n => `${n} in stock`, kEdit: 'Edit price and stock',
     kNoCloud: 'Cloud stock isn’t set up: fill in SHOP_CONFIG.cloud in index.html.',
     kOffline: 'Couldn’t reach the cloud service. Check your connection.',
@@ -714,7 +857,7 @@ const LANG = {
   },
   th: {
     tagline: 'เด็ค Riftbound พร้อมเล่นและการ์ดแยกใบ · สั่งซื้อผ่าน LINE',
-    step1: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: 'ส่งรายการให้เราทาง LINE แล้วเราจะแจ้งยอดชำระและการจัดส่ง',
+    step1: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', step2: 'ตรวจรายการของคุณ', step3: () => `ส่งรายการให้เราทาง LINE ค่าส่ง ${SHOP_CONFIG.shipping ? money(SHOP_CONFIG.shipping) : 'ฟรี'} แล้วเราจะแจ้งวิธีชำระเงิน`,
     whyTitle: 'ทำไมต้องการ์ดพิมพ์จีน?',
     why1h: 'ใช้แข่งได้', why1: 'การ์ด Riftbound ของแท้ ใช้ในงานแข่งที่ได้รับการรับรองได้ ใส่สลีฟทึบแบบเดียวกันทั้งเด็คเหมือนเด็คทั่วไป',
     why2h: 'ราคาถูกกว่ามาก', why2: 'การ์ดเหมือนกัน เล่นได้เหมือนกัน แต่ราคาถูกกว่าการ์ดพิมพ์อังกฤษมาก ทุกเด็คและการ์ดแสดงราคา TCGplayer เทียบกับราคาร้าน',
@@ -755,7 +898,10 @@ const LANG = {
     pStyle: 'สไตล์', pTags: 'แท็ก',
     pLevel: (n, r) => `ระดับ: <b>${n}</b> (${r}) ตามราคา`, pLevelAsk: 'ราคากำหนดระดับของเด็ค ถ้าไม่ใส่ราคา เด็คจะอยู่ในหมวด สอบถามราคา',
     search: 'ค้นหาชื่อการ์ดหรือข้อความบนการ์ด', allSets: 'ทุกชุด', allTypes: 'ทุกประเภท', allRarities: 'ทุกความหายาก',
-    sortNum: 'ชุดใหม่ล่าสุดก่อน', sortName: 'ชื่อ A–Z', sortLow: 'ราคา: ต่ำไปสูง', sortHigh: 'ราคา: สูงไปต่ำ',
+    sortNum: 'ชุดการ์ด', sortName: 'ชื่อ', sortType: 'ประเภท', sortDomain: 'โดเมน', sortPrice: 'ราคา', sortBy: 'เรียงตาม',
+    dirUp: 'น้อยไปมาก (แตะเพื่อกลับลำดับ)', dirDown: 'มากไปน้อย (แตะเพื่อกลับลำดับ)', view: 'มุมมอง', viewGrid: 'ตาราง', viewList: 'รายการ',
+    nTypes: n => `${n} ประเภท`, anyCost: 'ทุกค่าร่าย', costN: v => `ค่าร่าย ${v}`, anyMight: 'ทุกไมต์', mightN: v => `ไมต์ ${v}`,
+    allFilters: 'ตัวกรองทั้งหมด', fSet: 'ชุด', fRar: 'ความหายาก', fGroup: 'กลุ่ม', allGroups: 'ทุกกลุ่ม',
     clearFilters: 'ล้างตัวกรอง', more: 'ดูเพิ่ม',
     results: n => `${n.toLocaleString('en-US')} ใบ`,
     noMatch: 'ไม่พบการ์ดที่ตรงกับตัวกรอง', nothingYet: 'ยังไม่มีสินค้าวางขาย แวะมาดูใหม่เร็ว ๆ นี้', loading: 'กำลังโหลดการ์ด…', loadFail: 'โหลดรายการการ์ดไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วโหลดหน้าใหม่',
@@ -764,12 +910,25 @@ const LANG = {
     added: (n, q) => `เพิ่ม ${n} แล้ว` + (q > 1 ? ` (${q} ใบ)` : ''), maxed: n => `มีของแค่ ${n} ใบ`,
     myList: 'รายการของคุณ', empty: 'ยังไม่มีสินค้าในรายการ แตะเด็คหรือการ์ดเพื่อเพิ่ม', count: n => `${n} ใบ`,
     total: 'รวม', toPrice: n => `+ อีก ${n} ใบรอแจ้งราคา`,
+    subtotal: 'ยอดสินค้า', shipping: 'ค่าจัดส่ง', free: 'ฟรี', promo: 'โค้ดส่วนลด',
+    promoLabel: 'โค้ดส่วนลด', promoPh: 'มีโค้ด? พิมพ์ที่นี่', promoApply: 'ใช้โค้ด', promoRemove: 'เอาออก', promoChecking: 'กำลังตรวจโค้ด…',
+    promoOk: 'ใช้โค้ดแล้ว ส่วนลดรวมอยู่ในยอดและในคำสั่งซื้อที่ส่งถึงร้าน', promoBad: 'โค้ดนี้ใช้ไม่ได้หรือหมดอายุแล้ว',
+    promoOff: 'ตอนนี้ยังใช้โค้ดส่วนลดไม่ได้ ส่งคำสั่งซื้อแล้วบอกโค้ดในช่องข้อความถึงร้านได้เลย', promoNet: 'ตรวจโค้ดไม่ได้ ตรวจการเชื่อมต่อแล้วลองอีกครั้ง',
+    promoMin: m => `โค้ดนี้ใช้ได้เมื่อสั่งซื้อตั้งแต่ ${m} ขึ้นไป (ไม่รวมค่าส่ง)`, promoPct: n => `ลด ${n}%`, promoAmt: m => `ลด ${m}`, promoShip: 'ส่งฟรี',
+    policyTitle: 'การจัดส่งและการคืนสินค้า',
+    policy: ship => `<h3>การจัดส่ง</h3><ul><li>${ship ? `ค่าส่ง ${ship} ต่อคำสั่งซื้อ ส่งได้ทั่วประเทศไทย` : 'ส่งฟรีทั่วประเทศไทย'}</li>
+      <li>ร้านยืนยันคำสั่งซื้อและแจ้งวิธีชำระเงินทาง LINE จัดส่งภายใน 2 วันทำการหลังชำระเงิน พร้อมแจ้งเลขพัสดุ</li>
+      <li>แพ็กการ์ดอย่างดี ถึงมือเรียบร้อย ไม่งอ ไม่เสียหาย</li></ul>
+      <h3>การคืนสินค้า</h3><ul><li><b>ได้การ์ดผิดหรือการ์ดเสียหาย:</b> แจ้งร้านทาง LINE ภายใน 7 วันหลังได้รับสินค้า พร้อมรูปถ่าย (มีคลิปตอนแกะพัสดุจะดีมาก) ร้านจะส่งการ์ดที่ถูกต้องให้หรือคืนเงิน โดยร้านออกค่าส่งให้</li>
+      <li><b>เปลี่ยนใจ:</b> ส่งคืนได้ภายใน 7 วันหลังได้รับสินค้า การ์ดต้องยังไม่ได้ใช้เล่นและอยู่ในสภาพเดิม ร้านคืนเงินค่าการ์ดเมื่อได้รับของคืน ผู้ซื้อออกค่าส่งคืนเอง</li>
+      <li>คืนเงินทางช่องทางเดียวกับที่ชำระ ภายใน 7 วันหลังร้านได้รับของคืน</li></ul>
+      <p class="muted">มีคำถาม? ทักร้านทาง LINE ก่อนสั่งได้เลย</p>`,
     countItems: n => `${n} ชิ้น`, toPriceItems: n => `+ อีก ${n} ชิ้นรอแจ้งราคา`, resultsItems: n => `${n.toLocaleString('en-US')} รายการ`,
     review: 'ตรวจรายการและส่ง', clear: 'ล้างรายการ', clearAsk: 'ลบการ์ดทั้งหมดออกจากรายการใช่ไหม', close: 'ปิด',
     viewList: 'ดูรายการ', tapCards: 'แตะเด็คหรือการ์ดเพื่อเพิ่มลงรายการ', less: 'ลดหนึ่งใบ', plus: 'เพิ่มหนึ่งใบ',
     reviewTitle: 'ตรวจสอบคำสั่งซื้อ', yourName: 'ชื่อของคุณ (ไม่บังคับ)', note: 'ข้อความถึงร้าน (ไม่บังคับ)', notePh: 'จัดส่งหรือรับเอง สภาพการ์ด หรือคำถามอื่น ๆ',
     send: 'ส่งคำสั่งซื้อทาง LINE', copy: 'คัดลอกรายการ', copied: 'คัดลอกรายการแล้ว', preview: 'ตัวอย่างข้อความ',
-    howOA: 'LINE จะเปิดแชตกับร้านโดยพิมพ์รายการไว้ให้แล้ว กดส่งในแชต แล้วร้านจะแจ้งยอดชำระและการจัดส่ง',
+    howOA: 'LINE จะเปิดแชตกับร้านโดยพิมพ์รายการไว้ให้แล้ว กดส่งในแชต แล้วร้านจะแจ้งวิธีชำระเงิน',
     howId: id => `LINE จะเปิดพร้อมพิมพ์รายการไว้ให้ เลือกร้าน (${id}) จากรายชื่อเพื่อนแล้วกดส่ง ถ้ายังไม่ได้เพิ่มเพื่อนกับร้าน ให้เพิ่มเพื่อนก่อน`,
     scanOA: 'สแกนด้วยกล้องมือถือ LINE จะเปิดแชตกับร้านโดยพิมพ์รายการไว้ให้แล้ว จากนั้นกดส่ง',
     scanId: id => `สแกนด้วยกล้องมือถือ LINE จะเปิดพร้อมพิมพ์รายการไว้ให้ เลือกร้าน (${id}) จากรายชื่อเพื่อนแล้วกดส่ง`,
@@ -805,7 +964,7 @@ const LANG = {
     kImported: n => `บันทึก ${n} แถวแล้ว`,
     kShow: 'แสดง', kShowAll: n => `การ์ดทั้งหมด (${n})`, kShow_listed: n => `เฉพาะที่ลงขาย (${n})`, kShow_shown: n => `ที่ลูกค้าเห็น (${n})`,
     kShow_hidden: n => `ซ่อนอยู่: ไม่ถูกกว่า TCGplayer (${n})`, kShow_notcg: n => `ไม่มีราคา TCGplayer (${n})`, kShow_noprice: n => `ไม่มีราคา สอบถามราคา (${n})`,
-    kMin: 'ต่ำสุด ฿', kMax: 'สูงสุด ฿', sortOver: 'ราคาเทียบ TCGplayer: แพงกว่ามากสุดก่อน',
+    kMin: 'ต่ำสุด ฿', kMax: 'สูงสุด ฿', sortOver: 'ราคาเทียบ TCGplayer',
     kNotListed: 'ยังไม่ลงขาย', kInStock: n => `มี ${n} ชิ้น`, kEdit: 'แก้ไขราคาและสต็อก',
     kNoCloud: 'ยังไม่ได้ตั้งค่าสต็อกบนคลาวด์: ใส่ค่าใน SHOP_CONFIG.cloud ใน index.html',
     kOffline: 'เชื่อมต่อบริการคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต',
@@ -958,8 +1117,9 @@ const DB = { ok: false, failed: false, sheets: [], imgBase: '', cards: [], byId:
 // f filters the cards, d the decks (d.legend is a Legend's card key, so every printing of it counts).
 const blankDeckFilter = () => ({ q: '', level: '', style: '', tag: '', legend: '' });
 // f.show, f.min and f.max are the shopkeeper's: which cards to show ('listed', 'shown', 'hidden'…) and a price range.
-const S = { cart: store.get('rbshop.cart', {}), tab: 'decks', f: { q: '', set: '', type: '', rar: '', dom: new Set(), show: '', min: '', max: '', sort: 'num' }, d: blankDeckFilter(),
-  list: [], shown: PAGE, ref: '', detail: null };
+const S = { cart: store.get('rbshop.cart', {}), tab: 'decks', f: null, d: blankDeckFilter(),  // f: the card filters, set under filters below
+  view: store.get('rbshop.view', 'grid') === 'list' ? 'list' : 'grid', more: false,  // the cards as a grid or a list; All filters open
+  list: [], shown: PAGE, ref: '', detail: null, promo: null };
 
 // Excel saves plain "CSV" in the computer's own encoding (windows-874 on Thai Windows) unless "CSV UTF-8" is picked.
 function decodeCsv(buf) { try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch { return new TextDecoder('windows-874').decode(buf); } }
@@ -1194,8 +1354,26 @@ async function load() {
 async function reloadStock() { setStock(await loadStock()); renderAll(); }
 
 // ---------- filters ----------
-const defaults = () => ({ q: '', set: '', type: '', rar: '', dom: new Set(), show: '', min: '', max: '', sort: S.f.sort });
-const filtered = () => { const f = S.f; return !!(f.q || f.set || f.type || f.rar || f.dom.size || f.show || f.min || f.max); };
+const defaults = (sort = 'num', dir = 1) => ({ q: '', types: new Set(), dom: new Set(), cost: '', set: '', rar: '', group: '', might: '', show: '', min: '', max: '', sort, dir });
+S.f = defaults();
+// The filters under All filters, counted on its button.
+const moreCount = () => { const f = S.f; return [f.set, f.rar, f.group, f.might, f.show, f.min || f.max].filter(Boolean).length; };
+const filtered = () => { const f = S.f; return !!(f.q || f.types.size || f.dom.size || f.cost) || moreCount() > 0; };
+// Card types as Rift Atlas lists them; a card matching any ticked one shows.
+const TYPE_FILTERS = [
+  ['champion', 'Champion Unit', c => c.t === 'Unit' && c.st === 'Champion'], ['unit', 'Unit', c => c.t === 'Unit'],
+  ['spell', 'Spell', c => c.t === 'Spell'], ['signature', 'Signature', c => c.st === 'Signature'], ['gear', 'Gear', c => c.t === 'Gear'],
+  ['rune', 'Rune', c => c.t === 'Rune'], ['battlefield', 'Battlefield', c => c.t === 'Battlefield'], ['legend', 'Legend', c => c.t === 'Legend'],
+];
+const COSTS = ['0', '1', '2', '3', '4', '5', '6', '7+'];
+const atLeast = (v, s) => v != null && (s.endsWith('+') ? v >= parseInt(s, 10) : v === +s);
+// Sorts: what each one compares (products have no card, so they go last, like cards without a value). Up or down by S.f.dir.
+const SORTS = {
+  num: null,  // the listing order: newest set first, by card number
+  name: x => nameOf(x).toLowerCase(), cost: x => x.c ? x.c.e : null, might: x => x.c ? x.c.m : null,
+  type: x => x.c ? TYPES.indexOf(x.c.t) : null, domain: x => x.c ? DOMAINS.indexOf(x.c.d[0]) : null,
+  price: x => x.price, over: x => { const v = vsTcg(x); return v == null ? null : -v; },  // over: furthest above TCGplayer first
+};
 // The shopkeeper's "Show" choices: which listings each one keeps.
 const SHOWS = {
   listed: x => x.listed,
@@ -1224,33 +1402,52 @@ function visible() {
     if (!K.on && notCheaper(x)) return false;
     if (K.on && f.show && !SHOWS[f.show](x)) return false;
     if (K.on && (f.min || f.max) && (x.price == null || (f.min && x.price < +f.min) || (f.max && x.price > +f.max))) return false;
-    if (x.p) return !x.p.isDeck && !(f.set || f.rar || f.dom.size || (f.type && f.type !== PRODUCTS)) && (!f.q || hasText(x, f.q));  // decks have their own tab; products have no set, type or domain
-    if (f.type === PRODUCTS) return false;
-    if (f.set && !c.s.includes(f.set)) return false;
-    if (f.type && c.t !== f.type) return false;
-    if (f.rar && c.r !== f.rar) return false;
+    // decks have their own tab; products have no set, domain, cost… so any card filter leaves them out
+    if (x.p) return !x.p.isDeck && !(f.set || f.rar || f.group || f.might || f.cost || f.dom.size || (f.types.size && !f.types.has(PRODUCTS))) && (!f.q || hasText(x, f.q));
+    if (f.types.size && !TYPE_FILTERS.some(([k, , ok]) => f.types.has(k) && ok(c))) return false;
     if (f.dom.size && !c.d.some(d => f.dom.has(d))) return false;
+    if (f.cost && !atLeast(c.e, f.cost)) return false;
+    if (f.set && !c.s.includes(f.set)) return false;
+    if (f.rar && c.r !== f.rar) return false;
+    if (f.group && !(c.g || []).includes(f.group)) return false;
+    if (f.might && !atLeast(c.m, f.might)) return false;
     return !f.q || hasText(x, f.q);
   });
-  if (f.sort === 'name') xs.sort((a, b) => nameOf(a).localeCompare(nameOf(b)));
-  if (f.sort === 'low' || f.sort === 'high') {
-    const s = f.sort === 'low' ? 1 : -1;  // cards without a price go last either way
-    xs.sort((a, b) => (a.price == null) - (b.price == null) || s * ((a.price ?? 0) - (b.price ?? 0)));
-  }
-  if (f.sort === 'over') xs.sort((a, b) => { const x = vsTcg(a), y = vsTcg(b); return (x == null) - (y == null) || (y ?? 0) - (x ?? 0); });  // furthest above TCGplayer first
+  const key = SORTS[f.sort];
+  if (key) {
+    const v = new Map(xs.map(x => [x, key(x)]));
+    xs.sort((a, b) => { const x = v.get(a), y = v.get(b); return (x == null) - (y == null) || (x == null ? 0 : f.dir * (x < y ? -1 : x > y ? 1 : 0)); });
+  } else if (f.dir < 0) xs.reverse();
   return xs;
 }
 function renderFilters() {
   const sets = Object.keys(SET_NAMES).filter(s => DB.listings.some(x => x.c && x.c.s.includes(s)))
     .sort((a, b) => { const i = s => { const k = SET_ORDER.indexOf(s.toLowerCase()); return k < 0 ? 99 : k; }; return i(a) - i(b); });
   const opts = (all, list, cur, label = v => v) => `<option value="">${esc(all)}</option>` + list.map(v => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(label(v))}</option>`).join('');
-  $('#fSet').innerHTML = opts(t('allSets'), sets, S.f.set, s => `${SET_NAMES[s]} (${s})`);
-  $('#fType').innerHTML = opts(t('allTypes'), [...(DB.products.some(p => !p.isDeck) ? [PRODUCTS] : []), ...TYPES], S.f.type, v => v === PRODUCTS ? t('typeProducts') : v);
-  $('#fRar').innerHTML = opts(t('allRarities'), RARITIES.filter(r => DB.listings.some(x => x.c && x.c.r === r)), S.f.rar);
-  $('#fSort').innerHTML = [['num', 'sortNum'], ['name', 'sortName'], ...(DB.stocked ? [['low', 'sortLow'], ['high', 'sortHigh']] : []), ...(K.on && TCG.ok ? [['over', 'sortOver']] : [])]
-    .map(([v, k]) => `<option value="${v}"${v === S.f.sort ? ' selected' : ''}>${esc(t(k))}</option>`).join('');
-  $('#fDoms').innerHTML = DOMAINS.map(d => `<button type="button" class="dom" data-dom="${d}" aria-pressed="${S.f.dom.has(d)}"><i style="background:${domColor(d)}"></i>${d}</button>`).join('');
-  $('#fQ').value = S.f.q;
+  const f = S.f, cards = DB.listings.filter(x => x.c).map(x => x.c);
+  const types = [...TYPE_FILTERS.filter(([, , ok]) => cards.some(ok)).map(([k, label]) => [k, label]), ...(DB.products.some(p => !p.isDeck) ? [[PRODUCTS, t('typeProducts')]] : [])];
+  $('#fTypes').innerHTML = `<label><input type="checkbox" data-type=""${f.types.size ? '' : ' checked'}>${esc(t('allTypes'))}</label><hr>`
+    + types.map(([k, label]) => `<label><input type="checkbox" data-type="${k}"${f.types.has(k) ? ' checked' : ''}>${esc(label)}</label>`).join('');
+  const picked = types.filter(([k]) => f.types.has(k)).map(([, label]) => label);
+  $('#fTypeBtn').textContent = !picked.length ? t('allTypes') : picked.length === 1 ? picked[0] : t('nTypes', picked.length);
+  $('#fTypeBtn').classList.toggle('on', picked.length > 0);
+  $('#fDoms').innerHTML = DOMAINS.map(d => `<button type="button" data-dom="${d}" aria-pressed="${f.dom.has(d)}" title="${d}" aria-label="${d}" style="--dc:${domColor(d)}"><i></i></button>`).join('');
+  $('#fCost').innerHTML = `<option value="">${esc(t('anyCost'))}</option>` + COSTS.map(v => `<option value="${v}"${v === f.cost ? ' selected' : ''}>${esc(t('costN', v))}</option>`).join('');
+  $('#fCost').classList.toggle('on', !!f.cost);
+  $('#fSort').innerHTML = [['num', 'sortNum'], ['name', 'sortName'], ['cost', 'cost'], ['might', 'might'], ['type', 'sortType'], ['domain', 'sortDomain'],
+    ...(DB.stocked ? [['price', 'sortPrice']] : []), ...(K.on && TCG.ok ? [['over', 'sortOver']] : [])]
+    .map(([v, k]) => `<option value="${v}"${v === f.sort ? ' selected' : ''}>${esc(t(k))}</option>`).join('');
+  $('#fDir').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="transform:scaleY(${f.dir})"><path d="M7 4v16M3.5 16.5 7 20l3.5-3.5M13 6h8M13 11h6M13 16h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  $('#fDir').setAttribute('aria-label', t(f.dir > 0 ? 'dirUp' : 'dirDown')); $('#fDir').title = t(f.dir > 0 ? 'dirUp' : 'dirDown');
+  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === S.view));
+  $('#grid').classList.toggle('list', S.view === 'list');
+  $('#fMore').hidden = !S.more; $('#fMoreBtn').setAttribute('aria-expanded', S.more);
+  const n = moreCount(); $('#fMoreN').hidden = !n; $('#fMoreN').textContent = n;
+  $('#fSet').innerHTML = opts(t('allSets'), sets, f.set, s => `${SET_NAMES[s]} (${s})`);
+  $('#fRar').innerHTML = opts(t('allRarities'), RARITIES.filter(r => cards.some(c => c.r === r)), f.rar);
+  $('#fGroup').innerHTML = opts(t('allGroups'), [...new Set(cards.flatMap(c => c.g || []))].sort((a, b) => a.localeCompare(b)), f.group);
+  $('#fMight').innerHTML = `<option value="">${esc(t('anyMight'))}</option>` + COSTS.map(v => `<option value="${v}"${v === f.might ? ' selected' : ''}>${esc(t('mightN', v))}</option>`).join('');
+  if (document.activeElement !== $('#fQ')) $('#fQ').value = f.q;
   // The shopkeeper's filters, each choice with how many cards it holds (products and decks aside).
   $('#fKeepWrap').hidden = !K.on;
   if (K.on) {
@@ -1268,8 +1465,10 @@ function priceTag(x) {
   const p = x.price != null ? `<span class="price">${money(x.price)}</span>` : `<span class="ask">${t('askPrice')}</span>`;
   return x.qty > 0 ? `<span>${p} <span class="left">· ${t('left', x.qty)}</span></span>` : `<span>${p}</span>`;
 }
-function stepper(x, n) {
-  return `<span class="step"><button type="button" data-act="dec" aria-label="${esc(t('less'))}">−</button><span class="num" aria-label="${esc(t('inList', n))}">${n}</span>`
+// − [n] +, where n can also be typed (0 takes it off the list). cls 'onpic' puts it on a tile's picture.
+function stepper(x, n, cls = '') {
+  return `<span class="step${cls ? ' ' + cls : ''}"><button type="button" data-act="dec" aria-label="${esc(t('less'))}">−</button>`
+    + `<input class="qn num" type="text" inputmode="numeric" enterkeyhint="done" maxlength="2" data-act="qty" value="${n}" aria-label="${esc(t('inList', n))}">`
     + `<button type="button" data-act="inc" aria-label="${esc(t('plus'))}"${x.qty != null && n >= x.qty ? ' disabled' : ''}>+</button></span>`;
 }
 function keeperTag(x) {
@@ -1280,16 +1479,16 @@ function keeperTag(x) {
 function tile(x, pop = false) {
   const n = K.on ? 0 : inCart(x.key), out = x.qty === 0, label = nameOf(x), name = label + (x.note ? ` (${x.note})` : '');
   return `<article class="tile${n ? ' in' : ''}${out ? ' out' : ''}" data-key="${esc(x.key)}">
-    <button type="button" class="pic" data-act="add" aria-label="${esc(K.on ? t('kEdit') + ': ' + name : t('addX', name))}"${out && !K.on ? ' disabled' : ''}>
-      <span class="frame">${itemThumb(x)}</span>${n ? `<span class="count num${pop ? ' pop' : ''}">${n}</span>` : ''}${out ? `<span class="flag">${t('soldOut')}</span>` : ''}
-    </button>
+    <div class="picbox"><button type="button" class="pic" data-act="add" aria-label="${esc(K.on ? t('kEdit') + ': ' + name : t('addX', name))}"${out && !K.on ? ' disabled' : ''}>
+      <span class="frame">${itemThumb(x)}</span>${out ? `<span class="flag">${t('soldOut')}</span>` : ''}
+    </button>${n ? stepper(x, n, 'onpic' + (pop ? ' pop' : '')) : ''}</div>
     <button type="button" class="info" data-act="info" aria-label="${esc(t('details') + ': ' + label)}">${ICON_INFO}</button>
     <div class="nm" title="${esc(label)}">${esc(label)}</div>
     ${x.p && x.p.isDeck ? `<div class="dsub">${styleChip(x.p.style)}${x.p.list.length ? `<span>${t('nCards', deckSize(x.p.list))}</span>` : ''}</div>`
       + (x.p.tagList.length ? `<div class="dtags">${x.p.tagList.map(tagBtn).join('')}</div>` : '')
       : `<div class="sub">${x.p ? prodTag(x.p) : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>`}
     ${x.descr ? `<div class="desc" title="${esc(x.descr)}">${esc(x.descr)}</div>` : ''}
-    <div class="buy">${K.on ? keeperTag(x) : priceTag(x) + (n ? stepper(x, n) : '')}</div>
+    <div class="buy">${K.on ? keeperTag(x) : priceTag(x)}</div>
     ${tcgLine(x)}
   </article>`;
 }
@@ -1393,6 +1592,15 @@ function totals(items) {
   items.forEach(({ x, q }) => { s.count += q; if (x.price != null) { s.total += x.price * q; s.priced += q; } else s.unpriced += q; });
   return s;
 }
+// What the customer pays: the priced items, less the promo code (S.promo) if the order is big enough, plus shipping.
+function bill(items) {
+  const s = totals(items), p = S.promo, on = !!p && s.total >= p.min;
+  const disc = on ? Math.min(s.total, p.pct ? Math.round(s.total * p.pct / 100) : p.amt) : 0;
+  const ship = !s.count || (on && p.ship) ? 0 : SHOP_CONFIG.shipping || 0;
+  return { ...s, disc, ship, freeShip: on && p.ship, short: !!p && !on, grand: s.total - disc + ship };
+}
+const shipText = b => b.ship ? money(b.ship) : t('free');
+const promoText = p => [p.pct ? t('promoPct', p.pct) : p.amt ? t('promoAmt', money(p.amt)) : '', p.ship ? t('promoShip') : ''].filter(Boolean).join(' + ');
 function addOne(key) {
   const x = DB.byKey.get(key), n = inCart(key); if (!x || x.qty === 0) return;
   if (n >= (x.qty ?? MAX_COPIES)) return toast(t('maxed', x.qty ?? MAX_COPIES));
@@ -1409,14 +1617,18 @@ function setQty(key, q) {
   if ($('#review').open) renderReview();
 }
 function renderCart() {
-  const items = cartItems(), s = totals(items);
+  const items = cartItems(), s = bill(items);
   $('#cartCount').textContent = s.count ? counted('count', s.count, items) : '';
   $('#lines').innerHTML = items.length ? items.map(({ x, q }) => `<li class="ln" data-key="${esc(x.key)}">
       ${itemThumb(x, 44)}<div class="t" title="${esc(nameOf(x))}">${esc(nameOf(x))}</div>
       <div class="amt num">${x.price != null ? money(x.price * q) : `<span class="ask">${t('askPrice')}</span>`}</div>
       <div class="s">${esc(itemRef(x))}${x.price != null && q > 1 ? ' · ' + money(x.price) + ' ×' + q : ''}</div>
       ${stepper(x, q)}</li>`).join('') : `<li class="empty">${t('empty')}</li>`;
-  $('#cartTotal').textContent = s.priced ? money(s.total) : s.count ? '—' : money(0);
+  $('#cartSums').hidden = !s.count;
+  $('#cartSums').innerHTML = `<div><span>${t('subtotal')}</span><span class="num">${s.priced ? money(s.total) : '—'}</span></div>`
+    + (s.disc ? `<div class="disc"><span>${t('promo')} ${esc(S.promo.code)}</span><span class="num">−${money(s.disc)}</span></div>` : '')
+    + `<div><span>${t('shipping')}</span><span class="num">${shipText(s)}</span></div>`;
+  $('#cartTotal').textContent = s.priced ? money(s.grand) : s.count ? '—' : money(0);
   $('#cartUnpriced').hidden = !s.unpriced;
   $('#cartUnpriced').textContent = counted('toPrice', s.unpriced, items);
   // What the same priced items would cost on TCGplayer, when the list comes out cheaper here.
@@ -1427,7 +1639,7 @@ function renderCart() {
   $('#toReview').disabled = !s.count;
   $('#clearCart').hidden = !s.count;
   $('#mbCount').textContent = s.count ? counted('count', s.count, items) : t('myList');
-  $('#mbTotal').textContent = s.count ? (s.priced ? money(s.total) : '') + (s.unpriced ? (s.priced ? ' ' : '') + counted('toPrice', s.unpriced, items) : '') : t('tapCards');
+  $('#mbTotal').textContent = s.count ? (s.priced ? money(s.grand) : '') + (s.unpriced ? (s.priced ? ' ' : '') + counted('toPrice', s.unpriced, items) : '') : t('tapCards');
 }
 function openSheet(open) {
   $('#cart').classList.toggle('open', open); $('#scrim').classList.toggle('open', open);
@@ -1436,7 +1648,7 @@ function openSheet(open) {
 }
 function clearCart() {
   if (!confirm(t('clearAsk'))) return false;
-  const keys = Object.keys(S.cart); S.cart = {}; saveCart();
+  const keys = Object.keys(S.cart); S.cart = {}; S.promo = null; saveCart();
   keys.forEach(refreshTile); renderCart();
   if (S.detail) renderDetail();
   return true;
@@ -1444,26 +1656,33 @@ function clearCart() {
 
 // ---------- review and send ----------
 function orderText() {
-  const items = cartItems(), s = totals(items), L = [`${t('msgTitle')} #${S.ref}`, ''];
+  const items = cartItems(), s = bill(items), L = [`${t('msgTitle')} #${S.ref}`, ''];
   items.forEach(({ x, q }, i) => {
     const price = x.price != null ? t('linePrice', money(x.price), money(x.price * q), q) : t('askPrice');
     L.push(`${i + 1}. ${nameOf(x)}${x.p ? '' : ` (${cardNo(x.c)}${x.note ? ', ' + x.note : ''})`} ×${q} — ${price}`);
   });
-  L.push('', `${t('msgTotal')}: ${counted('count', s.count, items)}${s.priced ? ' · ' + money(s.total) : ''}${s.unpriced ? ' ' + counted('toPrice', s.unpriced, items) : ''}`);
+  L.push('', `${t('subtotal')}: ${counted('count', s.count, items)}${s.priced ? ' · ' + money(s.total) : ''}`);
+  if (s.disc || s.freeShip) L.push(`${t('promo')} ${S.promo.code}: ${[s.disc && '−' + money(s.disc), s.freeShip && t('promoShip')].filter(Boolean).join(', ')}`);
+  L.push(`${t('shipping')}: ${shipText(s)}`);
+  L.push(`${t('msgTotal')}: ${s.priced ? money(s.grand) : '—'}${s.unpriced ? ' ' + counted('toPrice', s.unpriced, items) : ''}`);
   const who = $('#who').value.trim(), note = $('#note').value.trim();
   if (who) L.push(`${t('msgName')}: ${who}`);
   if (note) L.push(`${t('msgNote')}: ${note}`);
   return L.join('\n');
 }
 function renderReview() {
-  const items = cartItems(), s = totals(items);
+  const items = cartItems(), s = bill(items);
   $('#revRef').textContent = '#' + S.ref;
   $('#revList').innerHTML = items.length ? `<table class="rev"><tbody>${items.map(({ x, q }) => `<tr>
       <td>${esc(nameOf(x))}<div class="small muted">${esc(itemRef(x))}${x.price != null && q > 1 ? ' · ' + money(x.price) + ' ×' + q : ''}</div></td>
       <td class="r num">×${q}</td><td class="r num">${x.price != null ? money(x.price * q) : `<span class="ask">${t('askPrice')}</span>`}</td></tr>`).join('')}</tbody>
-      <tfoot><tr><th>${t('total')}</th><th class="r num">${s.count}</th><th class="r num">${s.priced ? money(s.total) : '—'}</th></tr>
+      <tfoot><tr class="sub"><td>${t('subtotal')}</td><td class="r num">${s.count}</td><td class="r num">${s.priced ? money(s.total) : '—'}</td></tr>
+      ${s.disc ? `<tr class="sub disc"><td colspan="2">${t('promo')} ${esc(S.promo.code)}</td><td class="r num">−${money(s.disc)}</td></tr>` : ''}
+      <tr class="sub${s.freeShip ? ' disc' : ''}"><td colspan="2">${t('shipping')}</td><td class="r num">${shipText(s)}</td></tr>
+      <tr class="grand"><th colspan="2">${t('total')}</th><th class="r num">${s.priced ? money(s.grand) : '—'}</th></tr>
       ${s.unpriced ? `<tr><td colspan="3" class="r small muted">${counted('toPrice', s.unpriced, items)}</td></tr>` : ''}</tfoot></table>`
     : `<p class="muted">${t('empty')}</p>`;
+  renderPromo(s);
   const ready = lineReady(), oa = !!SHOP_CONFIG.lineOA.trim(), add = ready ? ` <a href="${esc(lineAddUrl())}" target="_blank" rel="noopener">${t('addFriend')}</a>` : '';
   $('#how').innerHTML = !ready ? `<p>${t('notSetup')}</p>`
     : onPhone ? `<p>${oa ? t('howOA') : esc(t('howId', lineName()))}${add}</p>`
@@ -1496,6 +1715,36 @@ function openReview() {
   renderReview();
   $('#review').showModal();
 }
+// Promo codes: the shop asks the database about the one code typed (shop_promo() in supabase/shop.sql).
+function promoMsg(text, bad = true) { const el = $('#promoMsg'); el.textContent = text; el.className = 'small' + (text && bad ? ' bad-t' : text ? ' ok-t' : ''); }
+function renderPromo(s) {
+  const p = S.promo;
+  $('#promoRow').hidden = !!p; $('#promoOn').hidden = !p;
+  if (!p) return;
+  $('#promoOn').innerHTML = `<span><span class="num">${esc(p.code)}</span> · ${esc(promoText(p))}</span><button type="button" class="btn sm" id="promoRemove">${t('promoRemove')}</button>`;
+  promoMsg(s.short ? t('promoMin', money(p.min)) : t('promoOk'), s.short);
+}
+async function applyPromo() {
+  const code = $('#promoIn').value.trim().toUpperCase(), btn = $('#promoApply');
+  if (!code || btn.disabled) return;
+  if (!/^[A-Z0-9_-]{2,30}$/.test(code)) return promoMsg(t('promoBad'));
+  if (!cloudReady()) return promoMsg(t('promoOff'));
+  btn.disabled = true; promoMsg(t('promoChecking'), false);
+  try {
+    const { url, anonKey } = SHOP_CONFIG.cloud;
+    const r = await fetch(`${url}/rest/v1/rpc/shop_promo`, { method: 'POST', cache: 'no-store',
+      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_code: code }) });
+    if (!r.ok) return promoMsg(t('promoOff'));  // the database doesn't have promo codes yet
+    const [row] = await r.json();
+    if (!row) return promoMsg(t('promoBad'));
+    S.promo = { code: row.code, pct: +row.percent_off || 0, amt: +row.amount_off || 0, ship: !!row.free_shipping, min: +row.min_order || 0 };
+    $('#promoIn').value = '';
+    renderCart(); renderReview();
+  } catch { promoMsg(t('promoNet')); }
+  finally { btn.disabled = false; }
+}
+// The shipping and return policy: in the order check, and from the link at the bottom of the page.
+const policyHtml = () => t('policy', SHOP_CONFIG.shipping ? money(SHOP_CONFIG.shipping) : '');
 async function copyText(s) {
   try { await navigator.clipboard.writeText(s); return true; } catch {}
   const ta = Object.assign(document.createElement('textarea'), { value: s, readOnly: true });
@@ -1658,14 +1907,15 @@ function renderDetail() {
     return;
   }
   const c = x.c, wide = landscape(c);
-  const stats = [[c.e, 'cost'], [c.p, 'power'], [c.m, 'might']].filter(([v]) => v != null).map(([v, k]) => `${t(k)} <b class="num">${v}</b>`);
+  const stats = [[c.e, 'cost'], [c.p, 'power'], [c.m, 'might']].filter(([v]) => v != null).map(([v, k]) => `${t(k)} <b class="cstat">${v}</b>`);
   const big = `${DB.imgBase}${c.u}?w=${wide ? 900 : 600}&fm=webp`;  // the card CDN resizes on request
   body.className = 'dlg detail' + (wide ? ' wide' : '');
   body.innerHTML = `${close}
     <div class="big">${thumb(c)}<img src="${esc(big)}" alt="${esc(c.n)}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
     <div class="dinfo">
-      <h2>${esc(c.n)}</h2>
-      <div class="tags"><span>${esc([c.st, c.t].filter(Boolean).join(' '))}</span>${c.d.map(d => `<span class="d"><i style="background:${domColor(d)}"></i>${d}</span>`).join('')}${stats.length ? `<span>${stats.join(' · ')}</span>` : ''}</div>
+      <h2 class="cname">${esc(c.n)}</h2>
+      <div class="cgroups">${[[c.st, c.t].filter(Boolean).join(' '), ...(c.g || [])].map(g => `<span>${esc(g)}</span>`).join('')}</div>
+      <div class="tags">${c.d.map(d => `<span class="d"><i style="background:${domColor(d)}"></i>${d}</span>`).join('')}${stats.length ? `<span>${stats.join(' · ')}</span>` : ''}</div>
       ${c.x ? `<p class="ctext">${esc(readable(c.x))}</p>` : ''}
       <div class="small muted">${esc(c.r)} · ${cardNo(c)} · ${c.s.map(s => esc(SET_NAMES[s] || s)).join(', ')}</div>
       ${shopDesc(x)}
@@ -1685,6 +1935,7 @@ function applyLang() {
   document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
   $('#notSetup').hidden = lineReady();
   $('#notSetup').innerHTML = t('notSetup');
+  document.querySelectorAll('.policy-body').forEach(el => { el.innerHTML = policyHtml(); });
 }
 // ---------- shopkeeper zone (index.html#keeper) ----------
 // Sign in with a Riftcheese account (the same accounts and saved sign-in as riftbound-prep.html), then tap a card to set its
@@ -2261,6 +2512,17 @@ function renderAll() {
   if ($('#review').open) renderReview();
 }
 const setHead = () => document.documentElement.style.setProperty('--head', $('#top').offsetHeight + 'px');
+// The card fonts (--f-cname, --f-cgroup, --f-ctext): the installed font by its names, then the file in SHOP_CONFIG.cardFonts.
+function loadCardFonts() {
+  const F = {
+    name: ['Card Name', ['Beaufort for LOL Bold', 'BeaufortforLOL-Bold', 'Beaufort for LOL']],
+    group: ['Card Group', ['Univers 59 Ultra Condensed', 'Univers LT Std 59 Ultra Condensed', 'UniversLTStd-UltraCn', 'Univers 59']],
+    text: ['Card Text', ['Univers 55 Roman', 'Univers LT Std 55 Roman', 'UniversLTStd', 'Univers 55', 'Univers']],
+  };
+  const files = SHOP_CONFIG.cardFonts || {};
+  document.head.append(Object.assign(document.createElement('style'), { textContent: Object.entries(F).map(([k, [family, names]]) =>
+    `@font-face { font-family: "${family}"; font-weight: 100 900; font-display: swap; src: ${[...names.map(n => `local("${n}")`), ...(files[k] ? [`url("${encodeURI(files[k])}")`] : [])].join(', ')}; }`).join('\n') }));
+}
 
 // events
 document.addEventListener('click', e => {
@@ -2272,23 +2534,50 @@ document.addEventListener('click', e => {
   else if (act === 'add' || act === 'inc') addOne(key);
   else if (act === 'dec') setQty(key, inCart(key) - 1);
 });
+// A typed count: saved on Enter or on leaving the box; anything that isn't a number puts the old count back.
+document.addEventListener('change', e => {
+  const i = e.target.closest('[data-act="qty"]'); if (!i) return;
+  const key = i.closest('[data-key]')?.dataset.key, x = DB.byKey.get(key); if (!x) return;
+  const v = parseInt(i.value.replace(/\D/g, ''), 10), max = x.qty ?? MAX_COPIES;
+  if (isNaN(v)) { i.value = inCart(key); return; }
+  if (v > max) toast(t('maxed', max));
+  setQty(key, v);
+});
+document.addEventListener('focusin', e => { if (e.target.matches('[data-act="qty"]')) e.target.select(); });
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-act="qty"]')) { e.preventDefault(); e.target.blur(); } });
 document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; store.set('rbshop.lang', lang); renderAll(); }));
 let qTimer;
 $('#fQ').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.f.q = e.target.value; S.shown = PAGE; renderGrid(); }, 120); });
-[['#fSet', 'set'], ['#fType', 'type'], ['#fRar', 'rar'], ['#fSort', 'sort']].forEach(([id, k]) => $(id).addEventListener('change', e => { S.f[k] = e.target.value; S.shown = PAGE; renderGrid(); }));
-$('#fShow').addEventListener('change', e => { S.f.show = e.target.value; S.shown = PAGE; renderGrid(); });
+// Card filters: each change redraws the bar (counts, labels) and the cards.
+const refilter = () => { S.shown = PAGE; renderFilters(); renderGrid(); };
+[['#fCost', 'cost'], ['#fSet', 'set'], ['#fRar', 'rar'], ['#fGroup', 'group'], ['#fMight', 'might']].forEach(([id, k]) => $(id).addEventListener('change', e => { S.f[k] = e.target.value; refilter(); }));
+$('#fSort').addEventListener('change', e => { S.f.sort = e.target.value; S.f.dir = 1; refilter(); });
+$('#fDir').addEventListener('click', () => { S.f.dir = -S.f.dir; refilter(); });
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { S.view = b.dataset.view; store.set('rbshop.view', S.view); refilter(); }));
+$('#fMoreBtn').addEventListener('click', () => { S.more = !S.more; renderFilters(); });
+// The type menu: tick as many as you like; "All types" clears them.
+const typeMenu = open => { $('#fTypes').hidden = !open; $('#fTypeBtn').setAttribute('aria-expanded', open); };
+$('#fTypeBtn').addEventListener('click', () => typeMenu($('#fTypes').hidden));
+$('#fTypes').addEventListener('change', e => {
+  const k = e.target.dataset.type; if (k == null) return;
+  if (!k) S.f.types.clear(); else if (e.target.checked) S.f.types.add(k); else S.f.types.delete(k);
+  refilter(); typeMenu(true);
+});
+document.addEventListener('click', e => { if (!$('#fTypes').hidden && !e.target.closest('#fTypeDd')) typeMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#fTypes').hidden) { typeMenu(false); $('#fTypeBtn').focus(); } });
+$('#fShow').addEventListener('change', e => { S.f.show = e.target.value; refilter(); });
 [['#fMin', 'min'], ['#fMax', 'max']].forEach(([id, k]) => {
   let timer;  // one per box, so typing in one doesn't cancel the other
   $(id).addEventListener('input', e => {
-    clearTimeout(timer); timer = setTimeout(() => { S.f[k] = cleanPrice(e.target.value).replace(/[^\d.]/g, ''); S.shown = PAGE; renderGrid(); }, 200);
+    clearTimeout(timer); timer = setTimeout(() => { S.f[k] = cleanPrice(e.target.value).replace(/[^\d.]/g, ''); refilter(); }, 200);
   });
 });
 $('#fDoms').addEventListener('click', e => {
   const b = e.target.closest('[data-dom]'); if (!b) return;
   const d = b.dataset.dom; S.f.dom.has(d) ? S.f.dom.delete(d) : S.f.dom.add(d);
-  b.setAttribute('aria-pressed', S.f.dom.has(d)); S.shown = PAGE; renderGrid();
+  refilter(); $(`#fDoms [data-dom="${d}"]`).focus();
 });
-$('#fClear').addEventListener('click', () => { S.f = defaults(); S.shown = PAGE; renderFilters(); renderGrid(); });
+$('#fClear').addEventListener('click', () => { S.f = defaults(S.f.sort, S.f.dir); refilter(); });
 // Deck filters. Tags (on decks and in a deck's details) and the tier list's Legends lead to the Decks tab, filtered.
 $('#dQ').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.d.q = e.target.value; renderDecks(); }, 120); });
 $('#dLegend').addEventListener('change', e => { S.d.legend = e.target.value; renderDecks(); });
@@ -2324,6 +2613,11 @@ $('#clearCart').addEventListener('click', clearCart);
 $('#sentClear').addEventListener('click', () => { if (clearCart()) { $('#review').close(); openSheet(false); } });
 $('#who').addEventListener('input', e => { store.set('rbshop.name', e.target.value.trim()); updateSend(); });
 $('#note').addEventListener('input', updateSend);
+$('#promoApply').addEventListener('click', applyPromo);
+$('#promoIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); applyPromo(); } });
+$('#promoIn').addEventListener('input', () => promoMsg(''));
+$('#promoOn').addEventListener('click', e => { if (e.target.closest('#promoRemove')) { S.promo = null; promoMsg(''); renderCart(); renderReview(); $('#promoIn').focus(); } });
+$('#policyOpen').addEventListener('click', () => $('#policyDlg').showModal());
 $('#sendLine').addEventListener('click', e => {
   if (!lineReady() || !cartItems().length) { e.preventDefault(); return; }
   const text = orderText(); e.currentTarget.href = lineSendUrl(text);
@@ -2338,6 +2632,7 @@ document.querySelectorAll('dialog').forEach(d => {
 });
 addEventListener('hashchange', setMode);
 addEventListener('resize', setHead);
+loadCardFonts();
 setHead();
 setMode();
 load();

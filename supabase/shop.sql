@@ -1,4 +1,5 @@
--- Riftbound shop (index.html): prices, stock, products (decks included) and the meta tier list, edited in the shopkeeper zone (#keeper).
+-- Riftbound shop (index.html): prices, stock, products (decks included) and the meta tier list, edited in the shopkeeper zone (#keeper),
+-- and promo codes, added in the Table Editor.
 -- Run once in Supabase → SQL Editor → New query → paste → Run. Safe to run again.
 -- Then make your account the shopkeeper with the line at the bottom (the shopkeeper zone shows it filled in).
 
@@ -109,6 +110,41 @@ begin
 end $$;
 revoke all on function public.shop_stock_save(jsonb, jsonb) from public, anon;
 grant execute on function public.shop_stock_save(jsonb, jsonb) to authenticated;
+
+-- Promo codes, typed by customers when they check their order. Add rows in Supabase → Table Editor → shop_promos.
+-- code is in capitals (customers can type it in any case). Give each code one of percent_off (10 = 10% off) or
+-- amount_off (100 = ฿100 off), and/or free_shipping. min_order is the smallest order (before shipping) it works on.
+-- starts_at / ends_at (empty = no limit) and active turn a code on and off. note is for you only.
+-- Customers can't read this table: the shop asks shop_promo() about one code at a time, so codes can't be listed.
+create table if not exists public.shop_promos (
+  code          text primary key check (code ~ '^[A-Z0-9_-]{2,30}$'),
+  percent_off   numeric(5, 2) check (percent_off > 0 and percent_off <= 100),
+  amount_off    numeric(10, 2) check (amount_off > 0),
+  free_shipping boolean not null default false,
+  min_order     numeric(10, 2) not null default 0 check (min_order >= 0),
+  starts_at     timestamptz,
+  ends_at       timestamptz,
+  active        boolean not null default true,
+  note          text not null default '' check (char_length(note) <= 200),
+  created_at    timestamptz not null default now()
+);
+alter table public.shop_promos enable row level security;
+grant select, insert, update, delete on public.shop_promos to authenticated;
+drop policy if exists "shop_promos keeper all" on public.shop_promos;
+create policy "shop_promos keeper all" on public.shop_promos for all to authenticated using (public.is_shop_keeper()) with check (public.is_shop_keeper());
+
+-- The one code a customer typed, if it is on and in date; nothing otherwise.
+create or replace function public.shop_promo(p_code text)
+returns table (code text, percent_off numeric, amount_off numeric, free_shipping boolean, min_order numeric)
+language sql stable security definer set search_path = public as $$
+  select p.code, p.percent_off, p.amount_off, p.free_shipping, p.min_order from public.shop_promos p
+  where p.code = upper(trim(p_code)) and p.active
+    and (p.starts_at is null or p.starts_at <= now()) and (p.ends_at is null or p.ends_at > now());
+$$;
+revoke all on function public.shop_promo(text) from public;
+grant execute on function public.shop_promo(text) to anon, authenticated;
+-- An example: 10% off orders of ฿500 or more until the end of 2026.
+-- insert into public.shop_promos (code, percent_off, min_order, ends_at) values ('WELCOME10', 10, 500, '2027-01-01');
 
 -- Product photos: a public bucket (anyone can view a photo by its address), 5 MB per file, images only.
 -- Only shopkeepers can add, replace or delete them.
