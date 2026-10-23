@@ -216,6 +216,8 @@ body.keeper .why { display: none; }
 .tl-deck b { font-size: 14.5px; line-height: 1.25; }
 .tl-deck .cimg { border-radius: 4px; }
 .tl-deck .btn.link { padding: 2px 0; font-size: 13px; }
+.tl-deck[data-tl] { cursor: pointer; }
+.tl-deck[data-tl]:hover { box-shadow: 0 0 0 2px var(--accent); }
 .tl-empty { padding: 12px; color: var(--muted); font-size: 13.5px; }
 @media (max-width: 560px) { .tl-row { grid-template-columns: minmax(0, 1fr); } .tl-tier { place-items: center start; padding: 6px 12px; font-size: 15px; } .tl-decks { grid-template-columns: minmax(0, 1fr); } }
 
@@ -375,7 +377,7 @@ body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps { d
 .qty button { width: 30px; height: 36px; border: 0; background: none; cursor: pointer; font-size: 17px; font-weight: 700; color: var(--ink); padding: 0; }
 .qty input[type=text] { width: 42px; border: 0; background: none; text-align: center; padding: 8px 0; border-radius: 0; }
 .ed-foot { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
-.ed-foot #edMsg, .ed-foot #pedMsg { margin-right: auto; }
+.ed-foot #edMsg, .ed-foot #pedMsg, .ed-foot #teMsg { margin-right: auto; }
 .ed-row textarea { grid-column: 1 / -1; min-height: 40px; font-size: 14px; }
 .ed-row + .ed-row { border-top: 1px solid var(--line); padding-top: 10px; }
 .ped { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; align-items: start; }
@@ -388,18 +390,53 @@ body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps { d
 .btn.danger { color: var(--loss); }
 .two-sel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 10px; }
 @media (max-width: 520px) { .two-sel { grid-template-columns: minmax(0, 1fr); } }
-/* the tier list editor: one box per tier, one row per deck */
-#teditor { width: min(920px, calc(100% - 24px)); }
-.te-tier { border: 1px solid var(--line); border-left: 6px solid var(--tc); border-radius: var(--r); padding: 10px; display: grid; gap: 8px; }
-.te-th { display: flex; gap: 6px; align-items: center; }
-.te-th input { max-width: 220px; font-weight: 700; }
-.te-deck { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.3fr) minmax(0, .9fr) minmax(0, .9fr) auto; gap: 6px; align-items: center; }
-.te-deck + .te-deck { border-top: 1px dashed var(--line); padding-top: 8px; }
-.te-deck .te-note { grid-column: 1 / -1; }
-.te-btns { display: flex; gap: 2px; justify-content: flex-end; }
+/* the tier list editor: the tiers as a table of Legend pictures, the Legends to drag from underneath */
+#teditor { width: min(1040px, calc(100% - 24px)); }
+.te-board { display: grid; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.te-board > * + * { border-top: 1px solid var(--line); }
+.te-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); }
+.te-label { display: grid; align-content: center; gap: 4px; padding: 8px 6px; background: var(--tc); }
+.te-label input { padding: 4px; text-align: center; font-family: var(--f-display); font-weight: 700; font-size: 16px; color: #14181F; background: rgb(255 255 255 / .55); border-color: transparent; }
+.te-tbtns { display: flex; justify-content: center; gap: 2px; }
+.te-label .x.sm { width: 26px; height: 26px; color: #14181F; background: rgb(255 255 255 / .4); }
+.te-label .x.sm:hover { background: rgb(255 255 255 / .7); }
+.te-drop { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px 10px; padding: 8px 10px; min-height: 112px; background: var(--panel); }
+.te-drop.over, .te-pics.over { background: var(--accent-soft); }
+.te-empty { align-self: center; color: var(--muted); font-size: 13px; }
+.te-item { position: relative; display: grid; justify-items: center; gap: 3px; width: 60px; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: grab;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.te-item > span:last-child { max-width: 100%; font-size: 11.5px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.te-item .cimg { border-radius: 5px; box-shadow: 0 1px 3px rgb(0 0 0 / .2); transition: transform .12s ease; }
+.te-item:hover .cimg { transform: translateY(-2px); }
+.te-item.on .cimg { box-shadow: 0 0 0 3px var(--accent); }
+.te-item.lift { opacity: .3; }
+.te-item.before::before, .te-item.after::after { content: ''; position: absolute; top: 0; bottom: 0; width: 3px; border-radius: 2px; background: var(--accent); }
+.te-item.before::before { left: -7px; }
+.te-item.after::after { right: -7px; }
+.te-dot { position: absolute; top: -3px; right: -3px; width: 11px; height: 11px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); }
+.te-item.used::after { content: '✓'; position: absolute; top: -4px; right: -4px; width: 17px; height: 17px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 700; }
+.te-ghost { position: fixed; left: 0; top: 0; z-index: 10; pointer-events: none; cursor: grabbing; filter: drop-shadow(0 8px 14px rgb(0 0 0 / .35)); }
+.te-ghost .cimg { transform: rotate(-3deg) scale(1.06); }
+.te-detail { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; padding: 12px; background: var(--panel-2); border-left: 6px solid var(--tc); }
+.te-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 10px; }
+.te-wide { grid-column: 1 / -1; }
+.te-dbtns { display: flex; align-items: center; gap: 4px; }
+.te-dbtns .btn.link { margin-left: auto; }
+.te-pool { position: sticky; bottom: -18px; z-index: 1; display: grid; gap: 8px; margin: 0 -18px -14px; padding: 10px 18px 14px; background: var(--panel); border-top: 1px solid var(--line); box-shadow: 0 -6px 14px rgb(0 0 0 / .08); }
+.te-pool-h { display: flex; align-items: center; gap: 10px; }
+.te-pool-h input { max-width: 240px; padding: 5px 9px; }
+.te-pics { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px; max-height: min(186px, 26vh); overflow-y: auto; border-radius: 6px; }
+.te-pics .te-item { width: 52px; }
+@media (max-width: 640px) {
+  .te-row { grid-template-columns: 76px minmax(0, 1fr); }
+  .te-label input { font-size: 14px; }
+  .te-tbtns { flex-wrap: wrap; }
+  .te-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .te-detail { grid-template-columns: minmax(0, 1fr); }
+  .te-pics { max-height: 128px; }
+}
 .x.sm { width: 30px; height: 30px; font-weight: 700; }
 .x:disabled { opacity: .35; cursor: not-allowed; }
-@media (max-width: 640px) { .te-deck { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .te-btns { grid-column: 1 / -1; } }
 
 footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
 @media (max-width: 999px) { footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); } .shop { padding-bottom: 8px; } }
@@ -585,9 +622,12 @@ const LANG = {
     teTierName: 'Tier name', teUp: 'Move up', teDown: 'Move down', teDelTier: 'Delete this tier', teMove: 'Move to tier',
     teDelTierAsk: (n, k) => `Delete ${n} and the ${k} deck${k === 1 ? '' : 's'} in it?`,
     tePickLegend: 'Legend…', teName: 'Deck name', teNamePh: 'Deck name, e.g. Kennen Combo',
-    teEntryNotePh: 'Note for customers (optional), e.g. Strong against Aggro', teAdd: n => `Add a deck to ${n}`, teAddTier: 'Add a tier',
-    teHint: 'Pick each deck’s Legend so customers can jump to the decks you sell with it. Empty tiers are hidden in the shop. Saving shows the new list right away.',
-    kAddDeck: '+ Add a deck', kTierHint: 'Keep the tier list in step with the current meta. Customers see it in the Tier list tab.',
+    teEntryNote: 'Note for customers', teEntryNotePh: 'e.g. Strong against Aggro', teAddTier: 'Add a tier',
+    teDragHint: 'Drag a Legend from the bottom onto a tier. Drag a deck to reorder it, move it to another tier, or back to the Legends to take it off. Click a deck to give it a name, style and note.',
+    teDropHere: 'Drag Legends here', teLegends: 'Legends', teFind: 'Find a Legend', teDragTip: 'Drag it onto a tier (on a phone: hold it, then drag)',
+    teLeft: 'Move left', teRight: 'Move right', teRemove: 'Take off the tier list', teDone: 'Done',
+    teHint: 'Customers can jump from each deck to the decks you sell with its Legend. Empty tiers are hidden in the shop. Saving shows the new list right away.',
+    kAddDeck: '+ Add a deck', kTierHint: 'Keep the tier list in step with the current meta: drag Legends onto the tiers, and click a deck in the list to add its description. Customers see it in the Tier list tab.',
     kDeckHint: (a, b) => `Tap a deck to change it. The price sets its level: up to ${a} is Budget Starter, up to ${b} Mid-Level, above that Tournament Winner.`,
     kNeedSql: 'The shop database needs an update for deck styles, tags and the tier list: in Supabase → SQL Editor, run supabase/shop.sql again, then reload this page.',
     pKind: 'What is it?', pKindDeck: 'Deck', pKindOther: 'Other product', pTitleNewDeck: 'New deck', pTitleDeck: 'Edit deck', pDeckNamePh: 'e.g. Kennen Combo',
@@ -690,9 +730,12 @@ const LANG = {
     teTierName: 'ชื่อระดับ', teUp: 'เลื่อนขึ้น', teDown: 'เลื่อนลง', teDelTier: 'ลบระดับนี้', teMove: 'ย้ายไประดับ',
     teDelTierAsk: (n, k) => `ลบ ${n} และเด็คในระดับนี้ ${k} เด็คใช่ไหม`,
     tePickLegend: 'เลือก Legend…', teName: 'ชื่อเด็ค', teNamePh: 'ชื่อเด็ค เช่น Kennen Combo',
-    teEntryNotePh: 'หมายเหตุถึงลูกค้า (ไม่บังคับ) เช่น ได้เปรียบเด็ค Aggro', teAdd: n => `เพิ่มเด็คใน ${n}`, teAddTier: 'เพิ่มระดับ',
-    teHint: 'เลือก Legend ของแต่ละเด็ค เพื่อให้ลูกค้ากดไปดูเด็คที่ร้านขายซึ่งใช้ Legend นั้นได้ ระดับที่ไม่มีเด็คจะไม่แสดงในร้าน บันทึกแล้วจะแสดงทันที',
-    kAddDeck: '+ เพิ่มเด็ค', kTierHint: 'อัปเดต Tier list ให้ตรงกับเมต้าปัจจุบัน ลูกค้าจะเห็นในแท็บ Tier list',
+    teEntryNote: 'หมายเหตุถึงลูกค้า', teEntryNotePh: 'เช่น ได้เปรียบเด็ค Aggro',
+    teDragHint: 'ลาก Legend จากด้านล่างไปวางในระดับ ลากเด็คเพื่อเรียงลำดับ ย้ายไปอีกระดับ หรือลากกลับไปที่ Legend เพื่อนำออก คลิกเด็คเพื่อใส่ชื่อ สไตล์ และหมายเหตุ',
+    teDropHere: 'ลาก Legend มาวางที่นี่', teLegends: 'Legend', teFind: 'ค้นหา Legend', teDragTip: 'ลากไปวางในระดับ (บนมือถือ: แตะค้างไว้แล้วลาก)',
+    teLeft: 'เลื่อนไปซ้าย', teRight: 'เลื่อนไปขวา', teRemove: 'นำออกจาก Tier list', teDone: 'เสร็จ', teAddTier: 'เพิ่มระดับ',
+    teHint: 'ลูกค้ากดจากแต่ละเด็คไปดูเด็คที่ร้านขายซึ่งใช้ Legend เดียวกันได้ ระดับที่ไม่มีเด็คจะไม่แสดงในร้าน บันทึกแล้วจะแสดงทันที',
+    kAddDeck: '+ เพิ่มเด็ค', kTierHint: 'อัปเดต Tier list ให้ตรงกับเมต้าปัจจุบัน: ลาก Legend ไปวางในแต่ละระดับ แล้วคลิกเด็คในตารางเพื่อใส่คำอธิบาย ลูกค้าจะเห็นในแท็บ Tier list',
     kDeckHint: (a, b) => `แตะเด็คเพื่อแก้ไข ราคากำหนดระดับของเด็ค: ไม่เกิน ${a} เป็นเด็คเริ่มต้น ไม่เกิน ${b} เป็นเด็คระดับกลาง มากกว่านั้นเป็นเด็คแชมป์ทัวร์นาเมนต์`,
     kNeedSql: 'ฐานข้อมูลร้านต้องอัปเดตเพื่อใช้สไตล์เด็ค แท็ก และ Tier list: เปิด Supabase → SQL Editor แล้วรัน supabase/shop.sql อีกครั้ง จากนั้นโหลดหน้านี้ใหม่',
     pKind: 'ประเภทสินค้า', pKindDeck: 'เด็ค', pKindOther: 'สินค้าอื่น', pTitleNewDeck: 'เด็คใหม่', pTitleDeck: 'แก้ไขเด็ค', pDeckNamePh: 'เช่น Kennen Combo',
@@ -1306,14 +1349,14 @@ function renderTiers() {
   if (!DB.ok) { el.innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; return; }
   const tl = DB.tiers, decks = DB.listings.filter(x => x.p && x.p.isDeck && x.p.legend);
   const when = tl.updated ? new Date(tl.updated).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-  const entry = e => {
+  const entry = (e, i, j) => {
     const c = DB.byId.get(e.legend), n = c ? decks.filter(x => x.p.legend.k === c.k).length : 0;
-    return `<article class="tl-deck">${c ? thumb(c, 48) : `<span class="cimg pimg" style="width:48px;height:67px;flex:none" aria-hidden="true">${ICON_BOX}</span>`}<div>
+    return `<article class="tl-deck"${K.on ? ` data-tl="${i}.${j}" title="${esc(t('tlEdit'))}"` : ''}>${c ? thumb(c, 48) : `<span class="cimg pimg" style="width:48px;height:67px;flex:none" aria-hidden="true">${ICON_BOX}</span>`}<div>
       <b>${esc(e.name || (c ? legendLabel(c) : ''))}</b>${styleChip(e.style)}${c && e.name ? `<span class="small muted">${esc(legendLabel(c))}</span>` : ''}
       ${e.note ? `<span class="small">${esc(e.note)}</span>` : ''}${n ? `<button type="button" class="btn link" data-legend="${esc(c.k)}">${t('tlShop', n)}</button>` : ''}</div></article>`;
   };
   const rows = tl.tiers.map((x, i) => x.decks.length || K.on ? `<div class="tl-row"><div class="tl-tier" style="--tc:${tierColor(i)}">${esc(x.name)}</div>
-      <div class="tl-decks">${x.decks.map(entry).join('') || `<p class="tl-empty">—</p>`}</div></div>` : '').join('');
+      <div class="tl-decks">${x.decks.map((e, j) => entry(e, i, j)).join('') || `<p class="tl-empty">—</p>`}</div></div>` : '').join('');
   el.innerHTML = `<div class="tl-head"><div><h2>${t('tlTitle')}</h2>${when ? `<p class="small muted">${t('tlUpdated', esc(when))}</p>` : ''}</div></div>
     ${tl.note ? `<p class="tl-note">${esc(tl.note)}</p>` : ''}
     ${rows ? `<div class="tl">${rows}</div><p class="small muted">${t('tlHow')}</p>` : `<div class="state">${t('tlEmpty')}</div>`}`;
@@ -2010,37 +2053,58 @@ $('#pedBody').addEventListener('click', e => {
 });
 $('#peditor').addEventListener('close', () => { if ($('#peditor').open) return; if (P && P.preview) URL.revokeObjectURL(P.preview); P = null; });
 
-// The tier list editor: tiers top to bottom, each with its decks in order. The whole list is saved at once.
-let TL = null;  // the tier list being edited: { note, tiers: [{ name, decks: [{ name, legend, style, note }] }], busy }
+// The tier list editor: the tiers as a table, top to bottom, with every Legend's picture under it. A Legend dragged onto a tier
+// adds a deck there; a deck's picture is dragged to reorder or move it, or back to the Legends to take it off. Clicking a deck
+// opens its name, style and note under its tier. The whole list is saved at once.
+let TL = null;  // the tier list being edited: { note, tiers: [{ name, decks: [{ name, legend, style, note }] }], sel (the deck open for editing), q (the Legend search), busy }
 const tierName = (x, i) => x.name.trim() || `Tier ${i + 1}`;
-function openTierEditor() {
+const champName = c => (c.g && c.g[0]) || c.n;
+const teDeckName = e => { const c = DB.byId.get(e.legend); return e.name.trim() || (c ? champName(c) : '—'); };
+const tePic = (e, w) => { const c = DB.byId.get(e.legend); return c ? thumb(c, w) : `<span class="cimg pimg" style="width:${w}px;height:${Math.round(w * 1.4)}px" aria-hidden="true">${ICON_BOX}</span>`; };
+// A deck's picture in its tier; the dot says it has a note for customers.
+const teItem = (e, j) => `<button type="button" class="te-item${e === TL.sel ? ' on' : ''}" data-di="${j}" title="${esc(teDeckName(e))}">${tePic(e, 60)}${e.note ? '<i class="te-dot" aria-hidden="true"></i>' : ''}<span>${esc(teDeckName(e))}</span></button>`;
+function openTierEditor(i = -1, j = -1) {
   if (K.state !== 'keeper') { toast(t('kSignInFirst')); $('#keeper').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   const cur = cleanTiers(DB.tiers);
   if (!cur.tiers.length) cur.tiers = [1, 2, 3].map(n => ({ name: `Tier ${n}`, decks: [] }));
-  TL = { ...cur, busy: false };
+  TL = { ...cur, sel: (cur.tiers[i] && cur.tiers[i].decks[j]) || null, q: '', busy: false };
   renderTierEditor(); $('#teditor').showModal();
+  teShowDetail('auto');
+}
+// Scrolls the open deck's details into view, clear of the Legends stuck to the bottom.
+function teShowDetail(behavior) {
+  const d = $('#teBody .te-detail'); if (!d) return;
+  d.style.scrollMarginBottom = $('#teBody .te-pool').offsetHeight + 12 + 'px';
+  d.scrollIntoView({ block: 'nearest', behavior });
 }
 function renderTierEditor() {
-  const legends = DB.cards.filter(c => c.t === 'Legend').sort((a, b) => legendLabel(a).localeCompare(legendLabel(b)));
+  const all = DB.cards.filter(c => c.t === 'Legend').sort((a, b) => legendLabel(a).localeCompare(legendLabel(b)));
+  const seen = new Set(), legends = all.filter(c => !seen.has(c.k) && seen.add(c.k));  // one picture per Legend in the pool
+  const used = new Set(TL.tiers.flatMap(x => x.decks.map(e => { const c = DB.byId.get(e.legend); return c ? c.k : ''; })));
   const opts = (list, cur, first) => `<option value="">${esc(first)}</option>` + list.map(([v, label]) => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(label)}</option>`).join('');
-  const legendList = legends.map(c => [c.id, legendLabel(c)]), styleList = STYLES.map(s => [s, t('st_' + s)]);
+  const legendList = all.map(c => [c.id, legendLabel(c)]), styleList = STYLES.map(s => [s, t('st_' + s)]);
   const small = (act, label, icon, off) => `<button type="button" class="x sm" data-te="${act}" aria-label="${esc(label)}" title="${esc(label)}"${off ? ' disabled' : ''}>${icon}</button>`;
+  const q = norm(TL.q);
+  const detail = (e, i, j, n) => `<div class="te-detail" data-ti="${i}" data-di="${j}" style="--tc:${tierColor(i)}">${tePic(e, 84)}<div class="te-fields">
+      <label class="field"><span>${t('teName')}</span><input type="text" data-tf="name" value="${esc(e.name)}" maxlength="60" placeholder="${esc(t('teNamePh'))}"></label>
+      <label class="field"><span>Legend</span><select data-tf="legend">${opts(legendList, e.legend, t('tePickLegend'))}</select></label>
+      <label class="field"><span>${t('pStyle')}</span><select data-tf="style">${opts(styleList, e.style, '—')}</select></label>
+      <label class="field"><span>${t('teMove')}</span><select data-tf="tier">${TL.tiers.map((y, k) => `<option value="${k}"${k === i ? ' selected' : ''}>${esc(tierName(y, k))}</option>`).join('')}</select></label>
+      <label class="field te-wide"><span>${t('teEntryNote')}</span><textarea data-tf="enote" rows="2" maxlength="200" placeholder="${esc(t('teEntryNotePh'))}">${esc(e.note)}</textarea></label>
+      <div class="te-wide te-dbtns">${small('up', t('teLeft'), '←', !j)}${small('down', t('teRight'), '→', j === n - 1)}
+        <button type="button" class="btn link danger" data-te="del">${t('teRemove')}</button><button type="button" class="btn sm" data-te="done">${t('teDone')}</button></div>
+    </div></div>`;
   $('#teBody').innerHTML = `<div class="dlg-head"><h2 id="teTitle">${t('tlEdit')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
     <label class="field"><span>${t('teNote')}</span><textarea data-tf="note" rows="2" maxlength="600" placeholder="${esc(t('teNotePh'))}">${esc(TL.note)}</textarea></label>
-    ${TL.tiers.map((x, i) => `<section class="te-tier" data-ti="${i}" style="--tc:${tierColor(i)}">
-      <div class="te-th"><input type="text" data-tf="tname" value="${esc(x.name)}" maxlength="16" placeholder="Tier ${i + 1}" aria-label="${esc(t('teTierName'))}">
-        ${small('tup', t('teUp'), '↑', !i)}${small('tdown', t('teDown'), '↓', i === TL.tiers.length - 1)}${small('tdel', t('teDelTier'), ICON_TRASH)}</div>
-      ${x.decks.map((e, j) => `<div class="te-deck" data-di="${j}">
-        <select data-tf="legend" aria-label="Legend">${opts(legendList, e.legend, t('tePickLegend'))}</select>
-        <input type="text" data-tf="name" value="${esc(e.name)}" maxlength="60" placeholder="${esc(t('teNamePh'))}" aria-label="${esc(t('teName'))}">
-        <select data-tf="style" aria-label="${esc(t('pStyle'))}">${opts(styleList, e.style, t('pStyle') + '…')}</select>
-        <select data-tf="tier" aria-label="${esc(t('teMove'))}">${TL.tiers.map((y, k) => `<option value="${k}"${k === i ? ' selected' : ''}>${esc(tierName(y, k))}</option>`).join('')}</select>
-        <span class="te-btns">${small('up', t('teUp'), '↑', !j)}${small('down', t('teDown'), '↓', j === x.decks.length - 1)}${small('del', t('eRemove'), ICON_TRASH)}</span>
-        <input type="text" class="te-note" data-tf="enote" value="${esc(e.note)}" maxlength="200" placeholder="${esc(t('teEntryNotePh'))}">
-      </div>`).join('')}
-      <div><button type="button" class="btn link" data-te="add">+ ${esc(t('teAdd', tierName(x, i)))}</button></div>
-    </section>`).join('')}
+    <p class="small muted">${t('teDragHint')}</p>
+    <div class="te-board">${TL.tiers.map((x, i) => `<div class="te-row" data-ti="${i}" style="--tc:${tierColor(i)}">
+      <div class="te-label"><input type="text" data-tf="tname" value="${esc(x.name)}" maxlength="16" placeholder="Tier ${i + 1}" aria-label="${esc(t('teTierName'))}">
+        <span class="te-tbtns">${small('tup', t('teUp'), '↑', !i)}${small('tdown', t('teDown'), '↓', i === TL.tiers.length - 1)}${small('tdel', t('teDelTier'), ICON_TRASH)}</span></div>
+      <div class="te-drop" data-drop="${i}">${x.decks.map(teItem).join('') || `<span class="te-empty">${t('teDropHere')}</span>`}</div>
+    </div>${x.decks.includes(TL.sel) ? detail(TL.sel, i, x.decks.indexOf(TL.sel), x.decks.length) : ''}`).join('')}</div>
     <div><button type="button" class="btn sm" data-te="addtier">+ ${t('teAddTier')}</button></div>
+    <section class="te-pool"><div class="te-pool-h"><b>${t('teLegends')}</b><input type="search" data-tf="q" value="${esc(TL.q)}" placeholder="${esc(t('teFind'))}" aria-label="${esc(t('teFind'))}"></div>
+      <div class="te-pics" data-drop="pool">${legends.map(c => `<button type="button" class="te-item${used.has(c.k) ? ' used' : ''}" data-lg="${esc(c.id)}" data-q="${esc(norm(legendLabel(c)))}" title="${esc(legendLabel(c))}"${q && !norm(legendLabel(c)).includes(q) ? ' hidden' : ''}>${thumb(c, 52)}<span>${esc(champName(c))}</span></button>`).join('')}</div></section>
     <p class="small muted">${t('teHint')}</p>
     <div class="ed-foot"><span class="small" id="teMsg" role="status"></span><button type="button" class="btn" data-close>${t('eCancel')}</button><button type="button" class="btn primary" data-te="save">${t('eSave')}</button></div>`;
 }
@@ -2048,7 +2112,7 @@ function teMsg(m, bad = true) { const el = $('#teMsg'); if (el) { el.textContent
 async function saveTiers() {
   const cur = TL; if (!cur || cur.busy) return;
   const data = cleanTiers({ note: cur.note, tiers: cur.tiers.map((x, i) => ({ name: tierName(x, i),
-    decks: x.decks.map(e => { const c = DB.byId.get(e.legend); return { ...e, name: e.name.trim() || (c ? (c.g && c.g[0]) || c.n : '') }; }).filter(e => e.name) })) });
+    decks: x.decks.map(e => { const c = DB.byId.get(e.legend); return { ...e, name: e.name.trim() || (c ? champName(c) : '') }; }).filter(e => e.name) })) });
   const save = $('#teBody [data-te="save"]');
   cur.busy = true; save.disabled = true; teMsg(t('eSaving'), false);
   const res = await K.sb.from('shop_docs').upsert({ id: 'tierlist', data, updated_at: new Date().toISOString() }).select('id').then(r => r, e => ({ error: e }));
@@ -2059,37 +2123,109 @@ async function saveTiers() {
 }
 $('#teBody').addEventListener('input', e => {
   const f = e.target.dataset.tf; if (!TL || !f) return;
-  const ti = e.target.closest('[data-ti]'), di = e.target.closest('[data-di]'), i = ti ? +ti.dataset.ti : -1, tier = TL.tiers[i], ent = tier && di ? tier.decks[+di.dataset.di] : null;
-  const v = e.target.value;
+  const ti = e.target.closest('[data-ti]'), i = ti ? +ti.dataset.ti : -1, tier = TL.tiers[i], ent = TL.sel, v = e.target.value;
   if (f === 'note') TL.note = v;
-  else if (f === 'tname') {  // the tier's new name in the move-to lists and its add button, without redrawing what's being typed in
+  else if (f === 'q') { TL.q = v; const q = norm(v); $('#teBody').querySelectorAll('[data-lg]').forEach(b => { b.hidden = !!q && !b.dataset.q.includes(q); }); }
+  else if (f === 'tname') {  // the tier's new name in the move-to list, without redrawing what's being typed in
     tier.name = v;
     $('#teBody').querySelectorAll(`select[data-tf="tier"] option[value="${i}"]`).forEach(o => { o.textContent = tierName(tier, i); });
-    ti.querySelector('[data-te="add"]').textContent = '+ ' + t('teAdd', tierName(tier, i));
-  } else if (f === 'tier') { tier.decks.splice(+di.dataset.di, 1); TL.tiers[+v].decks.push(ent); renderTierEditor(); }
-  else if (f === 'legend') {  // a new deck is named after its champion until it's given a name
-    ent.legend = v;
-    const c = DB.byId.get(v), name = di.querySelector('[data-tf="name"]');
-    if (c && !ent.name.trim()) name.value = ent.name = (c.g && c.g[0]) || c.n;
-  } else if (f === 'name' || f === 'style') ent[f] = v;
-  else if (f === 'enote') ent.note = v;
+  } else if (!ent) return;
+  else if (f === 'tier') { tier.decks.splice(tier.decks.indexOf(ent), 1); TL.tiers[+v].decks.push(ent); renderTierEditor(); }
+  else if (f === 'legend') { ent.legend = v; renderTierEditor(); }
+  else {  // name, style or note: redraw just the deck's picture in its tier
+    ent[f === 'enote' ? 'note' : f] = v;
+    const j = tier.decks.indexOf(ent), b = $(`#teBody .te-row[data-ti="${i}"] .te-item[data-di="${j}"]`);
+    if (b) b.outerHTML = teItem(ent, j);
+  }
 });
 $('#teBody').addEventListener('click', e => {
-  const b = e.target.closest('[data-te]'); if (!b || !TL || b.disabled) return;
+  if (!TL) return;
+  const it = e.target.closest('.te-item');
+  if (it) {  // a Legend: it has to be dragged; a deck: open or close its details
+    if (it.dataset.lg) return toast(t('teDragTip'));
+    const ent = TL.tiers[+it.closest('[data-ti]').dataset.ti].decks[+it.dataset.di];
+    TL.sel = TL.sel === ent ? null : ent; renderTierEditor();
+    teShowDetail('smooth');
+    return;
+  }
+  const b = e.target.closest('[data-te]'); if (!b || b.disabled) return;
   const ti = b.closest('[data-ti]'), di = b.closest('[data-di]'), i = ti ? +ti.dataset.ti : -1, j = di ? +di.dataset.di : -1, act = b.dataset.te;
   const swap = (a, x, y) => { [a[x], a[y]] = [a[y], a[x]]; };
   if (act === 'save') return saveTiers();
   if (act === 'addtier') TL.tiers.push({ name: '', decks: [] });
   else if (act === 'tup' || act === 'tdown') swap(TL.tiers, i, act === 'tup' ? i - 1 : i + 1);
   else if (act === 'tdel') { const x = TL.tiers[i]; if (x.decks.length && !confirm(t('teDelTierAsk', tierName(x, i), x.decks.length))) return; TL.tiers.splice(i, 1); }
-  else if (act === 'add') TL.tiers[i].decks.push({ name: '', legend: '', style: '', note: '' });
   else if (act === 'up' || act === 'down') swap(TL.tiers[i].decks, j, act === 'up' ? j - 1 : j + 1);
-  else if (act === 'del') TL.tiers[i].decks.splice(j, 1);
+  else if (act === 'del') { TL.tiers[i].decks.splice(j, 1); TL.sel = null; }
+  else if (act === 'done') TL.sel = null;
   renderTierEditor();
-  if (act === 'add') $(`#teBody [data-ti="${i}"] [data-di="${TL.tiers[i].decks.length - 1}"] select`).focus();
-  else if (act === 'addtier') $(`#teBody [data-ti="${TL.tiers.length - 1}"] input`).focus();
+  if (act === 'addtier') $(`#teBody [data-ti="${TL.tiers.length - 1}"] input`).focus();
 });
 $('#teditor').addEventListener('close', () => { if (!$('#teditor').open) TL = null; });
+
+// Dragging a picture: with a mouse straight away, on a touch screen after holding it still (so a swipe still scrolls).
+// TD is the drag in progress: { it (the picture), id (the pointer), x, y, x0, y0, on (lifted), ghost, timer, scroll }.
+let TD = null, teNoClick = false;
+// Where a drop at x, y lands: the Legends ('pool') or a tier and the place in it, with the picture to mark the place by.
+function teDrop(x, y) {
+  const el = document.elementFromPoint(x, y), z = el && el.closest('#teBody [data-drop]'); if (!z) return null;
+  if (z.dataset.drop === 'pool') return { zone: 'pool', el: z };
+  const items = [...z.querySelectorAll('.te-item')];
+  let at = items.findIndex(b => { const r = b.getBoundingClientRect(); return y < r.top || (y <= r.bottom && x < r.left + r.width / 2); });
+  if (at < 0) at = items.length;
+  return { zone: +z.dataset.drop, at, el: z, mark: items[at] ? [items[at], 'before'] : items.length ? [items[at - 1], 'after'] : null };
+}
+function teMark(d) {
+  $('#teBody').querySelectorAll('.over, .before, .after').forEach(el => el.classList.remove('over', 'before', 'after'));
+  if (d) { d.el.classList.add('over'); if (d.mark) d.mark[0].classList.add(d.mark[1]); }
+}
+function teLift() {
+  const d = TD; if (!d || d.on) return;
+  const r = d.it.getBoundingClientRect();
+  d.on = true; d.dx = d.x0 - r.left; d.dy = d.y0 - r.top;  // keep the picture where it was grabbed
+  d.ghost = d.it.cloneNode(true); d.ghost.classList.remove('on', 'used'); d.ghost.classList.add('te-ghost'); d.ghost.removeAttribute('data-di');
+  $('#teditor').append(d.ghost); d.it.classList.add('lift');
+  try { d.it.setPointerCapture(d.id); } catch {}
+  teMove();
+  d.scroll = setInterval(() => {  // scroll the editor while the picture is held near its top or bottom
+    const b = $('#teBody').getBoundingClientRect(), v = d.y < b.top + 48 ? -12 : d.y > b.bottom - 48 ? 12 : 0;
+    if (v) { $('#teBody').scrollTop += v; teMark(teDrop(d.x, d.y)); }
+  }, 16);
+}
+function teMove() { const d = TD; d.ghost.style.transform = `translate(${d.x - d.dx}px, ${d.y - d.dy}px)`; teMark(teDrop(d.x, d.y)); }
+function teEnd(e, drop) {
+  const d = TD; if (!d || e.pointerId !== d.id) return;
+  TD = null; clearTimeout(d.timer); if (!d.on) return;
+  clearInterval(d.scroll); d.ghost.remove(); d.it.classList.remove('lift'); teMark(null);
+  teNoClick = true; setTimeout(() => { teNoClick = false; });
+  const to = drop && TL && teDrop(e.clientX, e.clientY); if (!to) return;
+  if (d.it.dataset.lg) {
+    if (to.zone === 'pool') return;
+    TL.tiers[to.zone].decks.splice(to.at, 0, { name: '', legend: d.it.dataset.lg, style: '', note: '' });
+  } else {
+    const fi = +d.it.closest('[data-ti]').dataset.ti, j = +d.it.dataset.di, ent = TL.tiers[fi].decks.splice(j, 1)[0];
+    if (to.zone === 'pool') { if (TL.sel === ent) TL.sel = null; }
+    else TL.tiers[to.zone].decks.splice(to.zone === fi && j < to.at ? to.at - 1 : to.at, 0, ent);
+  }
+  renderTierEditor();
+}
+$('#teBody').addEventListener('pointerdown', e => {
+  const it = e.target.closest('.te-item'); if (!TL || !it || e.button) return;
+  if (e.pointerType === 'mouse') e.preventDefault();  // no text selection while dragging
+  TD = { it, id: e.pointerId, x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, on: false };
+  if (e.pointerType !== 'mouse') TD.timer = setTimeout(teLift, 300);
+});
+document.addEventListener('pointermove', e => {
+  const d = TD; if (!d || e.pointerId !== d.id) return;
+  d.x = e.clientX; d.y = e.clientY;
+  if (d.on) teMove();
+  else if (Math.hypot(d.x - d.x0, d.y - d.y0) > 6) { if (d.timer) { clearTimeout(d.timer); TD = null; } else teLift(); }  // a touch that moves first is a scroll
+});
+document.addEventListener('pointerup', e => teEnd(e, true));
+document.addEventListener('pointercancel', e => teEnd(e, false));
+$('#teBody').addEventListener('touchmove', e => { if (TD && TD.on) e.preventDefault(); }, { passive: false });
+$('#teBody').addEventListener('contextmenu', e => { if (e.target.closest('.te-item')) e.preventDefault(); });
+$('#teBody').addEventListener('click', e => { if (teNoClick) { teNoClick = false; e.stopImmediatePropagation(); } }, true);  // the click that ends a drag
 
 
 function renderAll() {
@@ -2159,6 +2295,8 @@ document.addEventListener('click', e => {
   if ($('#detail').open) $('#detail').close();
   showDecks();
 });
+// In the shopkeeper zone, a deck in the tier list opens the editor on it.
+$('#tiersView').addEventListener('click', e => { const d = K.on && !e.target.closest('button, a') && e.target.closest('[data-tl]'); if (d) openTierEditor(...d.dataset.tl.split('.').map(Number)); });
 $('#more').addEventListener('click', showMore);
 new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) showMore(); }, { rootMargin: '800px 0px' }).observe($('#more'));
 $('#mbOpen').addEventListener('click', () => openSheet(true));
