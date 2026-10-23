@@ -120,6 +120,11 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .dom { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 4px 11px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; }
 .dom i { width: 9px; height: 9px; border-radius: 2px; transform: rotate(45deg); display: inline-block; flex: none; }
 .dom[aria-pressed="true"] { border-color: var(--ink); background: var(--panel-2); }
+/* the shopkeeper's own filters: what to show, and a price range */
+.kfil { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+.kfil select { width: auto; max-width: 100%; }
+.prange { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.prange input { width: 92px; }
 .chk { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .chk input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
 .resbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13.5px; color: var(--muted); }
@@ -449,7 +454,10 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
       </div>
       <div class="frow2">
         <div class="doms" id="fDoms" role="group" aria-label="Domains"></div>
-        <label class="chk" id="fStockWrap" hidden><input type="checkbox" id="fStock"><span></span></label>
+        <div class="kfil" id="fKeepWrap" hidden>
+          <select id="fShow" data-t-label="kShow"></select>
+          <span class="prange"><input type="text" id="fMin" inputmode="numeric" data-t-ph="kMin" data-t-label="kMin"><span>–</span><input type="text" id="fMax" inputmode="numeric" data-t-ph="kMax" data-t-label="kMax"></span>
+        </div>
       </div>
     </div>
     <div class="resbar"><span id="resCount" aria-live="polite"></span><button type="button" class="btn link" id="fClear" data-t="clearFilters" hidden></button></div>
@@ -555,7 +563,7 @@ const LANG = {
     tcgSave: (n, a) => `You save ${n}% (${a})`, tcgN: 'Normal',
     tcgNote: (d, r) => `TCGplayer market price in US dollars${d ? ` on ${d}` : ''}, at 1 USD = ${r}. A guide: real prices depend on condition and shipping.`,
     tcgDeckNote: 'Each card counted at its cheapest printing on TCGplayer.', tcgMissing: n => `${n} card${n === 1 ? ' has' : 's have'} no TCGplayer price and ${n === 1 ? 'isn’t' : 'aren’t'} counted.`,
-    kHidden: 'Hidden: not cheaper', cartSave: a => `You save ${a} compared with TCGplayer`, pDeckTcg: v => `TCGplayer value ${v}`,
+    kHidden: n => n > 0 ? `Hidden · ${n}% above` : 'Hidden · same price', cartSave: a => `You save ${a} compared with TCGplayer`, pDeckTcg: v => `TCGplayer value ${v}`,
     why3h: '100% genuine', why3: 'Guaranteed real product, from a certified shop.',
     why4h: 'Easy to read', why4: 'Every deck here shows its cards in English, so you know what each one does.',
     dvOpen: 'See the whole deck on one page', dvMain: n => `${n} cards`, dvSide: 'Sideboard', dvPng: 'Save as image', dvMaking: 'Making the image…',
@@ -634,7 +642,10 @@ const LANG = {
     kImportAsk: (a, d, u) => `Save ${a} listed row${a === 1 ? '' : 's'} from this file?` + (d ? ` ${d} version${d === 1 ? '' : 's'} left blank in the file will be taken off sale.` : '') + (u ? ` ${u === 1 ? '1 row matches' : u + ' rows match'} no card and will be skipped.` : ''),
     kImportEmpty: 'Nothing to save from this file. It needs an id or name column and some prices, copies or notes.',
     kImported: n => `Saved ${n} row${n === 1 ? '' : 's'}`,
-    kListed: 'Listed only', kNotListed: 'Not listed', kInStock: n => `${n} in stock`, kEdit: 'Edit price and stock',
+    kShow: 'Show', kShowAll: n => `All cards (${n})`, kShow_listed: n => `Listed only (${n})`, kShow_shown: n => `Shown to customers (${n})`,
+    kShow_hidden: n => `Hidden: not cheaper than TCGplayer (${n})`, kShow_notcg: n => `No TCGplayer price (${n})`, kShow_noprice: n => `No price, Ask price (${n})`,
+    kMin: 'Min ฿', kMax: 'Max ฿', sortOver: 'Price vs TCGplayer: most above first',
+    kNotListed: 'Not listed', kInStock: n => `${n} in stock`, kEdit: 'Edit price and stock',
     kNoCloud: 'Cloud stock isn’t set up: fill in SHOP_CONFIG.cloud in shop.html.',
     kOffline: 'Couldn’t reach the cloud service. Check your connection.',
     kBadLogin: 'Username or password is wrong.', kRate: 'Too many attempts. Wait a minute and try again.', kFail: m => `Couldn’t sign in: ${m}`,
@@ -658,7 +669,7 @@ const LANG = {
     tcgSave: (n, a) => `ประหยัด ${n}% (${a})`, tcgN: 'ปกติ',
     tcgNote: (d, r) => `ราคาตลาด TCGplayer เป็นดอลลาร์สหรัฐ${d ? ` วันที่ ${d}` : ''} คิดที่ 1 USD = ${r} ใช้เป็นแนวทาง ราคาจริงขึ้นกับสภาพการ์ดและค่าส่ง`,
     tcgDeckNote: 'คิดการ์ดแต่ละใบจากเวอร์ชันที่ถูกที่สุดบน TCGplayer', tcgMissing: n => `การ์ด ${n} ใบไม่มีราคาบน TCGplayer จึงไม่ได้นับรวม`,
-    kHidden: 'ซ่อนอยู่: ไม่ถูกกว่า', cartSave: a => `ประหยัดกว่า TCGplayer ${a}`, pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
+    kHidden: n => n > 0 ? `ซ่อน · แพงกว่า ${n}%` : 'ซ่อน · ราคาเท่ากัน', cartSave: a => `ประหยัดกว่า TCGplayer ${a}`, pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
     why3h: 'ของแท้ 100%', why3: 'รับประกันสินค้าของแท้ จากร้านที่ได้รับการรับรอง',
     why4h: 'อ่านง่าย', why4: 'ทุกเด็คในร้านแสดงการ์ดเป็นภาษาอังกฤษ จึงรู้ว่าการ์ดแต่ละใบทำอะไร',
     dvOpen: 'ดูการ์ดทั้งเด็คในหน้าเดียว', dvMain: n => `${n} ใบ`, dvSide: 'Sideboard', dvPng: 'บันทึกเป็นรูปภาพ', dvMaking: 'กำลังสร้างรูป…',
@@ -736,7 +747,10 @@ const LANG = {
     kImportAsk: (a, d, u) => `บันทึก ${a} แถวที่ลงขายจากไฟล์นี้ใช่ไหม` + (d ? ` อีก ${d} เวอร์ชันที่เว้นว่างในไฟล์จะถูกนำออกจากการขาย` : '') + (u ? ` มี ${u} แถวที่ไม่ตรงกับการ์ดใบใดและจะถูกข้าม` : ''),
     kImportEmpty: 'ไม่มีอะไรให้บันทึกจากไฟล์นี้ ไฟล์ต้องมีคอลัมน์ id หรือ name และมีราคา จำนวน หรือหมายเหตุ',
     kImported: n => `บันทึก ${n} แถวแล้ว`,
-    kListed: 'เฉพาะที่ลงขาย', kNotListed: 'ยังไม่ลงขาย', kInStock: n => `มี ${n} ชิ้น`, kEdit: 'แก้ไขราคาและสต็อก',
+    kShow: 'แสดง', kShowAll: n => `การ์ดทั้งหมด (${n})`, kShow_listed: n => `เฉพาะที่ลงขาย (${n})`, kShow_shown: n => `ที่ลูกค้าเห็น (${n})`,
+    kShow_hidden: n => `ซ่อนอยู่: ไม่ถูกกว่า TCGplayer (${n})`, kShow_notcg: n => `ไม่มีราคา TCGplayer (${n})`, kShow_noprice: n => `ไม่มีราคา สอบถามราคา (${n})`,
+    kMin: 'ต่ำสุด ฿', kMax: 'สูงสุด ฿', sortOver: 'ราคาเทียบ TCGplayer: แพงกว่ามากสุดก่อน',
+    kNotListed: 'ยังไม่ลงขาย', kInStock: n => `มี ${n} ชิ้น`, kEdit: 'แก้ไขราคาและสต็อก',
     kNoCloud: 'ยังไม่ได้ตั้งค่าสต็อกบนคลาวด์: ใส่ค่าใน SHOP_CONFIG.cloud ใน shop.html',
     kOffline: 'เชื่อมต่อบริการคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต',
     kBadLogin: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', kRate: 'ลองหลายครั้งเกินไป รอสักครู่แล้วลองใหม่', kFail: m => `เข้าสู่ระบบไม่สำเร็จ: ${m}`,
@@ -887,7 +901,8 @@ const DB = { ok: false, failed: false, sheets: [], imgBase: '', cards: [], byId:
   listings: [], byKey: new Map(), stocked: false, stock: { source: '', error: '', unmatched: [] }, tiers: { note: '', tiers: [], updated: '', missing: false } };
 // f filters the cards, d the decks (d.legend is a Legend's card key, so every printing of it counts).
 const blankDeckFilter = () => ({ q: '', level: '', style: '', tag: '', legend: '' });
-const S = { cart: store.get('rbshop.cart', {}), tab: 'decks', f: { q: '', set: '', type: '', rar: '', dom: new Set(), stock: false, sort: 'num' }, d: blankDeckFilter(),
+// f.show, f.min and f.max are the shopkeeper's: which cards to show ('listed', 'shown', 'hidden'…) and a price range.
+const S = { cart: store.get('rbshop.cart', {}), tab: 'decks', f: { q: '', set: '', type: '', rar: '', dom: new Set(), show: '', min: '', max: '', sort: 'num' }, d: blankDeckFilter(),
   list: [], shown: PAGE, ref: '', detail: null };
 
 // Excel saves plain "CSV" in the computer's own encoding (windows-874 on Thai Windows) unless "CSV UTF-8" is picked.
@@ -1086,7 +1101,7 @@ function tcgLine(x) {
   const v = tcgValue(x), pct = tcgSave(x);
   if (!v || (!pct && !K.on)) return '';
   return `<div class="tcg"><span>TCGplayer <span class="num">${money(v.thb)}${v.miss ? '+' : ''}</span></span>${pct ? `<span class="save">${t('save', pct)}</span>` : ''}`
-    + `${K.on && notCheaper(x) ? `<span class="bad-t">${t('kHidden')}</span>` : ''}</div>`;
+    + `${K.on && notCheaper(x) ? `<span class="bad-t">${t('kHidden', Math.round(vsTcg(x)))}</span>` : ''}</div>`;
 }
 // In the details: the comparison with where the price comes from.
 function tcgBox(x) {
@@ -1123,8 +1138,18 @@ async function load() {
 async function reloadStock() { setStock(await loadStock()); renderAll(); }
 
 // ---------- filters ----------
-const defaults = () => ({ q: '', set: '', type: '', rar: '', dom: new Set(), stock: false, sort: S.f.sort });
-const filtered = () => { const f = S.f, d = defaults(); return f.q || f.set || f.type || f.rar || f.dom.size || f.stock !== d.stock; };
+const defaults = () => ({ q: '', set: '', type: '', rar: '', dom: new Set(), show: '', min: '', max: '', sort: S.f.sort });
+const filtered = () => { const f = S.f; return !!(f.q || f.set || f.type || f.rar || f.dom.size || f.show || f.min || f.max); };
+// The shopkeeper's "Show" choices: which listings each one keeps.
+const SHOWS = {
+  listed: x => x.listed,
+  shown: x => x.listed && !notCheaper(x),         // what customers see
+  hidden: x => notCheaper(x),                     // listed, but not cheaper than TCGplayer
+  notcg: x => x.listed && !tcgValue(x),           // nothing on TCGplayer to compare with
+  noprice: x => x.listed && x.price == null,      // shows Ask price
+};
+// How far a listing's price is above (+) or below (−) TCGplayer, in percent; null when there's nothing to compare.
+const vsTcg = x => { const v = tcgValue(x); return v && x.price != null ? (x.price - v.thb) / v.thb * 100 : null; };
 const searchText = new WeakMap();
 function hasText(x, q) {
   const words = norm(q).replace(/[\[\]]/g, '').split(' ').filter(Boolean);
@@ -1140,8 +1165,9 @@ function visible() {
   const f = S.f;
   const xs = DB.listings.filter(x => {
     const c = x.c;
-    if (f.stock && !x.listed) return false;  // the shopkeeper's "Listed only"
     if (!K.on && notCheaper(x)) return false;
+    if (K.on && f.show && !SHOWS[f.show](x)) return false;
+    if (K.on && (f.min || f.max) && (x.price == null || (f.min && x.price < +f.min) || (f.max && x.price > +f.max))) return false;
     if (x.p) return !x.p.isDeck && !(f.set || f.rar || f.dom.size || (f.type && f.type !== PRODUCTS)) && (!f.q || hasText(x, f.q));  // decks have their own tab; products have no set, type or domain
     if (f.type === PRODUCTS) return false;
     if (f.set && !c.s.includes(f.set)) return false;
@@ -1155,6 +1181,7 @@ function visible() {
     const s = f.sort === 'low' ? 1 : -1;  // cards without a price go last either way
     xs.sort((a, b) => (a.price == null) - (b.price == null) || s * ((a.price ?? 0) - (b.price ?? 0)));
   }
+  if (f.sort === 'over') xs.sort((a, b) => { const x = vsTcg(a), y = vsTcg(b); return (x == null) - (y == null) || (y ?? 0) - (x ?? 0); });  // furthest above TCGplayer first
   return xs;
 }
 function renderFilters() {
@@ -1164,13 +1191,19 @@ function renderFilters() {
   $('#fSet').innerHTML = opts(t('allSets'), sets, S.f.set, s => `${SET_NAMES[s]} (${s})`);
   $('#fType').innerHTML = opts(t('allTypes'), [...(DB.products.some(p => !p.isDeck) ? [PRODUCTS] : []), ...TYPES], S.f.type, v => v === PRODUCTS ? t('typeProducts') : v);
   $('#fRar').innerHTML = opts(t('allRarities'), RARITIES.filter(r => DB.listings.some(x => x.c && x.c.r === r)), S.f.rar);
-  $('#fSort').innerHTML = [['num', 'sortNum'], ['name', 'sortName'], ...(DB.stocked ? [['low', 'sortLow'], ['high', 'sortHigh']] : [])]
+  $('#fSort').innerHTML = [['num', 'sortNum'], ['name', 'sortName'], ...(DB.stocked ? [['low', 'sortLow'], ['high', 'sortHigh']] : []), ...(K.on && TCG.ok ? [['over', 'sortOver']] : [])]
     .map(([v, k]) => `<option value="${v}"${v === S.f.sort ? ' selected' : ''}>${esc(t(k))}</option>`).join('');
   $('#fDoms').innerHTML = DOMAINS.map(d => `<button type="button" class="dom" data-dom="${d}" aria-pressed="${S.f.dom.has(d)}"><i style="background:${domColor(d)}"></i>${d}</button>`).join('');
   $('#fQ').value = S.f.q;
-  $('#fStockWrap').hidden = !K.on || !DB.stocked;
-  $('#fStockWrap span').textContent = t('kListed');
-  $('#fStock').checked = S.f.stock;
+  // The shopkeeper's filters, each choice with how many cards it holds (products and decks aside).
+  $('#fKeepWrap').hidden = !K.on;
+  if (K.on) {
+    const cards = DB.listings.filter(x => x.c), n = k => cards.filter(SHOWS[k]).length;
+    $('#fShow').innerHTML = [['', t('kShowAll', cards.length)], ...['listed', 'shown', 'hidden', 'notcg', 'noprice'].filter(k => k !== 'hidden' || SHOP_CONFIG.hideNotCheaper)
+      .map(k => [k, t('kShow_' + k, n(k))])].map(([v, label]) => `<option value="${v}"${v === S.f.show ? ' selected' : ''}>${esc(label)}</option>`).join('');
+    if (document.activeElement !== $('#fMin')) $('#fMin').value = S.f.min;
+    if (document.activeElement !== $('#fMax')) $('#fMax').value = S.f.max;
+  }
 }
 
 // ---------- card grid ----------
@@ -1612,7 +1645,7 @@ function setMode() {
   S.tab = TABS.includes(K.on ? b : a) ? (K.on ? b : a) : 'decks';
   document.body.classList.toggle('keeper', K.on);
   if (K.on) openSheet(false);
-  if (DB.ok && K.on !== was) { buildListings(); S.f.stock = false; S.shown = PAGE; }
+  if (DB.ok && K.on !== was) { buildListings(); Object.assign(S.f, { show: '', min: '', max: '' }); if (S.f.sort === 'over') S.f.sort = 'num'; S.shown = PAGE; }
   if (S.tab !== tab || K.on !== was) { if ($('#detail').open) $('#detail').close(); scrollTo(0, 0); }
   renderAll();
   if (K.on) keeperInit();
@@ -2091,7 +2124,13 @@ document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click'
 let qTimer;
 $('#fQ').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.f.q = e.target.value; S.shown = PAGE; renderGrid(); }, 120); });
 [['#fSet', 'set'], ['#fType', 'type'], ['#fRar', 'rar'], ['#fSort', 'sort']].forEach(([id, k]) => $(id).addEventListener('change', e => { S.f[k] = e.target.value; S.shown = PAGE; renderGrid(); }));
-$('#fStock').addEventListener('change', e => { S.f.stock = e.target.checked; S.shown = PAGE; renderGrid(); });
+$('#fShow').addEventListener('change', e => { S.f.show = e.target.value; S.shown = PAGE; renderGrid(); });
+[['#fMin', 'min'], ['#fMax', 'max']].forEach(([id, k]) => {
+  let timer;  // one per box, so typing in one doesn't cancel the other
+  $(id).addEventListener('input', e => {
+    clearTimeout(timer); timer = setTimeout(() => { S.f[k] = cleanPrice(e.target.value).replace(/[^\d.]/g, ''); S.shown = PAGE; renderGrid(); }, 200);
+  });
+});
 $('#fDoms').addEventListener('click', e => {
   const b = e.target.closest('[data-dom]'); if (!b) return;
   const d = b.dataset.dom; S.f.dom.has(d) ? S.f.dom.delete(d) : S.f.dom.add(d);
