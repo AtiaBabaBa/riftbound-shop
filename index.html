@@ -20,17 +20,21 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14l-12 7L4 23V9z' fill='%2310131A' stroke='%2346C3C7' stroke-width='2'/%3E%3Cpath d='M16 8v16M10 12l6 4 6-4M10 20l6-4 6 4' fill='none' stroke='%23D9A84C' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#EDECE6">
+<script>try { const t = JSON.parse(localStorage.getItem('rbshop.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Marcellus&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: header with the yellow tab, headline and section pills; the goods fill the page; the customer's list is a drawer
    (a bottom sheet on phones) opened from a round button at the bottom right. */
-/* The look: cream paper, dark brown ink and a yellow tab, after johnnypep.com/shop; one light theme. */
+/* The look: cream paper, dark brown ink and a yellow tab, after johnnypep.com/shop. Dark mode turns it into coffee-brown
+   paper with cream ink; it follows the device unless the visitor picks one with the sun/moon button (html[data-theme]). */
 :root {
   --bg: #EDECE6; --panel: #F8F7F2; --panel-2: #E4E2D8; --ink: #3A1F01; --muted: #76664F; --line: #D3CDBD;
   --accent: #3A1F01; --accent-ink: #FFFFFF; --accent-soft: #FFF0B3; --yellow: #FECF0A; --gold: #8A5A00;
   --warn: #A0520A; --warn-bg: #FBE7C2; --loss: #B0362E; --loss-bg: #F6DFDB;
+  --on-ink: #FFFFFF; --on-ink-muted: #E9DCC8; --ink-hover: #57320A; --raised: #FFFFFF; --on-yellow: #3A1F01;
+  --shade: 58 31 1; --speck: #3A1F01; --speck-a: 1; --speck-far: #8A5A00; --save: #2C7A43;
   --fury: #D2453A; --calm: #3B9855; --mind: #3874C6; --body: #DE872B; --chaos: #8C4DC2; --order: #C29C1E; --colorless: #8B93A1;
   --line-green: #06C755; --line-green-ink: #FFFFFF;
   /* the fonts printed on the cards (see cardFonts in SHOP_CONFIG), then free stand-ins */
@@ -42,6 +46,22 @@
   --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
   --r: 16px; --head: 64px;
   color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17120C; --panel: #211A12; --panel-2: #2C2318; --ink: #F3E9D8; --muted: #B7A78E; --line: #45392B;
+  --accent: #F3E9D8; --accent-ink: #17120C; --accent-soft: #3D3214; --gold: #E2B44E;
+  --warn: #F0A55A; --warn-bg: #3A2A16; --loss: #F08378; --loss-bg: #3D1F1B;
+  --on-ink: #17120C; --on-ink-muted: #4A3B28; --ink-hover: #FFF6E6; --raised: #2E251A;
+  --shade: 0 0 0; --speck: #F3E9D8; --speck-a: .35; --speck-far: #FECF0A; --save: #7FD493;
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #17120C; --panel: #211A12; --panel-2: #2C2318; --ink: #F3E9D8; --muted: #B7A78E; --line: #45392B;
+  --accent: #F3E9D8; --accent-ink: #17120C; --accent-soft: #3D3214; --gold: #E2B44E;
+  --warn: #F0A55A; --warn-bg: #3A2A16; --loss: #F08378; --loss-bg: #3D1F1B;
+  --on-ink: #17120C; --on-ink-muted: #4A3B28; --ink-hover: #FFF6E6; --raised: #2E251A;
+  --shade: 0 0 0; --speck: #F3E9D8; --speck-a: .35; --speck-far: #FECF0A; --save: #7FD493;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -346,6 +366,13 @@ body.keeper .why { display: none; }
 .sums { display: grid; gap: 3px; font-size: 13.5px; color: var(--muted); }
 .sums div { display: flex; justify-content: space-between; gap: 10px; }
 .sums .disc { color: var(--accent); font-weight: 600; }
+/* above the subtotal: the same cards on TCGplayer, struck through, and what the Chinese prints save */
+.was .num { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.sums .cheaper, .rev tfoot .sub.cheaper td { color: var(--save); font-weight: 700; }
+.sums .sub-l { border-top: 1px dashed var(--line); padding-top: 4px; margin-top: 2px; color: var(--ink); font-weight: 600; }
+.sums .note { font-size: 12px; }
+.cart .promo-row input { height: 40px; padding-block: 0; }
+.cart .promo-row .btn { padding-block: 0; height: 40px; }
 .tot { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .tot b { font-size: 18px; }
 .foot-row { display: flex; justify-content: space-between; align-items: center; }
@@ -354,25 +381,26 @@ body.keeper .why { display: none; }
 
 /* the list: a drawer from the right (a bottom sheet on phones), opened from the round button */
 .cart { position: fixed; z-index: 41; top: 14px; right: 14px; bottom: 14px; width: min(400px, calc(100% - 28px)); border: 2px solid var(--ink); border-radius: 22px;
-  transform: translateX(calc(100% + 30px)); visibility: hidden; transition: transform .26s ease, visibility 0s linear .26s; box-shadow: 0 18px 50px rgb(58 31 1 / .3); }
+  transform: translateX(calc(100% + 30px)); visibility: hidden; transition: transform .26s ease, visibility 0s linear .26s; box-shadow: 0 18px 50px rgb(var(--shade) / .3); }
 .cart.open { transform: none; visibility: visible; transition: transform .26s ease; }
-.scrim { display: none; position: fixed; inset: 0; z-index: 40; background: rgb(58 31 1 / .35); }
+.scrim { display: none; position: fixed; inset: 0; z-index: 40; background: rgb(var(--shade) / .35); }
 .scrim.open { display: block; }
 @media (max-width: 640px) {
   .cart { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 88vh; max-height: 88dvh; border-width: 2px 0 0; border-radius: 22px 22px 0 0;
     transform: translateY(105%); padding-bottom: env(safe-area-inset-bottom, 0px); }
 }
 .mbar { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 30; }
-.fab { display: flex; align-items: center; gap: 12px; padding: 9px 22px 9px 12px; border: 0; border-radius: 999px; background: #fff; color: var(--ink); cursor: pointer;
-  box-shadow: 0 8px 24px rgb(58 31 1 / .22); text-align: left; max-width: calc(100vw - 36px); }
-.fab:hover { box-shadow: 0 10px 28px rgb(58 31 1 / .3); }
-.fab-ic { position: relative; display: grid; place-items: center; width: 42px; height: 42px; flex: none; }
-.fab-n { position: absolute; top: -2px; right: -4px; min-width: 21px; height: 21px; padding: 0 5px; border-radius: 11px; background: var(--yellow); color: var(--ink);
-  font-family: var(--f-display); font-weight: 800; font-size: 13px; display: grid; place-items: center; }
+.fab { display: flex; align-items: center; gap: 12px; padding: 8px 24px 8px 10px; border: 0; border-radius: 999px; background: var(--raised); color: var(--ink); cursor: pointer;
+  box-shadow: 0 8px 24px rgb(var(--shade) / .22); text-align: left; max-width: calc(100vw - 36px); }
+.fab:hover { box-shadow: 0 10px 28px rgb(var(--shade) / .3); }
+.fab-ic { position: relative; display: grid; place-items: center; width: 58px; height: 58px; flex: none; }
+.fab-ic svg { width: 40px; height: 40px; }
+.fab-n { position: absolute; top: -1px; right: -5px; min-width: 25px; height: 25px; padding: 0 6px; border-radius: 13px; background: var(--yellow); color: var(--on-yellow);
+  font-family: var(--f-display); font-weight: 800; font-size: 15px; display: grid; place-items: center; }
 .fab .what { display: grid; line-height: 1.15; min-width: 0; }
 .fab .what b { font-family: var(--f-display); font-size: 17px; font-weight: 700; }
 .fab .what span { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fab.empty { padding: 9px; }
+.fab.empty { padding: 10px; }
 .fab.empty .what { display: none; }
 
 /* dialogs */
@@ -543,24 +571,36 @@ footer { padding-block: 8px 28px; font-size: 12.5px; color: var(--muted); }
 footer { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); text-align: center; }
 .shop { padding-bottom: 8px; }
 /* ---------- the look, after johnnypep.com/shop: paper specks, brown ink, yellow tab, big pills ---------- */
-body { background-color: var(--bg); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='460'%3E%3Cg fill='%233A1F01'%3E%3Ccircle cx='40' cy='60' r='2.4'/%3E%3Ccircle cx='190' cy='30' r='1.6'/%3E%3Ccircle cx='310' cy='96' r='2.8'/%3E%3Ccircle cx='420' cy='40' r='1.8'/%3E%3Ccircle cx='96' cy='180' r='1.5'/%3E%3Ccircle cx='250' cy='210' r='2'/%3E%3Ccircle cx='380' cy='250' r='1.6'/%3E%3Ccircle cx='30' cy='300' r='1.8'/%3E%3Ccircle cx='160' cy='330' r='2.6'/%3E%3Ccircle cx='300' cy='380' r='1.5'/%3E%3Ccircle cx='440' cy='400' r='2.2'/%3E%3Ccircle cx='80' cy='430' r='1.6'/%3E%3C/g%3E%3Cg fill='none' stroke='%233A1F01' stroke-width='2.6'%3E%3Cellipse cx='350' cy='170' rx='6' ry='4.4' transform='rotate(-20 350 170)'/%3E%3Cellipse cx='120' cy='260' rx='5' ry='6.5' transform='rotate(15 120 260)'/%3E%3Cellipse cx='230' cy='440' rx='4.5' ry='3.4'/%3E%3C/g%3E%3C/svg%3E"); }
+body { background-color: var(--bg); }
+/* The paper's specks sit on two layers behind the page that slide with it, slower than the goods: the near specks at about
+   half the scroll, the far hexagons and sparkles slower still and a little sideways (moveBg). The ink comes from --speck. */
+.bgfx { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.bgfx i { position: absolute; left: 0; top: 0; width: calc(100% + var(--n)); height: calc(100% + var(--n)); will-change: transform;
+  -webkit-mask-size: var(--n) var(--n); mask-size: var(--n) var(--n); }
+.bg-near { --n: 460px; background: var(--speck); opacity: var(--speck-a); -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='460'%3E%3Cg%3E%3Ccircle cx='40' cy='60' r='2.4'/%3E%3Ccircle cx='190' cy='30' r='1.6'/%3E%3Ccircle cx='310' cy='96' r='2.8'/%3E%3Ccircle cx='420' cy='40' r='1.8'/%3E%3Ccircle cx='96' cy='180' r='1.5'/%3E%3Ccircle cx='250' cy='210' r='2'/%3E%3Ccircle cx='380' cy='250' r='1.6'/%3E%3Ccircle cx='30' cy='300' r='1.8'/%3E%3Ccircle cx='160' cy='330' r='2.6'/%3E%3Ccircle cx='300' cy='380' r='1.5'/%3E%3Ccircle cx='440' cy='400' r='2.2'/%3E%3Ccircle cx='80' cy='430' r='1.6'/%3E%3C/g%3E%3Cg fill='none' stroke='%23000' stroke-width='2.6'%3E%3Cellipse cx='350' cy='170' rx='6' ry='4.4' transform='rotate(-20 350 170)'/%3E%3Cellipse cx='120' cy='260' rx='5' ry='6.5' transform='rotate(15 120 260)'/%3E%3Cellipse cx='230' cy='440' rx='4.5' ry='3.4'/%3E%3C/g%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='460'%3E%3Cg%3E%3Ccircle cx='40' cy='60' r='2.4'/%3E%3Ccircle cx='190' cy='30' r='1.6'/%3E%3Ccircle cx='310' cy='96' r='2.8'/%3E%3Ccircle cx='420' cy='40' r='1.8'/%3E%3Ccircle cx='96' cy='180' r='1.5'/%3E%3Ccircle cx='250' cy='210' r='2'/%3E%3Ccircle cx='380' cy='250' r='1.6'/%3E%3Ccircle cx='30' cy='300' r='1.8'/%3E%3Ccircle cx='160' cy='330' r='2.6'/%3E%3Ccircle cx='300' cy='380' r='1.5'/%3E%3Ccircle cx='440' cy='400' r='2.2'/%3E%3Ccircle cx='80' cy='430' r='1.6'/%3E%3C/g%3E%3Cg fill='none' stroke='%23000' stroke-width='2.6'%3E%3Cellipse cx='350' cy='170' rx='6' ry='4.4' transform='rotate(-20 350 170)'/%3E%3Cellipse cx='120' cy='260' rx='5' ry='6.5' transform='rotate(15 120 260)'/%3E%3Cellipse cx='230' cy='440' rx='4.5' ry='3.4'/%3E%3C/g%3E%3C/svg%3E"); }
+.bg-far { --n: 640px; background: var(--speck-far); opacity: calc(var(--speck-a) * .32); -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cg fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M120 70l26 15v30l-26 15-26-15V85z'/%3E%3Cpath d='M470 330l18 10.5v21L470 372l-18-10.5v-21z'/%3E%3Cpath d='M250 520l13 7.5v15L250 550l-13-7.5v-15z'/%3E%3Cpath d='M560 90v18M551 99h18M60 400v14M53 407h14M380 180v12M374 186h12M600 560v16M592 568h16'/%3E%3Ccircle cx='300' cy='260' r='9'/%3E%3Ccircle cx='160' cy='300' r='4'/%3E%3Ccircle cx='520' cy='470' r='5'/%3E%3Cpath d='M20 600c14-10 30-10 40 4M400 40c12-8 26-6 34 4'/%3E%3C/g%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cg fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M120 70l26 15v30l-26 15-26-15V85z'/%3E%3Cpath d='M470 330l18 10.5v21L470 372l-18-10.5v-21z'/%3E%3Cpath d='M250 520l13 7.5v15L250 550l-13-7.5v-15z'/%3E%3Cpath d='M560 90v18M551 99h18M60 400v14M53 407h14M380 180v12M374 186h12M600 560v16M592 568h16'/%3E%3Ccircle cx='300' cy='260' r='9'/%3E%3Ccircle cx='160' cy='300' r='4'/%3E%3Ccircle cx='520' cy='470' r='5'/%3E%3Cpath d='M20 600c14-10 30-10 40 4M400 40c12-8 26-6 34 4'/%3E%3C/g%3E%3C/svg%3E"); }
 h1, h2, h3 { font-family: var(--f-display); font-weight: 700; letter-spacing: .005em; }
 a { color: var(--ink); }
 
 /* header: language and LINE on the sides, the shop's yellow tab hanging from the top in the middle */
 .top { position: relative; background: none; border-bottom: 0; }
 .top-row { position: relative; justify-content: space-between; align-items: flex-start; min-height: 112px; padding-block: 14px 0; }
-.badge { position: absolute; left: 50%; top: 0; transform: translateX(-50%); display: grid; justify-items: center; text-decoration: none; color: var(--ink); }
+.badge { position: absolute; left: 50%; top: 0; transform: translateX(-50%); display: grid; justify-items: center; text-decoration: none; color: var(--on-yellow); }
 .badge-bar { display: flex; align-items: center; gap: 14px; background: var(--yellow); border-radius: 0 0 12px 12px; padding: 12px 18px 12px; min-width: 330px; justify-content: space-between;
   font-family: var(--f-display); font-weight: 800; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
-.badge-bar i { flex: 1; height: 9px; border-block: 2px solid var(--ink); position: relative; min-width: 60px; }
-.badge-bar i::after { content: ""; position: absolute; left: 0; right: 0; top: 1.5px; border-top: 2px solid var(--ink); }
+.badge-bar i { flex: 1; height: 9px; border-block: 2px solid currentColor; position: relative; min-width: 60px; }
+.badge-bar i::after { content: ""; position: absolute; left: 0; right: 0; top: 1.5px; border-top: 2px solid currentColor; }
 .badge-disc { display: grid; place-items: center; width: 180px; height: 82px; margin-top: -2px; background: var(--yellow); border-radius: 0 0 90px 90px; padding-bottom: 8px; }
 .badge:hover .badge-disc svg { transform: rotate(-8deg); }
 .badge-disc svg { transition: transform .2s ease; }
-.top .seg, #addFriend { margin-top: 6px; }
+.top .seg, #addFriend, #themeBtn { margin-top: 6px; }
+.top-r { display: flex; align-items: flex-start; gap: 8px; }
+#themeBtn { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 2px solid var(--ink); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
+#themeBtn:hover { background: var(--accent-soft); }
+#themeBtn .sun, :root[data-dark] #themeBtn .moon { display: none; }
+:root[data-dark] #themeBtn .sun { display: block; }
 .btn.pill, .seg { border-radius: 999px; }
-#addFriend { background: #fff; border: 0; box-shadow: 0 4px 14px rgb(58 31 1 / .14); padding: 8px 14px; }
+#addFriend { background: var(--raised); border: 0; box-shadow: 0 4px 14px rgb(var(--shade) / .14); padding: 8px 14px; }
 @media (max-width: 640px) {
   .top-row { min-height: 96px; }
   .badge-bar { min-width: 0; gap: 8px; padding: 9px 12px; font-size: 11px; }
@@ -579,7 +619,7 @@ a { color: var(--ink); }
 .hero-p { font-family: var(--f-display); font-weight: 600; font-size: 19px; max-width: 44ch; line-height: 1.25; }
 .doodle { width: clamp(150px, 22vw, 250px); height: auto; color: var(--ink); transform: rotate(6deg); }
 .steps { gap: 6px 20px; font-size: 14px; color: var(--ink); margin-top: 4px; }
-.steps b { background: var(--ink); color: #fff; font-family: var(--f-display); font-size: 13px; width: 24px; height: 24px; }
+.steps b { background: var(--ink); color: var(--on-ink); font-family: var(--f-display); font-size: 13px; width: 24px; height: 24px; }
 @media (max-width: 640px) { .hero { grid-template-columns: minmax(0, 1fr); } .doodle { display: none; } .hero-p { font-size: 17px; } }
 body.keeper .hero { display: none; }
 
@@ -587,50 +627,50 @@ body.keeper .hero { display: none; }
 .tabs.pills { justify-content: center; gap: 10px; padding-block: 18px 10px; flex-wrap: wrap; overflow: visible; }
 .tabs.pills a { border: 2px solid var(--ink); border-radius: 999px; padding: 13px 30px; font-family: var(--f-display); font-weight: 700; font-size: 21px; line-height: 1.1; color: var(--ink); background: transparent; }
 .tabs.pills a:hover { background: var(--accent-soft); }
-.tabs.pills a[aria-current="page"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tabs.pills a[aria-current="page"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
 @media (max-width: 640px) { .tabs.pills { gap: 6px; padding-top: 10px; } .tabs.pills a { padding: 9px 16px; font-size: 16px; } }
 .btn { border: 2px solid var(--ink); background: transparent; border-radius: 999px; font-family: var(--f-display); font-weight: 700; font-size: 16px; padding: 8px 18px; color: var(--ink); }
 .btn:hover { border-color: var(--ink); background: var(--accent-soft); }
-.btn.primary { background: var(--ink); color: #fff; }
-.btn.primary:hover { background: #57320A; filter: none; }
+.btn.primary { background: var(--ink); color: var(--on-ink); }
+.btn.primary:hover { background: var(--ink-hover); filter: none; }
 .btn.line { border-color: var(--line-green); }
 .btn.sm { padding: 5px 12px; font-size: 14px; }
 .btn.link { border: 0; background: none; padding: 2px 4px; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-.btn.link:hover { background: none; color: #6B3D0B; }
+.btn.link:hover { background: none; color: var(--ink-hover); }
 .btn.block { font-size: 18px; padding-block: 12px; }
 .seg { border: 2px solid var(--ink); }
 .seg button { background: transparent; font-family: var(--f-display); font-weight: 700; font-size: 14px; padding: 5px 12px; }
 .seg button + button { border-left: 2px solid var(--ink); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
 input[type=text], input[type=search], input[type=password], select, textarea { background: var(--panel); border: 2px solid var(--ink); border-radius: 12px; }
 .dom { border: 2px solid var(--ink); background: transparent; font-family: var(--f-display); font-weight: 700; font-size: 15px; padding: 6px 16px; }
-.dom[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
-.dom[aria-pressed="true"] i { box-shadow: 0 0 0 2px #fff; }
+.dom[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.dom[aria-pressed="true"] i { box-shadow: 0 0 0 2px var(--on-ink); }
 .filters { background: none; border: 0; padding: 0; }
 .qbox .q, .frow .q { border-radius: 999px; height: 50px; font-size: 16px; }
 .dd-btn, .tsel, .domset, .ibtn { border: 2px solid var(--ink); border-radius: 999px; background: var(--panel); font-family: var(--f-display); font-weight: 700; font-size: 15px; height: 40px; color: var(--ink); }
 .ibtn { width: 40px; color: var(--ink); }
 .tsel { padding: 0 32px 0 14px; }
 .dd-btn { padding: 0 14px; }
-.dd-btn.on, .tsel.on { background: var(--ink); color: #fff; border-color: var(--ink); }
-.dd-btn.on::after { border-color: #fff; }
+.dd-btn.on, .tsel.on { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.dd-btn.on::after { border-color: var(--on-ink); }
 .vseg { border: 2px solid var(--ink); border-radius: 999px; }
 .vseg .ibtn { border: 0; height: 36px; background: var(--panel); }
-.vseg .ibtn[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.vseg .ibtn[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
 .domset { padding: 0 6px; }
 .domset button { border-radius: 50%; }
 .dd-menu { border: 2px solid var(--ink); border-radius: 16px; background: var(--panel); }
 .dd-menu input { accent-color: var(--ink); }
 .allf { font-family: var(--f-display); font-weight: 700; font-size: 16px; text-decoration: none; }
-.nb { background: var(--yellow); color: var(--ink); font-weight: 800; }
+.nb { background: var(--yellow); color: var(--on-yellow); font-weight: 800; }
 .fmore { border-top: 2px dashed var(--line); }
 .resbar { font-family: var(--f-display); font-weight: 600; font-size: 15px; color: var(--muted); }
 
 /* deck levels and shelves */
 .lvl { background: var(--panel); border: 2px solid var(--ink); border-top: 8px solid var(--lc); border-radius: 18px; }
-.lvl:hover { border-color: var(--ink); border-top-color: var(--lc); background: #fff; }
-.lvl[aria-pressed="true"] { background: var(--ink); color: #fff; box-shadow: none; }
-.lvl[aria-pressed="true"] .for, .lvl[aria-pressed="true"] .n { color: #E9DCC8; }
+.lvl:hover { border-color: var(--ink); border-top-color: var(--lc); background: var(--raised); }
+.lvl[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.lvl[aria-pressed="true"] .for, .lvl[aria-pressed="true"] .n { color: var(--on-ink-muted); }
 .lvl b { font-size: 24px; font-weight: 800; }
 .lvl .num { font-size: 16px; }
 .shelf-h h2 { font-size: 30px; font-weight: 800; }
@@ -638,7 +678,7 @@ input[type=text], input[type=search], input[type=password], select, textarea { b
 .why { background: var(--panel); border: 2px solid var(--ink); border-radius: 22px; }
 .why h2 { font-size: 28px; font-weight: 800; }
 .why li b { font-family: var(--f-display); font-size: 18px; }
-.why li svg { background: var(--yellow); color: var(--ink); }
+.why li svg { background: var(--yellow); color: var(--on-yellow); }
 .tl-head h2 { font-size: 34px; font-weight: 800; }
 .tl { border: 2px solid var(--ink); border-radius: 18px; overflow: hidden; background: var(--panel); }
 .tl-tier { font-size: 22px; }
@@ -649,11 +689,11 @@ input[type=text], input[type=search], input[type=password], select, textarea { b
 .cards { gap: 34px 22px; }
 .tile { text-align: center; gap: 4px; }
 .tile .picbox { margin-bottom: 8px; }
-.pic .cimg { box-shadow: 0 6px 16px rgb(58 31 1 / .16); }
-.pic:hover .cimg { transform: translateY(-4px) rotate(-1deg); box-shadow: 0 12px 24px rgb(58 31 1 / .24); }
-.tile.in .pic .cimg { box-shadow: 0 0 0 3px var(--ink), 0 8px 18px rgb(58 31 1 / .2); }
-.info { top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 8px; background: var(--ink); box-shadow: 0 3px 8px rgb(58 31 1 / .3); }
-.info:hover { background: #57320A; }
+.pic .cimg { box-shadow: 0 6px 16px rgb(var(--shade) / .16); }
+.pic:hover .cimg { transform: translateY(-4px) rotate(-1deg); box-shadow: 0 12px 24px rgb(var(--shade) / .24); }
+.tile.in .pic .cimg { box-shadow: 0 0 0 3px var(--ink), 0 8px 18px rgb(var(--shade) / .2); }
+.info { top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 8px; background: var(--ink); color: var(--on-ink); box-shadow: 0 3px 8px rgb(var(--shade) / .3); }
+.info:hover { background: var(--ink-hover); }
 .tile .buy { order: 1; justify-content: center; min-height: 0; }
 .tile .nm { order: 2; font-size: 17px; min-height: 0; -webkit-line-clamp: 2; }
 .tile .nm.pnm { font-family: var(--f-display); font-weight: 700; font-size: 21px; line-height: 1.1; }  /* decks and products: Univers, like the rest of the shop */
@@ -662,11 +702,12 @@ input[type=text], input[type=search], input[type=password], select, textarea { b
 .tile .desc { order: 5; margin-top: 0; }
 .tile .tcg { order: 6; justify-content: center; margin-top: 2px; }
 .tile .price { font-size: 20px; }
-.save { background: var(--ink); color: #fff; border-radius: 4px; padding: 2px 7px; font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .02em; }
+.save { background: var(--ink); color: var(--on-ink); border-radius: 4px; padding: 2px 7px; font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .02em; }
 .tag { background: var(--accent-soft); color: var(--ink); }
-.tag[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.tag[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
 .left { color: var(--warn); }
-.step.onpic { background: var(--ink); border-color: var(--ink); backdrop-filter: none; box-shadow: 0 6px 16px rgb(58 31 1 / .35); }
+.step.onpic { background: var(--ink); border-color: var(--ink); backdrop-filter: none; box-shadow: 0 6px 16px rgb(var(--shade) / .35); }
+.step.onpic button, .step.onpic .qn { color: var(--on-ink); }
 .step.onpic .qn { font-size: 17px; }
 .cards.list { background: var(--panel); border: 2px solid var(--ink); border-radius: 18px; }
 .cards.list .tile { text-align: left; }
@@ -682,18 +723,19 @@ input[type=text], input[type=search], input[type=password], select, textarea { b
 .tot b { font-size: 24px; font-family: var(--f-display); }
 .tot span { font-family: var(--f-display); font-weight: 700; font-size: 18px; }
 .step { border: 2px solid var(--ink); }
-dialog::backdrop { background: rgb(58 31 1 / .45); }
+dialog::backdrop { background: rgb(var(--shade) / .45); }
 .dlg { border: 2px solid var(--ink); border-radius: 22px; background: var(--panel); }
 .dinfo h2.cname { font-size: 28px; }
 .ctext, .tcgbox, .how { background: var(--bg); border-radius: 12px; }
-.promo-on { background: var(--yellow); color: var(--ink); border-radius: 999px; }
+.promo-on { background: var(--yellow); color: var(--on-yellow); border-radius: 999px; }
 details.policy { border: 2px solid var(--ink); border-radius: 16px; }
-.toast { background: var(--ink); color: #fff; font-family: var(--f-display); font-size: 16px; }
+.toast { background: var(--ink); color: var(--on-ink); font-family: var(--f-display); font-size: 16px; }
 footer { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
+<div class="bgfx" aria-hidden="true"><i class="bg-far" id="bgFar"></i><i class="bg-near" id="bgNear"></i></div>
 <header class="top" id="top">
   <div class="wrap top-row">
     <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div>
@@ -701,7 +743,10 @@ footer { color: var(--muted); }
       <span class="badge-bar"><span>Riftbound</span><i aria-hidden="true"></i><span>Card shop</span></span>
       <span class="badge-disc"><svg width="58" height="58" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 27.5 9v14L16 29.5 4.5 23V9z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 8.5v15M10.5 12.2l5.5 3.6 5.5-3.6M10.5 19.8l5.5-3.6 5.5 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </a>
-    <a class="btn sm pill" id="addFriend" target="_blank" rel="noopener" data-t-label="addFriend" hidden><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9l-.6 2.7c-.1.5.4.8.8.6 2.7-1.6 6.4-4 8.4-6.2C20.9 14.6 22 12.9 22 11c0-4.4-4.5-8-10-8Z" fill="var(--line-green)"/></svg><span data-t="addFriend"></span></a>
+    <div class="top-r">
+      <button type="button" id="themeBtn" data-t-label="themeDark"><svg class="moon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><svg class="sun" width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <a class="btn sm pill" id="addFriend" target="_blank" rel="noopener" data-t-label="addFriend" hidden><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9l-.6 2.7c-.1.5.4.8.8.6 2.7-1.6 6.4-4 8.4-6.2C20.9 14.6 22 12.9 22 11c0-4.4-4.5-8-10-8Z" fill="var(--line-green)"/></svg><span data-t="addFriend"></span></a>
+    </div>
   </div>
   <div class="wrap hero">
     <div class="hero-text">
@@ -790,10 +835,14 @@ footer { color: var(--muted); }
     </div>
     <ul class="lines" id="lines"></ul>
     <div class="cart-foot">
+      <div class="promo" id="promo">
+        <div class="promo-row" id="promoRow"><input type="text" id="promoIn" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" data-t-ph="promoPh" data-t-label="promoLabel"><button type="button" class="btn" id="promoApply" data-t="promoApply"></button></div>
+        <div class="promo-on" id="promoOn" hidden></div>
+        <div class="small" id="promoMsg" role="status"></div>
+      </div>
       <div class="sums" id="cartSums"></div>
       <div class="tot"><span data-t="total"></span><b class="num" id="cartTotal"></b></div>
       <div class="small muted" id="cartUnpriced" hidden></div>
-      <div class="small ok-t" id="cartSave" hidden></div>
       <button type="button" class="btn primary block" id="toReview" data-t="review"></button>
       <div class="foot-row"><button type="button" class="btn link small" id="clearCart" data-t="clear"></button></div>
     </div>
@@ -815,12 +864,6 @@ footer { color: var(--muted); }
     <div class="dlg-head"><h2 id="revTitle" data-t="reviewTitle"></h2><span class="ref num" id="revRef"></span>
       <button type="button" class="x" data-close data-t-label="close"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
     <div id="revList"></div>
-    <div class="promo">
-      <label class="field" for="promoIn"><span data-t="promoLabel"></span></label>
-      <div class="promo-row" id="promoRow"><input type="text" id="promoIn" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" data-t-ph="promoPh"><button type="button" class="btn" id="promoApply" data-t="promoApply"></button></div>
-      <div class="promo-on" id="promoOn" hidden></div>
-      <div class="small" id="promoMsg" role="status"></div>
-    </div>
     <details class="policy"><summary data-t="policyTitle"></summary><div class="policy-body"></div></details>
     <div class="two">
       <label class="field"><span data-t="yourName"></span><input type="text" id="who" autocomplete="name" maxlength="80"></label>
@@ -901,7 +944,8 @@ const LANG = {
     tcgSave: (n, a) => `You save ${n}% (${a})`, tcgN: 'Normal',
     tcgNote: (d, r) => `TCGplayer market price in US dollars${d ? ` on ${d}` : ''}, at 1 USD = ${r}. A guide: real prices depend on condition and shipping.`,
     tcgDeckNote: 'Each card counted at its cheapest printing on TCGplayer.', tcgMissing: n => `${n} card${n === 1 ? ' has' : 's have'} no TCGplayer price and ${n === 1 ? 'isn’t' : 'aren’t'} counted.`,
-    kHidden: n => n > 0 ? `Hidden · ${n}% above` : 'Hidden · same price', cartSave: a => `You save ${a} compared with TCGplayer`, pDeckTcg: v => `TCGplayer value ${v}`,
+    kHidden: n => n > 0 ? `Hidden · ${n}% above` : 'Hidden · same price', cartTcg: 'TCGplayer price (English)', cartCheaper: 'Chinese print saves you', cartTcgMiss: n => `${n} item${n === 1 ? ' has' : 's have'} no TCGplayer price and ${n === 1 ? 'is' : 'are'} counted at our price.`,
+    themeDark: 'Dark mode', themeLight: 'Light mode', pDeckTcg: v => `TCGplayer value ${v}`,
     why3h: '100% genuine', why3: 'Guaranteed real product, from a certified shop.',
     why4h: 'Easy to read', why4: 'Every deck here shows its cards in English, so you know what each one does.',
     dvOpen: 'See the whole deck on one page', dvMain: n => `${n} cards`, dvSide: 'Sideboard', dvPng: 'Save as image', dvMaking: 'Making the image…',
@@ -955,10 +999,9 @@ const LANG = {
     // The shipping and return policy (ship: the shipping cost, or '' when it's free). Change it to match how you work.
     policyTitle: 'Shipping and returns',
     policy: ship => `<h3>Shipping</h3><ul><li>${ship ? `${ship} per order, anywhere in Thailand.` : 'Free, anywhere in Thailand.'}</li>
-      <li>We confirm your order on LINE and send you how to pay. Your cards ship within 2 working days of payment, and we send you the tracking number.</li>
+      <li>We confirm your order on LINE and send you how to pay. Your cards ship within 10 days of payment, and we send you the tracking number.</li>
       <li>Cards are packed with care so they arrive flat and undamaged.</li></ul>
       <h3>Returns</h3><ul><li><b>Wrong or damaged card:</b> tell us on LINE within 7 days of delivery, with photos (an unboxing video helps). We send the right card or refund you, and we pay the shipping.</li>
-      <li><b>Changed your mind:</b> send it back within 7 days of delivery, unplayed and as it arrived, and we refund the price of the cards once they reach us. You pay the return shipping.</li>
       <li>Refunds go back the way you paid, within 7 days of the return reaching us.</li></ul>
       <p class="muted">Questions? Message us on LINE before you order.</p>`,
     countItems: n => `${n} item${n === 1 ? '' : 's'}`, toPriceItems: n => `+ ${n} item${n === 1 ? '' : 's'} to be priced`, resultsItems: n => `${n.toLocaleString('en-US')} item${n === 1 ? '' : 's'}`,
@@ -1027,7 +1070,8 @@ const LANG = {
     tcgSave: (n, a) => `ประหยัด ${n}% (${a})`, tcgN: 'ปกติ',
     tcgNote: (d, r) => `ราคาตลาด TCGplayer เป็นดอลลาร์สหรัฐ${d ? ` วันที่ ${d}` : ''} คิดที่ 1 USD = ${r} ใช้เป็นแนวทาง ราคาจริงขึ้นกับสภาพการ์ดและค่าส่ง`,
     tcgDeckNote: 'คิดการ์ดแต่ละใบจากเวอร์ชันที่ถูกที่สุดบน TCGplayer', tcgMissing: n => `การ์ด ${n} ใบไม่มีราคาบน TCGplayer จึงไม่ได้นับรวม`,
-    kHidden: n => n > 0 ? `ซ่อน · แพงกว่า ${n}%` : 'ซ่อน · ราคาเท่ากัน', cartSave: a => `ประหยัดกว่า TCGplayer ${a}`, pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
+    kHidden: n => n > 0 ? `ซ่อน · แพงกว่า ${n}%` : 'ซ่อน · ราคาเท่ากัน', cartTcg: 'ราคาบน TCGplayer (ภาษาอังกฤษ)', cartCheaper: 'ประหยัดกว่าด้วยการ์ดจีน', cartTcgMiss: n => `มี ${n} ชิ้นที่ไม่มีราคาบน TCGplayer คิดตามราคาร้าน`,
+    themeDark: 'โหมดมืด', themeLight: 'โหมดสว่าง', pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
     why3h: 'ของแท้ 100%', why3: 'รับประกันสินค้าของแท้ จากร้านที่ได้รับการรับรอง',
     why4h: 'อ่านง่าย', why4: 'ทุกเด็คในร้านแสดงการ์ดเป็นภาษาอังกฤษ จึงรู้ว่าการ์ดแต่ละใบทำอะไร',
     dvOpen: 'ดูการ์ดทั้งเด็คในหน้าเดียว', dvMain: n => `${n} ใบ`, dvSide: 'Sideboard', dvPng: 'บันทึกเป็นรูปภาพ', dvMaking: 'กำลังสร้างรูป…',
@@ -1079,11 +1123,9 @@ const LANG = {
     promoMin: m => `โค้ดนี้ใช้ได้เมื่อสั่งซื้อตั้งแต่ ${m} ขึ้นไป (ไม่รวมค่าส่ง)`, promoPct: n => `ลด ${n}%`, promoAmt: m => `ลด ${m}`, promoShip: 'ส่งฟรี',
     policyTitle: 'การจัดส่งและการคืนสินค้า',
     policy: ship => `<h3>การจัดส่ง</h3><ul><li>${ship ? `ค่าส่ง ${ship} ต่อคำสั่งซื้อ ส่งได้ทั่วประเทศไทย` : 'ส่งฟรีทั่วประเทศไทย'}</li>
-      <li>ร้านยืนยันคำสั่งซื้อและแจ้งวิธีชำระเงินทาง LINE จัดส่งภายใน 2 วันทำการหลังชำระเงิน พร้อมแจ้งเลขพัสดุ</li>
+      <li>ร้านยืนยันคำสั่งซื้อและแจ้งวิธีชำระเงินทาง LINE จัดส่งภายใน 10 วันหลังชำระเงิน พร้อมแจ้งเลขพัสดุ</li>
       <li>แพ็กการ์ดอย่างดี ถึงมือเรียบร้อย ไม่งอ ไม่เสียหาย</li></ul>
-      <h3>การคืนสินค้า</h3><ul><li><b>ได้การ์ดผิดหรือการ์ดเสียหาย:</b> แจ้งร้านทาง LINE ภายใน 7 วันหลังได้รับสินค้า พร้อมรูปถ่าย (มีคลิปตอนแกะพัสดุจะดีมาก) ร้านจะส่งการ์ดที่ถูกต้องให้หรือคืนเงิน โดยร้านออกค่าส่งให้</li>
-      <li><b>เปลี่ยนใจ:</b> ส่งคืนได้ภายใน 7 วันหลังได้รับสินค้า การ์ดต้องยังไม่ได้ใช้เล่นและอยู่ในสภาพเดิม ร้านคืนเงินค่าการ์ดเมื่อได้รับของคืน ผู้ซื้อออกค่าส่งคืนเอง</li>
-      <li>คืนเงินทางช่องทางเดียวกับที่ชำระ ภายใน 7 วันหลังร้านได้รับของคืน</li></ul>
+      <h3>การคืนสินค้า</h3><ul><li><b>ได้การ์ดผิดหรือการ์ดเสียหาย:</b> แจ้งร้านทาง LINE ภายใน 7 วันหลังได้รับสินค้า พร้อมรูปถ่าย (มีคลิปตอนแกะพัสดุจะดีมาก) ร้านจะส่งการ์ดที่ถูกต้องให้หรือคืนเงิน โดยร้านออกค่าส่งให้</li>      <li>คืนเงินทางช่องทางเดียวกับที่ชำระ ภายใน 7 วันหลังร้านได้รับของคืน</li></ul>
       <p class="muted">มีคำถาม? ทักร้านทาง LINE ก่อนสั่งได้เลย</p>`,
     countItems: n => `${n} ชิ้น`, toPriceItems: n => `+ อีก ${n} ชิ้นรอแจ้งราคา`, resultsItems: n => `${n.toLocaleString('en-US')} รายการ`,
     review: 'ตรวจรายการและส่ง', clear: 'ล้างรายการ', clearAsk: 'ลบการ์ดทั้งหมดออกจากรายการใช่ไหม', close: 'ปิด',
@@ -1762,6 +1804,18 @@ function bill(items) {
   return { ...s, disc, ship, freeShip: on && p.ship, short: !!p && !on, grand: s.total - disc + ship };
 }
 const shipText = b => b.ship ? money(b.ship) : t('free');
+// Above the subtotal: what the same priced items cost on TCGplayer, struck through, and how much less they cost here.
+// Items TCGplayer has no price for count at the shop's price, so the two lines still add up to the subtotal.
+// null when nothing compares, or the list isn't cheaper here.
+function listVsTcg(items) {
+  let tcg = 0, total = 0, hit = 0, miss = 0;
+  items.forEach(({ x, q }) => {
+    if (x.price == null) return;
+    const v = tcgValue(x); total += x.price * q;
+    if (v) { tcg += v.thb * q; hit += q; } else { tcg += x.price * q; miss += q; }
+  });
+  return hit && tcg > total ? { tcg, save: tcg - total, miss } : null;
+}
 const promoText = p => [p.pct ? t('promoPct', p.pct) : p.amt ? t('promoAmt', money(p.amt)) : '', p.ship ? t('promoShip') : ''].filter(Boolean).join(' + ');
 function addOne(key) {
   const x = DB.byKey.get(key), n = inCart(key); if (!x || x.qty === 0) return;
@@ -1786,18 +1840,18 @@ function renderCart() {
       <div class="amt num">${x.price != null ? money(x.price * q) : `<span class="ask">${t('askPrice')}</span>`}</div>
       <div class="s">${esc(itemRef(x))}${x.price != null && q > 1 ? ' · ' + money(x.price) + ' ×' + q : ''}</div>
       ${stepper(x, q)}</li>`).join('') : `<li class="empty">${t('empty')}</li>`;
-  $('#cartSums').hidden = !s.count;
-  $('#cartSums').innerHTML = `<div><span>${t('subtotal')}</span><span class="num">${s.priced ? money(s.total) : '—'}</span></div>`
+  const vs = listVsTcg(items);
+  $('#cartSums').hidden = $('#promo').hidden = !s.count;
+  $('#cartSums').innerHTML = (vs ? `<div class="was"><span>${t('cartTcg')}</span><span class="num">${money(vs.tcg)}</span></div>`
+      + `<div class="cheaper"><span>${t('cartCheaper')}</span><span class="num">−${money(vs.save)}</span></div>` : '')
+    + `<div${vs ? ' class="sub-l"' : ''}><span>${t('subtotal')}</span><span class="num">${s.priced ? money(s.total) : '—'}</span></div>`
     + (s.disc ? `<div class="disc"><span>${t('promo')} ${esc(S.promo.code)}</span><span class="num">−${money(s.disc)}</span></div>` : '')
-    + `<div><span>${t('shipping')}</span><span class="num">${shipText(s)}</span></div>`;
+    + `<div><span>${t('shipping')}</span><span class="num">${shipText(s)}</span></div>`
+    + (vs && vs.miss ? `<p class="note">${t('cartTcgMiss', vs.miss)}</p>` : '');
+  renderPromo(s);
   $('#cartTotal').textContent = s.priced ? money(s.grand) : s.count ? '—' : money(0);
   $('#cartUnpriced').hidden = !s.unpriced;
   $('#cartUnpriced').textContent = counted('toPrice', s.unpriced, items);
-  // What the same priced items would cost on TCGplayer, when the list comes out cheaper here.
-  const vs = items.map(({ x, q }) => ({ v: tcgValue(x), x, q })).filter(i => i.v && i.x.price != null);
-  const saved = vs.reduce((a, i) => a + (i.v.thb - i.x.price) * i.q, 0);
-  $('#cartSave').hidden = !(saved > 0);
-  $('#cartSave').textContent = saved > 0 ? t('cartSave', money(saved)) : '';
   $('#toReview').disabled = !s.count;
   $('#clearCart').hidden = !s.count;
   $('#mbCount').textContent = s.count ? counted('count', s.count, items) : t('myList');
@@ -1835,18 +1889,19 @@ function orderText() {
   return L.join('\n');
 }
 function renderReview() {
-  const items = cartItems(), s = bill(items);
+  const items = cartItems(), s = bill(items), vs = listVsTcg(items);
   $('#revRef').textContent = '#' + S.ref;
   $('#revList').innerHTML = items.length ? `<table class="rev"><tbody>${items.map(({ x, q }) => `<tr>
       <td>${esc(nameOf(x))}<div class="small muted">${esc(itemRef(x))}${x.price != null && q > 1 ? ' · ' + money(x.price) + ' ×' + q : ''}</div></td>
       <td class="r num">×${q}</td><td class="r num">${x.price != null ? money(x.price * q) : `<span class="ask">${t('askPrice')}</span>`}</td></tr>`).join('')}</tbody>
-      <tfoot><tr class="sub"><td>${t('subtotal')}</td><td class="r num">${s.count}</td><td class="r num">${s.priced ? money(s.total) : '—'}</td></tr>
+      <tfoot>${vs ? `<tr class="sub was"><td colspan="2">${t('cartTcg')}</td><td class="r num">${money(vs.tcg)}</td></tr>
+      <tr class="sub cheaper"><td colspan="2">${t('cartCheaper')}</td><td class="r num">−${money(vs.save)}</td></tr>` : ''}
+      <tr class="sub"><td>${t('subtotal')}</td><td class="r num">${s.count}</td><td class="r num">${s.priced ? money(s.total) : '—'}</td></tr>
       ${s.disc ? `<tr class="sub disc"><td colspan="2">${t('promo')} ${esc(S.promo.code)}</td><td class="r num">−${money(s.disc)}</td></tr>` : ''}
       <tr class="sub${s.freeShip ? ' disc' : ''}"><td colspan="2">${t('shipping')}</td><td class="r num">${shipText(s)}</td></tr>
       <tr class="grand"><th colspan="2">${t('total')}</th><th class="r num">${s.priced ? money(s.grand) : '—'}</th></tr>
       ${s.unpriced ? `<tr><td colspan="3" class="r small muted">${counted('toPrice', s.unpriced, items)}</td></tr>` : ''}</tfoot></table>`
     : `<p class="muted">${t('empty')}</p>`;
-  renderPromo(s);
   const ready = lineReady(), oa = !!SHOP_CONFIG.lineOA.trim(), add = ready ? ` <a href="${esc(lineAddUrl())}" target="_blank" rel="noopener">${t('addFriend')}</a>` : '';
   $('#how').innerHTML = !ready ? `<p>${t('notSetup')}</p>`
     : onPhone ? `<p>${oa ? t('howOA') : esc(t('howId', lineName()))}${add}</p>`
@@ -2100,6 +2155,29 @@ function applyLang() {
   $('#notSetup').hidden = lineReady();
   $('#notSetup').innerHTML = t('notSetup');
   document.querySelectorAll('.policy-body').forEach(el => { el.innerHTML = policyHtml(); });
+}
+// Light or dark: the device's setting until the visitor taps the sun/moon, then theirs (rbshop.theme; the <head> applies it
+// before the page paints). html[data-dark] says which one is showing, for the button's icon.
+const darkQuery = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => (document.documentElement.dataset.theme || (darkQuery.matches ? 'dark' : 'light')) === 'dark';
+function applyTheme() {
+  const root = document.documentElement, dark = isDark(), b = $('#themeBtn');
+  root.toggleAttribute('data-dark', dark);
+  b.dataset.tLabel = dark ? 'themeLight' : 'themeDark';
+  b.setAttribute('aria-label', t(b.dataset.tLabel)); b.title = t(b.dataset.tLabel);
+  $('meta[name="theme-color"]').content = getComputedStyle(root).getPropertyValue('--bg').trim();
+}
+function toggleTheme() {
+  const theme = isDark() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = theme; store.set('rbshop.theme', theme); applyTheme();
+}
+// The background's two layers slide with the page at their own speeds (see .bgfx): [layer, down, sideways, tile size].
+const BG_LAYERS = [[$('#bgNear'), .5, 0, 460], [$('#bgFar'), .22, .07, 640]];
+let bgFrame = 0;
+function moveBg() {
+  bgFrame = 0;
+  const y = scrollY;
+  BG_LAYERS.forEach(([el, dy, dx, n]) => { el.style.transform = `translate3d(${-(y * dx % n)}px, ${-(y * dy % n)}px, 0)`; });
 }
 // ---------- shopkeeper zone (index.html#keeper) ----------
 // Sign in with a Riftcheese account (the same accounts and saved sign-in as riftbound-prep.html), then tap a card to set its
@@ -2709,7 +2787,10 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('focusin', e => { if (e.target.matches('[data-act="qty"]')) e.target.select(); });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-act="qty"]')) { e.preventDefault(); e.target.blur(); } });
-document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; store.set('rbshop.lang', lang); renderAll(); }));
+document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lang; store.set('rbshop.lang', lang); renderAll(); applyTheme(); }));
+$('#themeBtn').addEventListener('click', toggleTheme);
+darkQuery.addEventListener('change', applyTheme);
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) addEventListener('scroll', () => { bgFrame ||= requestAnimationFrame(moveBg); }, { passive: true });
 let qTimer;
 $('#fQ').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.f.q = e.target.value; S.shown = PAGE; renderGrid(); }, 120); });
 // Card filters: each change redraws the bar (counts, labels) and the cards.
@@ -2797,6 +2878,8 @@ document.querySelectorAll('dialog').forEach(d => {
 addEventListener('hashchange', setMode);
 addEventListener('resize', setHead);
 loadCardFonts();
+applyTheme();
+moveBg();
 setHead();
 setMode();
 load();
