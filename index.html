@@ -539,6 +539,9 @@ const SHOP_CONFIG = {
   // TCGplayer market prices (US dollars, with the dollar-to-baht rate), refreshed daily by Riftcheese. Cards and decks show
   // what the same cards cost on TCGplayer, in baht, next to the shop's price. Empty = don't compare.
   tcgPrices: 'https://atiabababa.github.io/riftcheese/cards/prices.json',
+  // true: customers don't see singles that cost the same or more here than on TCGplayer (the shopkeeper zone still shows
+  // them, marked). Prices change daily, so a card comes back by itself once it's cheaper again.
+  hideNotCheaper: true,
 };
 
 const LANG = {
@@ -552,7 +555,7 @@ const LANG = {
     tcgSave: (n, a) => `You save ${n}% (${a})`, tcgN: 'Normal',
     tcgNote: (d, r) => `TCGplayer market price in US dollars${d ? ` on ${d}` : ''}, at 1 USD = ${r}. A guide: real prices depend on condition and shipping.`,
     tcgDeckNote: 'Each card counted at its cheapest printing on TCGplayer.', tcgMissing: n => `${n} card${n === 1 ? ' has' : 's have'} no TCGplayer price and ${n === 1 ? 'isn’t' : 'aren’t'} counted.`,
-    cartSave: a => `You save ${a} compared with TCGplayer`, pDeckTcg: v => `TCGplayer value ${v}`,
+    kHidden: 'Hidden: not cheaper', cartSave: a => `You save ${a} compared with TCGplayer`, pDeckTcg: v => `TCGplayer value ${v}`,
     why3h: '100% genuine', why3: 'Guaranteed real product, from a certified shop.',
     why4h: 'Easy to read', why4: 'Every deck here shows its cards in English, so you know what each one does.',
     dvOpen: 'See the whole deck on one page', dvMain: n => `${n} cards`, dvSide: 'Sideboard', dvPng: 'Save as image', dvMaking: 'Making the image…',
@@ -655,7 +658,7 @@ const LANG = {
     tcgSave: (n, a) => `ประหยัด ${n}% (${a})`, tcgN: 'ปกติ',
     tcgNote: (d, r) => `ราคาตลาด TCGplayer เป็นดอลลาร์สหรัฐ${d ? ` วันที่ ${d}` : ''} คิดที่ 1 USD = ${r} ใช้เป็นแนวทาง ราคาจริงขึ้นกับสภาพการ์ดและค่าส่ง`,
     tcgDeckNote: 'คิดการ์ดแต่ละใบจากเวอร์ชันที่ถูกที่สุดบน TCGplayer', tcgMissing: n => `การ์ด ${n} ใบไม่มีราคาบน TCGplayer จึงไม่ได้นับรวม`,
-    cartSave: a => `ประหยัดกว่า TCGplayer ${a}`, pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
+    kHidden: 'ซ่อนอยู่: ไม่ถูกกว่า', cartSave: a => `ประหยัดกว่า TCGplayer ${a}`, pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
     why3h: 'ของแท้ 100%', why3: 'รับประกันสินค้าของแท้ จากร้านที่ได้รับการรับรอง',
     why4h: 'อ่านง่าย', why4: 'ทุกเด็คในร้านแสดงการ์ดเป็นภาษาอังกฤษ จึงรู้ว่าการ์ดแต่ละใบทำอะไร',
     dvOpen: 'ดูการ์ดทั้งเด็คในหน้าเดียว', dvMain: n => `${n} ใบ`, dvSide: 'Sideboard', dvPng: 'บันทึกเป็นรูปภาพ', dvMaking: 'กำลังสร้างรูป…',
@@ -1006,10 +1009,11 @@ async function loadTiers() {
 
 // TCGplayer market prices (SHOP_CONFIG.tcgPrices: Riftcheese's cards/prices.json, every printing in US dollars per finish,
 // N normal and F foil, plus fx.THB), shown in baht next to the shop's price. They load after the shop and never hold it up.
-const TCG = { ok: false, fx: 0, updated: '', byNo: new Map(), byKey: new Map() };
+// done: the prices have loaded or failed to (the card grid waits for that when it hides cards that aren't cheaper).
+const TCG = { ok: false, done: false, fx: 0, updated: '', byNo: new Map(), byKey: new Map() };
 let tcgMemo = new WeakMap();
 async function loadTcg() {
-  if (!SHOP_CONFIG.tcgPrices) return;
+  if (!SHOP_CONFIG.tcgPrices) { TCG.done = true; return; }
   try {
     const r = await fetch(SHOP_CONFIG.tcgPrices, { cache: 'no-cache' }); if (!r.ok) return;
     const j = await r.json(); if (!j.fx || !j.fx.THB || !Array.isArray(j.products)) return;
@@ -1021,8 +1025,9 @@ async function loadTcg() {
     });
     Object.assign(TCG, { ok: true, fx: j.fx.THB, updated: j.updated || '' });
     tcgMemo = new WeakMap();
-    renderAll();
   } catch {}
+  TCG.done = true;
+  renderAll();
 }
 const tcgNo = c => { const [s, n, of] = c.id.split('-'); return TCG.byNo.get(`${s}|${n}/${of}`) || []; };
 const plainPrint = p => !p.n.includes('(');  // not an overnumbered, signature, metal… version
@@ -1072,11 +1077,16 @@ function tcgValue(x) {
 }
 // How much cheaper the shop is, in percent (0 when it isn't, or there's nothing to compare).
 const tcgSave = x => { const v = tcgValue(x); return v && x.price != null && v.thb > x.price ? Math.round((v.thb - x.price) / v.thb * 100) : 0; };
-// Under a tile's price: what TCGplayer asks, with the saving. Customers see it where the shop is cheaper; the shopkeeper always, as a guide.
+// A single that costs the same or more here than on TCGplayer, which customers don't see (SHOP_CONFIG.hideNotCheaper).
+// Cards without a price or without a TCGplayer price stay.
+const notCheaper = x => { if (!SHOP_CONFIG.hideNotCheaper || !x.c || x.price == null) return false; const v = tcgValue(x); return !!v && x.price >= v.thb; };
+// Under a tile's price: what TCGplayer asks, with the saving. Customers see it where the shop is cheaper; the shopkeeper always,
+// as a guide, with a note on the cards customers don't see.
 function tcgLine(x) {
   const v = tcgValue(x), pct = tcgSave(x);
   if (!v || (!pct && !K.on)) return '';
-  return `<div class="tcg"><span>TCGplayer <span class="num">${money(v.thb)}${v.miss ? '+' : ''}</span></span>${pct ? `<span class="save">${t('save', pct)}</span>` : ''}</div>`;
+  return `<div class="tcg"><span>TCGplayer <span class="num">${money(v.thb)}${v.miss ? '+' : ''}</span></span>${pct ? `<span class="save">${t('save', pct)}</span>` : ''}`
+    + `${K.on && notCheaper(x) ? `<span class="bad-t">${t('kHidden')}</span>` : ''}</div>`;
 }
 // In the details: the comparison with where the price comes from.
 function tcgBox(x) {
@@ -1131,6 +1141,7 @@ function visible() {
   const xs = DB.listings.filter(x => {
     const c = x.c;
     if (f.stock && !x.listed) return false;  // the shopkeeper's "Listed only"
+    if (!K.on && notCheaper(x)) return false;
     if (x.p) return !x.p.isDeck && !(f.set || f.rar || f.dom.size || (f.type && f.type !== PRODUCTS)) && (!f.q || hasText(x, f.q));  // decks have their own tab; products have no set, type or domain
     if (f.type === PRODUCTS) return false;
     if (f.set && !c.s.includes(f.set)) return false;
@@ -1195,7 +1206,8 @@ function tile(x, pop = false) {
 }
 function renderGrid() {
   const g = $('#grid');
-  if (!DB.ok) { g.innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; return; }
+  // Until the TCGplayer prices are in, it isn't known yet which cards to hide.
+  if (!DB.ok || (SHOP_CONFIG.hideNotCheaper && !TCG.done && !K.on)) { g.innerHTML = `<div class="state">${t(DB.failed ? 'loadFail' : 'loading')}</div>`; return; }
   S.list = visible();
   $('#resCount').textContent = counted('results', S.list.length, S.list);
   $('#fClear').hidden = !filtered();

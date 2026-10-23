@@ -51,6 +51,8 @@ Cards and decks show what the same cards cost on TCGplayer, in baht, so customer
 - **The list:** "You save ฿… compared with TCGplayer" for everything in it that has a price on both.
 - **Shopkeeper editors:** the card editor shows the card's TCGplayer price (normal, alternate art, overnumbered…), and the deck editor shows the TCGplayer value of the pasted list.
 
+Singles that cost the same or more here than on TCGplayer are hidden from customers (`hideNotCheaper` in `SHOP_CONFIG`; `false` shows them again). The shopkeeper zone still shows them, marked *Hidden: not cheaper*. TCGplayer prices change daily, so a card comes back by itself once it's cheaper here again, or when you lower its price. Cards TCGplayer has no price for (e.g. Chinese-only alt arts) and decks are always shown.
+
 A card is compared with its own printing: the version name picks it (`Alt Art` → TCGplayer's Alternate Art, also `Overnumbered`, `Signature`, `Metal`; `Normal`, `Foil` or blank → the plain card, foil price for `Foil`). A version TCGplayer doesn't sell (e.g. a Chinese-only alt art) shows no comparison. A deck counts every card in its list at that card's cheapest printing on TCGplayer.
 
 Prices are TCGplayer market prices in US dollars with the dollar-to-baht rate, from [Riftcheese's `cards/prices.json`](https://atiabababa.github.io/riftcheese/cards/prices.json), which a GitHub Action there refreshes every day (`tcgPrices` in `SHOP_CONFIG`; empty turns the comparison off). If that file can't be read, the shop works as before without it.
