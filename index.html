@@ -797,7 +797,7 @@ const ICON_BOX = '<svg width="40%" viewBox="0 0 24 24" aria-hidden="true"><path 
 const photoUrl = path => `${SHOP_CONFIG.cloud.url}/storage/v1/object/public/${PRODUCT_BUCKET}/${path.split('/').map(encodeURIComponent).join('/')}`;
 // A deck list in the usual one-card-per-line form: section headings ("Legend:", "Main Deck:"…) and lines like
 // "3 Falling Star [OGN-029]". Cards are found by their number, else by name; lines that match no card are kept (c: null).
-const DECK_SECTIONS = { legend: 'Legend', champion: 'Champion', 'chosen champion': 'Champion', 'main deck': 'Main Deck', main: 'Main Deck',
+const DECK_SECTIONS = { legend: 'Legend', champion: 'Champion', 'chosen champion': 'Champion', 'main deck': 'Main Deck', maindeck: 'Main Deck', main: 'Main Deck',
   battlefield: 'Battlefields', battlefields: 'Battlefields', rune: 'Runes', runes: 'Runes', sideboard: 'Sideboard' };
 function parseDeck(text) {
   const out = []; let section = '';
