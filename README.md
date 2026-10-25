@@ -28,14 +28,22 @@ Card names, cost and stats use **Beaufort for LOL Bold**, card types and groups 
 
 ## Finding cards
 
-The Singles & more tab's filters work like [Rift Atlas](https://riftatlas.com/cards): a search box (name, number or card text), then a **type** menu (tick several: Champion Unit, Unit, Spell, Signature, Gear, Rune, Battlefield, Legend, Other products), the six **domains** plus Colorless (tap several), **cost** (0 to 7+), **sort** (set, name, cost, might, type, domain, price) with a button to reverse it, **grid or list** view (remembered on that device), and **All filters** for set, rarity, group and might (and, in the shopkeeper zone, the *Show* menu and price range).
+The Singles & more tab's filters work like [Rift Atlas](https://riftatlas.com/cards): a search box (name, number or card text), then a **type** menu (tick several: Champion Unit, Unit, Spell, Signature, Gear, Rune, Battlefield, Legend, Other products), the six **domains** plus Colorless (tap several), **cost** (0 to 7+), **sort** (set, name, cost, might, type, domain, price) with a button to reverse it, **grid or list** view (remembered on that device), **EN | 中文** for the card pictures (English or the Chinese print, also remembered), and **All filters** for set, rarity, group and might (and, in the shopkeeper zone, the *Show* menu and price range). Search also finds Chinese names and text.
+
+## Printings and Chinese cards
+
+Every printing of a card is a card of its own in the shop, with its own picture, price and stock: alternate art (`UNL-116a`), overnumbered (`OGN-299`), signature (`OGN-299*`), showcase (`RAD-sp1`), rune art from later sets, starter-deck Legends, and the prints sold only in China (T1 and Arcane bundles, Chinese promos and signatures). A printing shows its version on the tile (e.g. *Alt Art*), in the details and in the LINE message, and is compared with that exact printing on TCGplayer; a Chinese-only print has no comparison.
+
+Every card also has its Chinese print: the Chinese name and card text in the details, and the Chinese picture when **中文** is picked.
+
+They come from `cards/printings.json` and its picture sheets (`cards/v*.webp` for the English printings, `cards/z*.webp` for the Chinese pictures), made by `python scripts/make_printings.py` from the official [card gallery](https://riftbound.leagueoflegends.com/en-us/card-gallery/) and the official Chinese site [playloltcg.com](https://playloltcg.com/card.html). Run it again when a new set comes out (after copying the new `cards/` from Riftcheese); it keeps its downloads in `.cache/`, so only new pictures are fetched. The big pictures in the details load from those two sites. Without the file the shop works as before, with just the cards.
 
 ## Adding things to sell
 
 In the shopkeeper zone, changes are saved straight away and show in the shop for everyone; there is nothing to commit.
 
-- **Cards:** search or filter for a card and tap it. Each row is one version of the card:
-  - *Version*: leave blank for the normal card, or type e.g. `Foil`, `Alt art`, `Signed`. **+ Add a version** adds another row with its own price and quantity.
+- **Cards:** the Singles & more tab in the shopkeeper zone shows only the cards you've listed. Tap **+ Add a card** to find any card or printing (search by name, number or Chinese name; pick a version such as *Alt Art*, *Overnumbered*, *Signature* or *Chinese-only prints*, and a set) and tap it; tap a card in your list to change it. The editor shows the card's other printings, to price them too. Each row is one version of that printing:
+  - *Version*: leave blank for the card as pictured, or type e.g. `Foil`, `Signed`. **+ Add a version** adds another row with its own price and quantity. (Alternate art, overnumbered and signature cards have their own entries now, with their own pictures; older listings with `Alt Art` as the version still work.)
   - *Price*: per copy, e.g. `120`. Blank shows *Ask price*.
   - *Quantity*: how many you have. `0` shows *Sold out*; blank shows no number.
   - *Description*: anything customers should know, e.g. `Near mint, English, from a sealed booster`.
@@ -55,7 +63,7 @@ In the shopkeeper zone, changes are saved straight away and show in the shop for
 - **Tier list** (the Tier list tab): tap **Edit tier list**, or click a deck in the list to open the editor on it. Drag a Legend's picture from the bottom of the editor onto a tier to add a deck (on a phone: hold the picture, then drag). Drag a deck to reorder it or move it to another tier, or back to the Legends to take it off. Click a deck to give it a name (it's named after its champion until then), a style and an optional note for customers; decks with a note show a dot. Each tier has a name (`Tier 1`, `S`…) and ↑ ↓ to change the order, and the note at the top can say what the list is based on. Saving shows it straight away with today's date. Customers see the decks' Legend pictures and, when you sell decks with that Legend, a link to them; a deck's details also say where its Legend stands in the tier list. Empty tiers are hidden from customers.
 - **Lots of cards at once:** *Download as CSV* gives every card with your current prices. Fill in `price`, `qty`, `note` and `description` in Excel or Google Sheets, save as CSV (in Excel, *CSV UTF-8*) and use *Import CSV*. A card's row left blank in the file takes that version off sale; cards missing from the file stay as they are. Products aren't in the CSV.
 
-Customers see only what you've listed: anything with a price, quantity, version name or description. Something with quantity `0` stays in the shop as *Sold out*; to hide it, clear its row (cards) or delete it (products). In the shopkeeper zone every card shows, so you can find new ones to list. To organize your listings, the Singles & more tab has, under *All filters*, a *Show* menu (all cards, listed only, shown to customers, hidden because they're not cheaper than TCGplayer, no TCGplayer price, no price), each with how many cards it holds; a *Min ฿ – Max ฿* price range; and the sort *Price vs TCGplayer*, which puts the cards furthest above TCGplayer on top. Hidden cards say how far above TCGplayer they are, e.g. *Hidden · 24% above*. Set `showAllCards: true` in `SHOP_CONFIG` to let customers also ask about unlisted cards. The *Setup check* at the bottom of the shopkeeper zone shows which LINE account orders go to and where the stock is read from.
+Customers see only what you've listed: anything with a price, quantity, version name or description. Something with quantity `0` stays in the shop as *Sold out*; to hide it, clear its row (cards) or delete it (products). The shopkeeper zone shows the same listed cards; new ones are found with *+ Add a card*. To organize your listings, the Singles & more tab has, under *All filters*, a *Show* menu (all cards, listed only, shown to customers, hidden because they're not cheaper than TCGplayer, no TCGplayer price, no price), each with how many cards it holds; a *Min ฿ – Max ฿* price range; and the sort *Price vs TCGplayer*, which puts the cards furthest above TCGplayer on top. Hidden cards say how far above TCGplayer they are, e.g. *Hidden · 24% above*. Set `showAllCards: true` in `SHOP_CONFIG` to let customers also ask about unlisted cards. The *Setup check* at the bottom of the shopkeeper zone shows which LINE account orders go to and where the stock is read from.
 
 ## TCGplayer price comparison
 
@@ -77,9 +85,9 @@ Prices are TCGplayer market prices in US dollars with the dollar-to-baht rate, f
 - `index.html` – the shop and its shopkeeper zone (everything is in this one page).
 - `supabase/shop.sql` – the stock, product, tier list (`shop_docs`) and shopkeeper tables, the photo bucket and who may change what.
 - `stock.csv` – a fallback price list, read only until `supabase/shop.sql` has been run or when the cloud can't be reached. `python scripts/make_stock_csv.py` writes it (one row per card) and adds rows for new cards while keeping what's filled in.
-- `cards/` – card data (`cards.json`) and picture sheets, copied from Riftcheese. Copy them again when new sets are added there.
+- `cards/` – card data (`cards.json`) and picture sheets, copied from Riftcheese. Copy them again when new sets are added there. `printings.json` with the `v*.webp` and `z*.webp` sheets holds the other printings and the Chinese cards (`scripts/make_printings.py`).
 - `og.png` – the picture LINE, Facebook and X show when the shop link is shared (the `og:` tags at the top of `index.html`). `python scripts/make_og_image.py` draws it again. If the shop moves to its own domain, change the two addresses in those tags.
 
 ## Credits
 
-Card data from [Riftcodex](https://riftcodex.com) and the official [Riftbound card gallery](https://riftbound.leagueoflegends.com/en-us/card-gallery/). Riftbound, its cards and card images are the property of Riot Games. This shop is not affiliated with Riot Games.
+Card data from [Riftcodex](https://riftcodex.com) and the official [Riftbound card gallery](https://riftbound.leagueoflegends.com/en-us/card-gallery/); Chinese cards from the official Chinese site [playloltcg.com](https://playloltcg.com/card.html). Riftbound, its cards and card images are the property of Riot Games. This shop is not affiliated with Riot Games.

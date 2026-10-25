@@ -191,7 +191,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   .dd-btn { justify-content: space-between; overflow: hidden; }
   .domset { grid-column: 1 / -1; order: 3; justify-content: space-between; }
   .tgroup.end { display: flex; flex-wrap: nowrap; }
-  .tgroup.end .tsel { flex: 1 1 auto; min-width: 0; width: auto; }
+  .tgroup.end { flex-wrap: wrap; }  /* sort, EN | 中文 and view on one line, All filters under them when it doesn't fit */
+  .tgroup.end .tsel { flex: 1 1 96px; min-width: 0; width: auto; }
+  .lseg button { padding: 0 8px; }
   .allf { padding-inline: 2px; }
 }
 /* list view: one card per row */
@@ -528,6 +530,24 @@ body.keeper .cart, body.keeper .mbar, body.keeper .scrim, body.keeper .steps { d
 .setup ul { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 3px; }
 .ed-card { display: flex; gap: 12px; align-items: center; }
 .ed-card b { font-size: 16px; }
+/* a printing's version (Alt Art, Overnumbered, Signature…) next to its name */
+.ver { display: inline-block; font-family: var(--f-ui, inherit); font-size: 11.5px; font-weight: 700; line-height: 1.5; padding: 0 7px; border-radius: 4px; background: var(--gold); color: var(--panel); vertical-align: 2px; letter-spacing: .02em; }
+.lseg button { height: 36px; }
+.znm { font-size: 12.5px; color: var(--muted); margin-top: -4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cards.list .znm { display: none; }
+.zh { display: grid; gap: 8px; }
+.zh .ctext { font-family: inherit; white-space: pre-line; }
+.prints { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.prints button { border: 0; background: none; padding: 0; cursor: pointer; display: grid; gap: 3px; justify-items: center; font-size: 11.5px; color: var(--muted); max-width: 64px; text-align: center; }
+.prints button:hover .cimg { box-shadow: 0 0 0 2px var(--accent); }
+.pk-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.pk-bar input { flex: 1 1 220px; min-width: 0; }
+.pk-grid { display: grid; gap: 12px 10px; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); }
+.pk-grid button { border: 0; background: none; padding: 0; cursor: pointer; display: grid; gap: 4px; align-content: start; text-align: left; color: var(--ink); min-width: 0; }
+.pk-grid button:hover .cimg { box-shadow: 0 0 0 2px var(--accent); }
+.pk-grid .nm { font-size: 13px; min-height: 0; }
+.pk-grid .sub { white-space: normal; }
+.pk-on { font-size: 12px; font-weight: 700; color: var(--save); }
 .ed-rows { display: grid; gap: 8px; }
 .ed-h, .ed-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto 34px; gap: 8px; align-items: center; }
 .ed-h { font-size: 12px; font-weight: 600; color: var(--muted); }
@@ -727,6 +747,7 @@ input[type=text], input[type=search], input[type=password], select, textarea { b
 .tile .nm { order: 2; font-size: 17px; min-height: 0; -webkit-line-clamp: 2; }
 .tile .nm.pnm { font-family: var(--f-display); font-weight: 700; font-size: 21px; line-height: 1.1; }  /* decks and products: Univers, like the rest of the shop */
 .tile .sub, .tile .dsub { order: 3; justify-content: center; }
+.tile .znm { order: 2; margin-top: -2px; }
 .tile .dtags { order: 4; justify-content: center; }
 .tile .desc { order: 5; margin-top: 0; }
 .tile .tcg { order: 6; justify-content: center; margin-top: 2px; }
@@ -843,6 +864,7 @@ footer { color: var(--muted); }
         <div class="tgroup end">
           <select class="tsel" id="fSort" data-t-label="sortBy"></select>
           <button type="button" class="ibtn" id="fDir"></button>
+          <div class="seg lseg" role="group" id="fPic" data-t-label="picLang" hidden><button type="button" data-pic="en">EN</button><button type="button" data-pic="zh" lang="zh">中文</button></div>
           <div class="seg vseg" role="group" data-t-label="view"><button type="button" class="ibtn" data-view="grid" data-t-label="viewGrid"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button><button type="button" class="ibtn" data-view="list" data-t-label="viewList"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
           <button type="button" class="btn link allf" id="fMoreBtn" aria-expanded="false" aria-controls="fMore"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M14 4v6M8 14v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-t="allFilters"></span><span class="nb num" id="fMoreN" hidden></span></button>
         </div>
@@ -922,6 +944,7 @@ footer { color: var(--muted); }
 </div></dialog>
 <dialog id="detail"><div class="dlg detail" id="detailBody"></div></dialog>
 <dialog id="editor" aria-labelledby="edTitle"><div class="dlg" id="edBody"></div></dialog>
+<dialog id="picker" aria-labelledby="pkTitle"><div class="dlg" id="pkBody"></div></dialog>
 <dialog id="peditor" aria-labelledby="pedTitle"><div class="dlg" id="pedBody"></div></dialog>
 <dialog id="teditor" aria-labelledby="teTitle"><div class="dlg" id="teBody"></div></dialog>
 <dialog id="deckview" aria-labelledby="dvTitle"><div class="dv" id="dvBody"></div></dialog>
@@ -1076,8 +1099,11 @@ const LANG = {
     kNotKeeper: 'This account can’t change stock yet. To make it the shopkeeper, run this once in Supabase → SQL Editor:',
     kCheck: 'Check again', kCopy: 'Copy', kCopied: 'Copied',
     kStats: (n, p, s) => `${n} listed · ${p} with a price · ${s} sold out`,
-    kTapHint: 'Tap a card to set its price, quantity and description, or add your own products (boxes, packs, sleeves…). Changes show in the shop right away.',
-    kAddProduct: '+ Add a product', typeProducts: 'Other products', prodTag: 'Product',
+    kTapHint: 'Your list shows only the cards you sell. Tap + Add a card to find any card or printing (alt art, overnumbered, signature, Chinese-only prints) and set its price, quantity and description; tap a card in the list to change it. You can also add your own products (boxes, packs, sleeves…). Changes show in the shop right away.',
+    kAddProduct: '+ Add a product', typeProducts: 'Other products', prodTag: 'Product', kAddCard: '+ Add a card',
+    pkTitle: 'Add a card', pkSearch: 'Name, number or Chinese name', pkAllV: 'All versions', pkNormal: 'Normal', pkCn: 'Chinese-only prints',
+    pkHint: 'Every card and printing, each with its own picture and price. Tap one to set its price and stock; it joins your list once it has a price, quantity or description.',
+    pkOn: 'On sale', picLang: 'Card pictures', zhTitle: 'Chinese print', ePrints: 'Other printings', eDiscard: 'Leave without saving the changes here?',
     pTitleNew: 'New product', pTitle: 'Edit product', pName: 'Name', pNamePh: 'e.g. Origins booster box', pPhoto: 'Photo',
     pChoose: 'Choose a photo', pChange: 'Change photo', pRemovePhoto: 'Remove photo', pDelete: 'Delete product',
     pDeleteAsk: n => `Delete ${n} from the shop?`, pDeleted: 'Product deleted', pNeedName: 'Give the product a name.',
@@ -1100,7 +1126,7 @@ const LANG = {
     kBadLogin: 'Username or password is wrong.', kRate: 'Too many attempts. Wait a minute and try again.', kFail: m => `Couldn’t sign in: ${m}`,
     kSignInFirst: 'Sign in to change stock',
     eTitle: 'Price and stock', eNote: 'Version', eNotePh: 'Normal', ePrice: 'Price', eQty: 'Quantity',
-    eAdd: 'Add a version (Foil, Alt art…)', eHint: 'No price shows Ask price. Quantity 0 shows Sold out; blank shows no number. Clear a whole row to take it off sale.',
+    eAdd: 'Add a version (Foil, Signed…)', eHint: 'No price shows Ask price. Quantity 0 shows Sold out; blank shows no number. Clear a whole row to take it off sale.',
     eSave: 'Save', eCancel: 'Cancel', eSaving: 'Saving…', eSaved: 'Saved', eRemove: 'Remove this version',
     eDup: 'Two versions have the same name.', eBadPrice: 'Prices are numbers, like 120.', eBadQty: 'Copies are whole numbers, like 4.', eFail: m => `Couldn’t save: ${m}`,
     sTitle: 'Setup check', sLine: id => `Orders go to LINE: ${id}`, sNoLine: 'LINE isn’t set: put your LINE ID in SHOP_CONFIG in index.html.',
@@ -1207,8 +1233,11 @@ const LANG = {
     kNotKeeper: 'บัญชีนี้ยังแก้ไขสต็อกไม่ได้ หากต้องการตั้งเป็นเจ้าของร้าน ให้รันคำสั่งนี้หนึ่งครั้งใน Supabase → SQL Editor:',
     kCheck: 'ตรวจอีกครั้ง', kCopy: 'คัดลอก', kCopied: 'คัดลอกแล้ว',
     kStats: (n, p, s) => `ลงขาย ${n} รายการ · มีราคา ${p} · หมด ${s}`,
-    kTapHint: 'แตะการ์ดเพื่อตั้งราคา จำนวน และรายละเอียด หรือเพิ่มสินค้าของคุณเอง (บ็อกซ์ ซอง ซองใส่การ์ด…) การเปลี่ยนแปลงจะแสดงในร้านทันที',
-    kAddProduct: '+ เพิ่มสินค้า', typeProducts: 'สินค้าอื่น ๆ', prodTag: 'สินค้า',
+    kTapHint: 'รายการแสดงเฉพาะการ์ดที่คุณวางขาย แตะ + เพิ่มการ์ด เพื่อค้นหาการ์ดหรือแบบพิมพ์ใดก็ได้ (Alt art, Overnumbered, Signature, แบบพิมพ์จีนเท่านั้น) แล้วตั้งราคา จำนวน และรายละเอียด แตะการ์ดในรายการเพื่อแก้ไข และเพิ่มสินค้าของคุณเองได้ (บ็อกซ์ ซอง ซองใส่การ์ด…) การเปลี่ยนแปลงจะแสดงในร้านทันที',
+    kAddProduct: '+ เพิ่มสินค้า', typeProducts: 'สินค้าอื่น ๆ', prodTag: 'สินค้า', kAddCard: '+ เพิ่มการ์ด',
+    pkTitle: 'เพิ่มการ์ด', pkSearch: 'ชื่อ เลขการ์ด หรือชื่อภาษาจีน', pkAllV: 'ทุกเวอร์ชัน', pkNormal: 'ปกติ', pkCn: 'แบบพิมพ์จีนเท่านั้น',
+    pkHint: 'การ์ดและแบบพิมพ์ทุกแบบ แต่ละแบบมีภาพและราคาของตัวเอง แตะเพื่อตั้งราคาและสต็อก การ์ดจะเข้ารายการเมื่อมีราคา จำนวน หรือรายละเอียด',
+    pkOn: 'วางขายแล้ว', picLang: 'ภาพการ์ด', zhTitle: 'ฉบับพิมพ์จีน', ePrints: 'แบบพิมพ์อื่น', eDiscard: 'ออกโดยไม่บันทึกการเปลี่ยนแปลงใช่ไหม',
     pTitleNew: 'สินค้าใหม่', pTitle: 'แก้ไขสินค้า', pName: 'ชื่อสินค้า', pNamePh: 'เช่น บูสเตอร์บ็อกซ์ Origins', pPhoto: 'รูปภาพ',
     pChoose: 'เลือกรูป', pChange: 'เปลี่ยนรูป', pRemovePhoto: 'ลบรูป', pDelete: 'ลบสินค้า',
     pDeleteAsk: n => `ลบ ${n} ออกจากร้านใช่ไหม`, pDeleted: 'ลบสินค้าแล้ว', pNeedName: 'ใส่ชื่อสินค้าก่อน',
@@ -1231,7 +1260,7 @@ const LANG = {
     kBadLogin: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', kRate: 'ลองหลายครั้งเกินไป รอสักครู่แล้วลองใหม่', kFail: m => `เข้าสู่ระบบไม่สำเร็จ: ${m}`,
     kSignInFirst: 'เข้าสู่ระบบก่อนจึงจะแก้ไขสต็อกได้',
     eTitle: 'ราคาและสต็อก', eNote: 'เวอร์ชัน', eNotePh: 'ปกติ', ePrice: 'ราคา', eQty: 'จำนวน',
-    eAdd: 'เพิ่มเวอร์ชัน (Foil, Alt art…)', eHint: 'ไม่ใส่ราคาจะแสดงว่า สอบถามราคา จำนวน 0 แสดงว่า หมด เว้นว่างจะไม่แสดงจำนวน ล้างทั้งแถวเพื่อเลิกขาย',
+    eAdd: 'เพิ่มเวอร์ชัน (Foil, Signed…)', eHint: 'ไม่ใส่ราคาจะแสดงว่า สอบถามราคา จำนวน 0 แสดงว่า หมด เว้นว่างจะไม่แสดงจำนวน ล้างทั้งแถวเพื่อเลิกขาย',
     eSave: 'บันทึก', eCancel: 'ยกเลิก', eSaving: 'กำลังบันทึก…', eSaved: 'บันทึกแล้ว', eRemove: 'ลบเวอร์ชันนี้',
     eDup: 'มีสองเวอร์ชันที่ชื่อซ้ำกัน', eBadPrice: 'ราคาต้องเป็นตัวเลข เช่น 120', eBadQty: 'จำนวนต้องเป็นจำนวนเต็ม เช่น 4', eFail: m => `บันทึกไม่สำเร็จ: ${m}`,
     sTitle: 'ตรวจการตั้งค่า', sLine: id => `คำสั่งซื้อส่งไปที่ LINE: ${id}`, sNoLine: 'ยังไม่ได้ตั้ง LINE: ใส่ LINE ID ใน SHOP_CONFIG ใน index.html',
@@ -1245,7 +1274,7 @@ const SET_NAMES = { OGN: 'Origins', OGS: 'Proving Grounds', SFD: 'Spiritforged',
 const SET_ORDER = ['rad', 'ven', 'unl', 'sfd', 'ogn', 'ogs', 'opp'];  // newest first, by the set in a card's number
 const TYPES = ['Legend', 'Unit', 'Spell', 'Gear', 'Battlefield', 'Rune'];
 const DOMAINS = ['Fury', 'Calm', 'Mind', 'Body', 'Chaos', 'Order', 'Colorless'];
-const RARITIES = ['Common', 'Uncommon', 'Rare', 'Epic', 'Promo'];
+const RARITIES = ['Common', 'Uncommon', 'Rare', 'Epic', 'Showcase', 'Promo'];
 const PAGE = 60, MAX_COPIES = 99, PRODUCTS = '_products', PRODUCT_BUCKET = 'shop';
 const TABS = ['home', 'decks', 'cards', 'tiers'];  // the page's sections: #home, #decks, #cards, #tiers (#keeper/decks… in the shopkeeper zone, which has no Home)
 const LEVELS = ['budget', 'mid', 'top'];   // deck levels, by price (SHOP_CONFIG.deckLevels); a deck without a price is 'ask'
@@ -1265,7 +1294,10 @@ let lang = store.get('rbshop.lang', null) || (/^th\b/i.test(navigator.language |
 const t = (k, ...a) => { const v = LANG[lang][k] ?? LANG.en[k]; return typeof v === 'function' ? v(...a) : v; };
 const money = v => SHOP_CONFIG.currency + v.toLocaleString('en-US', { maximumFractionDigits: 2 });
 const toNum = s => { const v = parseFloat(String(s).replace(/[^\d.]/g, '')); return s && isFinite(v) ? v : null; };
-const cardNo = c => { const [s, n] = c.id.split('-'); return `${s.toUpperCase()}-${n}`; };
+// A card's number as printed: "OGN-029", "UNL-116a" (alt art), "SFD-227*" (signature), "T1S-001" (a Chinese-only print, zh-t1s-001-005).
+const cardNo = c => { const p = c.id.replace(/^zh-/, '').split('-'); return `${p[0].toUpperCase()}-${p[1]}${p[2] === 'star' ? '*' : ''}`; };
+// Chinese card text: {{S}} is Might; keywords, rune colours and costs are in {{…}}, shown in brackets.
+const zhText = s => String(s || '').replace(/\{\{([^}]*)\}\}/g, (_, k) => k === 'S' ? '战力' : `[${k.replace(/>/g, '')}]`);
 const domColor = d => `var(--${d.toLowerCase()})`;
 // Each domain's mark, white on its color: flame, leaf, eye, paw, spiral, star (drawn here, after the symbols on the cards).
 const DOMAIN_MARKS = {
@@ -1284,18 +1316,20 @@ function readable(x) {
     .replace(/:rb_([a-z0-9_]+):/g, (_, k) => ' ' + (k === 'rune_rainbow' ? 'power' : k.startsWith('energy_') ? k.slice(7) + ' energy'
       : k.startsWith('rune_') ? k.slice(5) + ' power' : k.replace(/_/g, ' ')) + ' ').replace(/ {2,}/g, ' ').replace(/ ([.,:;)])/g, '$1').replace(/\( /g, '(').trim();
 }
+// The picture to show: the Chinese print when the visitor picked 中文 (S.zh) and there is one.
+const picOf = c => (S.zh && c.zh && c.zh.im) || c.im;
 // Card picture from the sprite sheets. w = 0 fills the container's width.
 function thumb(c, w = 0) {
-  const sh = DB.sheets[c.im[0]], i = c.im[1], cx = i % sh.c, cy = Math.floor(i / sh.c);
+  const im = picOf(c), sh = DB.sheets[im[0]], i = im[1], cx = i % sh.c, cy = Math.floor(i / sh.c);
   if (!w) return `<span class="cimg fluid" aria-hidden="true" style="aspect-ratio:${sh.w}/${sh.h};background-image:url(${sh.f});background-size:${sh.c * 100}% ${sh.r * 100}%;background-position:${sh.c > 1 ? cx / (sh.c - 1) * 100 : 0}% ${sh.r > 1 ? cy / (sh.r - 1) * 100 : 0}%"></span>`;
   const h = Math.round(sh.h * w / sh.w);
   return `<span class="cimg" aria-hidden="true" style="width:${w}px;height:${h}px;background-image:url(${sh.f});background-size:${sh.c * w}px ${sh.r * h}px;background-position:-${cx * w}px -${cy * h}px"></span>`;
 }
-const landscape = c => { const sh = DB.sheets[c.im[0]]; return sh.w > sh.h; };
+const landscape = c => { const sh = DB.sheets[picOf(c)[0]]; return sh.w > sh.h; };
 // Listings are cards (x.c) or the shopkeeper's own products (x.p); these read either.
 const nameOf = x => x.p ? x.p.name : x.c.n;
 const prodTag = p => p.list.length ? t('deckTag', deckSize(p.list)) : t(p.isDeck ? 'deck' : 'prodTag');
-const itemRef = x => x.p ? prodTag(x.p) : cardNo(x.c) + (x.note ? ' · ' + x.note : '');
+const itemRef = x => x.p ? prodTag(x.p) : cardNo(x.c) + (x.c.v ? ' · ' + x.c.v : '') + (x.note ? ' · ' + x.note : '');
 const ICON_BOX = '<svg width="40%" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5zM3 7.5 12 12l9-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
 const photoUrl = path => `${SHOP_CONFIG.cloud.url}/storage/v1/object/public/${PRODUCT_BUCKET}/${path.split('/').map(encodeURIComponent).join('/')}`;
 // A deck list in the usual one-card-per-line form: section headings ("Legend:", "Main Deck:"…) and lines like
@@ -1391,6 +1425,7 @@ const blankDeckFilter = () => ({ q: '', level: '', style: '', tag: '', legend: '
 // f.show, f.min and f.max are the shopkeeper's: which cards to show ('listed', 'shown', 'hidden'…) and a price range.
 const S = { cart: store.get('rbshop.cart', {}), tab: 'decks', f: null, d: blankDeckFilter(),  // f: the card filters, set under filters below
   view: store.get('rbshop.view', 'grid') === 'list' ? 'list' : 'grid', more: false,  // the cards as a grid or a list; All filters open
+  zh: store.get('rbshop.zh', false) === true,  // card pictures in the Chinese print (the EN | 中文 switch)
   list: [], shown: PAGE, ref: '', detail: null, promo: null };
 
 // Excel saves plain "CSV" in the computer's own encoding (windows-874 on Thai Windows) unless "CSV UTF-8" is picked.
@@ -1416,7 +1451,11 @@ function parseCsv(text) {
 }
 const rank = id => { const [s, n] = id.split('-'), i = SET_ORDER.indexOf(s); return [i < 0 ? SET_ORDER.length : i, parseInt(n, 10) || 0]; };
 
-const byRank = (a, b) => { const x = rank(a.id), y = rank(b.id); return x[0] - y[0] || x[1] - y[1] || a.id.localeCompare(b.id); };
+// A printing sorts right after its card.
+const byRank = (a, b) => {
+  const p = a.base || a, q = b.base || b, x = rank(p.id), y = rank(q.id);
+  return x[0] - y[0] || x[1] - y[1] || p.id.localeCompare(q.id) || !!a.base - !!b.base || a.id.localeCompare(b.id);
+};
 
 // Stock rows in a CSV file (the stock file, or one the shopkeeper imports): { id, name, price, qty, note, line, listed }.
 function csvRows(text) {
@@ -1488,7 +1527,8 @@ function buildListings() {
   DB.cards.forEach(c => {
     const rs = rows.get(c.id);
     if (rs) [...rs].sort((a, b) => a[0].localeCompare(b[0])).forEach(([n, x]) => out.push({ key: c.id + (n ? '|' + n : ''), c, price: x.price, qty: x.qty, note: x.note, descr: x.descr, listed: true }));
-    else if (SHOP_CONFIG.showAllCards || K.on) out.push({ key: c.id, c, price: null, qty: null, note: '', descr: '', listed: false });
+    // Unlisted cards only when customers may ask about any card; the shopkeeper finds them with + Add a card.
+    else if (SHOP_CONFIG.showAllCards && !c.base) out.push({ key: c.id, c, price: null, qty: null, note: '', descr: '', listed: false });
   });
   DB.listings = out; DB.byKey = new Map(out.map(x => [x.key, x])); DB.stocked = out.some(x => x.listed);
 }
@@ -1532,7 +1572,9 @@ async function loadTcg() {
   TCG.done = true;
   renderAll();
 }
-const tcgNo = c => { const [s, n, of] = c.id.split('-'); return TCG.byNo.get(`${s}|${n}/${of}`) || []; };
+// A card's set, number and set size as TCGplayer writes them: "unl-116a-219" is unl 116a/219, the signature "sfd-227-star-221" 227*/221.
+const idParts = c => { const p = c.id.replace(/^zh-/, '').split('-'), star = p[2] === 'star'; return [p[0], p[1] + (star ? '*' : ''), p[star ? 3 : 2]]; };
+const tcgNo = c => { const [s, n, of] = idParts(c); return TCG.byNo.get(`${s}|${n}/${of}`) || []; };
 const plainPrint = p => !p.n.includes('(');  // not an overnumbered, signature, metal… version
 // A listing's version ("Alt Art", "Foil", "Overnumbered"…) as TCGplayer names its printings: the tag in brackets, '' for
 // the plain card, null for a version TCGplayer doesn't sell (then there's nothing to compare).
@@ -1543,16 +1585,25 @@ function tcgTag(note) {
 }
 // The printings of a card that has a tag ('' = plain), the one with the card's own number first.
 function tcgPrints(c, tag) {
-  const [s, n, of] = c.id.split('-');
-  const all = [...tcgNo(c), ...(TCG.byNo.get(`${s}|${n}a/${of}`) || []), ...(TCG.byKey.get(c.k) || [])];
+  const b = c.base || c, [s, n, of] = b.id.split('-'), own = new Set(tcgNo(c));
+  const all = [...own, ...tcgNo(b), ...(TCG.byNo.get(`${s}|${n}a/${of}`) || []), ...(TCG.byKey.get(b.k) || [])];
   const ps = [...new Set(all)].filter(p => tag ? p.n.includes(`(${tag})`) : plainPrint(p));
-  return ps.sort((a, b) => (b.s.toLowerCase() === s && (b.no || '').startsWith(n)) - (a.s.toLowerCase() === s && (a.no || '').startsWith(n)));
+  const mine = p => own.has(p) * 2 + (p.s.toLowerCase() === s && (p.no || '').startsWith(n));
+  return ps.sort((x, y) => mine(y) - mine(x));
 }
 // A card's price on TCGplayer in US dollars, in the printing its version names, foil or normal (a card that only comes
-// one way has only that price).
+// one way has only that price). A printing (c.base) is its own product on TCGplayer, found by its number; a Chinese-only
+// print that TCGplayer doesn't sell has none.
 function tcgUsd(c, note) {
-  const tag = tcgTag(note || ''), foil = /foil|ฟอยล์/i.test(note || '') && !/non-?foil/i.test(note || '');
-  const p = tag == null ? null : tcgPrints(c, tag)[0];
+  const foil = /foil|ฟอยล์/i.test(note || '') && !/non-?foil/i.test(note || '');
+  let p;
+  if (c.base) {
+    const tag = tcgTag(c.v || '');
+    p = tcgNo(c).find(q => !tag || q.n.includes(`(${tag})`)) || (tag && !c.cn ? tcgPrints(c, tag)[0] : null);
+  } else {
+    const tag = tcgTag(note || '');
+    p = tag == null ? null : tcgPrints(c, tag)[0];
+  }
   return p ? (foil ? p.F ?? p.N : p.N ?? p.F) : null;
 }
 // The cheapest a card can be had for on TCGplayer, any printing or finish: what a deck is counted at.
@@ -1605,18 +1656,22 @@ function tcgBox(x) {
 
 async function load() {
   try {
-    const [j, stock, tiers] = await Promise.all([
+    const [j, stock, tiers, pj] = await Promise.all([
       fetch('cards/cards.json').then(r => { if (!r.ok) throw 0; return r.json(); }),
       loadStock(),
       loadTiers(),
+      fetch('cards/printings.json').then(r => r.ok ? r.json() : null).catch(() => null),
     ]);
     DB.sheets = j.sheets; DB.imgBase = j.imgBase; DB.tiers = tiers;
     // Some Legends are listed twice, by title only ("Matriarch of War") and in full ("Ambessa - Matriarch of War"); keep the full one.
     const legends = j.cards.filter(c => c.t === 'Legend');
     const alias = new Set(legends.filter(c => !c.k.includes(' - ') && legends.some(x => x.k.endsWith(' - ' + c.k))).map(c => c.k));
-    DB.cards = j.cards.filter(c => c.im && !alias.has(c.k)).sort(byRank);
-    DB.byId = new Map(DB.cards.map(c => [c.id, c])); DB.byName = new Map(DB.cards.map(c => [c.k, c]));
+    DB.cards = j.cards.filter(c => c.im && !alias.has(c.k));
+    DB.byName = new Map(DB.cards.map(c => [c.k, c]));
     DB.byNo = new Map(DB.cards.map(c => [c.id.split('-').slice(0, 2).join('-'), c])); // "ogn-029", as deck lists write it
+    if (pj) addPrintings(pj);
+    DB.cards.sort(byRank);
+    DB.byId = new Map(DB.cards.map(c => [c.id, c]));
     setStock(stock);
     // Drop cards the shop no longer lists from a saved list, and keep within the stock.
     Object.keys(S.cart).forEach(k => { const x = DB.byKey.get(k), q = Math.min(S.cart[k] | 0, x ? x.qty ?? MAX_COPIES : 0); if (q > 0) S.cart[k] = q; else delete S.cart[k]; });
@@ -1626,6 +1681,28 @@ async function load() {
   renderAll();
 }
 async function reloadStock() { setStock(await loadStock()); renderAll(); }
+// Other printings (alternate art, overnumbered, signature, showcase…) are cards of their own, each with its own picture, price
+// and stock, sorted right after the card they print (c.base); c.v names the version and c.cn marks a print sold only in Chinese.
+// c.zh is a card's Chinese name, text and picture. From cards/printings.json (scripts/make_printings.py); without it the shop
+// has just the cards. A printing with no card in cards.json (a new or showcase card) comes with its own details.
+function addPrintings(j) {
+  const off = DB.sheets.length, at = im => im ? [im[0] + off, im[1]] : null, byId = new Map(DB.cards.map(c => [c.id, c])), added = [];
+  DB.sheets = DB.sheets.concat(j.sheets);
+  j.prints.filter(p => !p.of).forEach(p => {
+    const c = { ...p, v: p.v || '', im: at(p.im) }; byId.set(c.id, c); added.push(c);
+    if (!DB.byName.has(c.k)) DB.byName.set(c.k, c);
+    const no = c.id.split('-').slice(0, 2).join('-'); if (!DB.byNo.has(no)) DB.byNo.set(no, c);
+  });
+  j.prints.filter(p => p.of).forEach(p => {
+    const b = byId.get(p.of); if (!b) return;
+    const c = { ...b, id: p.id, r: p.r || b.r, s: p.s, u: p.u, im: at(p.im), v: p.v, cn: !!p.cn, base: b, zh: null };
+    byId.set(c.id, c); added.push(c);
+  });
+  Object.entries(j.zh || {}).forEach(([id, z]) => { const c = byId.get(id); if (c) c.zh = { ...z, im: at(z.im) }; });
+  // a printing the Chinese site doesn't list still has its card's Chinese name and text
+  added.forEach(c => { if (!c.zh && c.base && c.base.zh) c.zh = { ...c.base.zh, im: null, z: '' }; });
+  DB.cards = DB.cards.concat(added); DB.hasZh = Object.keys(j.zh || {}).length > 0;
+}
 
 // ---------- filters ----------
 const defaults = (sort = 'num', dir = 1) => ({ q: '', types: new Set(), dom: new Set(), cost: '', set: '', rar: '', group: '', might: '', show: '', min: '', max: '', sort, dir });
@@ -1664,7 +1741,7 @@ function hasText(x, q) {
   let h = searchText.get(x);
   if (h == null) {
     const c = x.c, parts = x.p ? [x.p.name, x.descr, x.p.style, ...x.p.tagList.map(g => '#' + g), ...x.p.list.map(l => l.name)]
-      : [c.n, c.id, cardNo(c), c.st, c.t, ...c.d, ...(c.g || []), readable(c.x), x.note, x.descr];
+      : [c.n, c.id, cardNo(c), c.v, c.st, c.t, ...c.d, ...(c.g || []), readable(c.x), x.note, x.descr, c.zh && c.zh.n, c.zh && c.zh.x];
     h = norm(parts.join(' ').replace(/[\[\]]/g, '')); searchText.set(x, h);
   }
   return words.every(w => h.includes(w));
@@ -1714,6 +1791,7 @@ function renderFilters() {
   $('#fDir').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="transform:scaleY(${f.dir})"><path d="M7 4v16M3.5 16.5 7 20l3.5-3.5M13 6h8M13 11h6M13 16h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   $('#fDir').setAttribute('aria-label', t(f.dir > 0 ? 'dirUp' : 'dirDown')); $('#fDir').title = t(f.dir > 0 ? 'dirUp' : 'dirDown');
   document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === S.view));
+  $('#fPic').hidden = !DB.hasZh; $('#fPic').querySelectorAll('[data-pic]').forEach(b => b.setAttribute('aria-pressed', (b.dataset.pic === 'zh') === S.zh));
   $('#grid').classList.toggle('list', S.view === 'list');
   $('#fMore').hidden = !S.more; $('#fMoreBtn').setAttribute('aria-expanded', S.more);
   const n = moreCount(); $('#fMoreN').hidden = !n; $('#fMoreN').textContent = n;
@@ -1751,16 +1829,17 @@ function keeperTag(x) {
   return `<span>${p} ${x.qty === 0 ? `<span class="left bad-t">· ${t('soldOut')}</span>` : x.qty != null ? `<span class="left">· ${t('kInStock', x.qty)}</span>` : ''}</span>`;
 }
 function tile(x, pop = false) {
-  const n = K.on ? 0 : inCart(x.key), out = x.qty === 0, label = nameOf(x), name = label + (x.note ? ` (${x.note})` : '');
+  const n = K.on ? 0 : inCart(x.key), out = x.qty === 0, label = nameOf(x), name = label + (x.c && x.c.v ? ` (${x.c.v})` : '') + (x.note ? ` (${x.note})` : '');
   return `<article class="tile${n ? ' in' : ''}${out ? ' out' : ''}" data-key="${esc(x.key)}">
     <div class="picbox"><button type="button" class="pic" data-act="add" aria-label="${esc(K.on ? t('kEdit') + ': ' + name : t('addX', name))}"${out && !K.on ? ' disabled' : ''}>
       <span class="frame">${itemThumb(x)}</span>${out ? `<span class="flag">${t('soldOut')}</span>` : ''}
     </button>${n ? stepper(x, n, 'onpic' + (pop ? ' pop' : '')) : ''}</div>
     <button type="button" class="info" data-act="info" aria-label="${esc(t('details') + ': ' + label)}">${ICON_INFO}</button>
     <div class="nm${x.p ? ' pnm' : ''}" title="${esc(label)}">${esc(label)}</div>
+    ${S.zh && x.c && x.c.zh ? `<div class="znm" lang="zh" title="${esc(x.c.zh.n)}">${esc(x.c.zh.n)}</div>` : ''}
     ${x.p && x.p.isDeck ? `<div class="dsub">${styleChip(x.p.style)}${x.p.list.length ? `<span>${t('nCards', deckSize(x.p.list))}</span>` : ''}</div>`
       + (x.p.tagList.length ? `<div class="dtags">${x.p.tagList.map(tagBtn).join('')}</div>` : '')
-      : `<div class="sub">${x.p ? prodTag(x.p) : `${cardNo(x.c)} · ${esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>`}
+      : `<div class="sub">${x.p ? prodTag(x.p) : `${cardNo(x.c)} · ${x.c.v ? `<b>${esc(x.c.v)}</b>` : esc(x.c.r)}${x.note ? ` · <b>${esc(x.note)}</b>` : ''}`}</div>`}
     ${x.descr ? `<div class="desc" title="${esc(x.descr)}">${esc(x.descr)}</div>` : ''}
     <div class="buy">${K.on ? keeperTag(x) : priceTag(x)}</div>
     ${tcgLine(x)}
@@ -1979,7 +2058,7 @@ function orderText() {
   const items = cartItems(), s = bill(items), L = [`${t('msgTitle')} #${S.ref}`, ''];
   items.forEach(({ x, q }, i) => {
     const price = x.price != null ? t('linePrice', money(x.price), money(x.price * q), q) : t('askPrice');
-    L.push(`${i + 1}. ${nameOf(x)}${x.p ? '' : ` (${cardNo(x.c)}${x.note ? ', ' + x.note : ''})`} ×${q} — ${price}`);
+    L.push(`${i + 1}. ${nameOf(x)}${x.p ? '' : ` (${cardNo(x.c)}${x.c.v ? ', ' + x.c.v : ''}${x.note ? ', ' + x.note : ''})`} ×${q} — ${price}`);
   });
   L.push('', `${t('subtotal')}: ${counted('count', s.count, items)}${s.priced ? ' · ' + money(s.total) : ''}`);
   if (s.disc || s.freeShip) L.push(`${t('promo')} ${S.promo.code}: ${[s.disc && '−' + money(s.disc), s.freeShip && t('promoShip')].filter(Boolean).join(', ')}`);
@@ -2229,15 +2308,19 @@ function renderDetail() {
   }
   const c = x.c, wide = landscape(c);
   const stats = [[c.e, 'cost'], [c.p, 'power'], [c.m, 'might']].filter(([v]) => v != null).map(([v, k]) => `${t(k)} <b class="cstat">${v}</b>`);
-  const big = `${DB.imgBase}${c.u}?w=${wide ? 900 : 600}&fm=webp`;  // the card CDN resizes on request
+  // the Chinese picture when 中文 is picked (or the print is Chinese-only); the English card CDN resizes on request
+  const zhBig = c.zh && c.zh.z && (S.zh || !c.u), big = zhBig ? c.zh.z : `${DB.imgBase}${c.u}?w=${wide ? 900 : 600}&fm=webp`;
+  const sw = c.zh && c.zh.z && c.u ? `<span class="seg lseg" role="group" aria-label="${esc(t('picLang'))}"><button type="button" data-pic="en" aria-pressed="${!S.zh}">EN</button><button type="button" data-pic="zh" lang="zh" aria-pressed="${S.zh}">中文</button></span>` : '';
   body.className = 'dlg detail' + (wide ? ' wide' : '');
   body.innerHTML = `${close}
     <div class="big">${thumb(c)}<img src="${esc(big)}" alt="${esc(c.n)}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
     <div class="dinfo">
-      <h2 class="cname">${esc(c.n)}</h2>
+      <h2 class="cname">${esc(c.n)}${c.v ? ` <span class="ver">${esc(c.v)}</span>` : ''}</h2>
       <div class="cgroups">${[[c.st, c.t].filter(Boolean).join(' '), ...(c.g || [])].map(g => `<span>${esc(g)}</span>`).join('')}</div>
       <div class="tags">${c.d.map(d => `<span class="d">${domIcon(d, 18)}${d}</span>`).join('')}${stats.length ? `<span>${stats.join(' · ')}</span>` : ''}</div>
       ${c.x ? `<p class="ctext">${esc(readable(c.x))}</p>` : ''}
+      ${c.zh ? `<div class="zh"><div class="spread"><span><span class="small muted">${t('zhTitle')}</span> <b lang="zh">${esc(c.zh.n)}</b></span>${sw}</div>
+        ${c.zh.x ? `<p class="ctext" lang="zh">${esc(zhText(c.zh.x))}</p>` : ''}</div>` : ''}
       <div class="small muted">${esc(c.r)} · ${cardNo(c)} · ${c.s.map(s => esc(SET_NAMES[s] || s)).join(', ')}</div>
       <div class="small">${t('condNM')}</div>
       ${shopDesc(x)}
@@ -2387,7 +2470,7 @@ function renderKeeper() {
     const L = DB.listings.filter(x => x.listed), main = (k, label) => `<button type="button" class="btn sm primary" data-k="${k}"${K.busy ? ' disabled' : ''}>${label}</button>`;
     const [hint, acts] = S.tab === 'decks' ? [t('kDeckHint', money(SHOP_CONFIG.deckLevels[0]), money(SHOP_CONFIG.deckLevels[1])), main('newdeck', t('kAddDeck'))]
       : S.tab === 'tiers' ? [t('kTierHint'), main('tiers', t('tlEdit'))]
-      : [t('kTapHint'), main('newprod', t('kAddProduct')) + btn('export', t('kExport')) + btn('import', K.busy ? t('kWorking') : t('kImport'))];
+      : [t('kTapHint'), main('addcard', t('kAddCard')) + btn('newprod', t('kAddProduct')) + btn('export', t('kExport')) + btn('import', K.busy ? t('kWorking') : t('kImport'))];
     body = `${signedIn}<p class="kstats">${t('kStats', L.length, L.filter(x => x.price != null).length, L.filter(x => x.qty === 0).length)}</p>
       ${DB.tiers.missing ? `<p class="notice">${t('kNeedSql')}</p>` : ''}
       <p class="muted">${esc(hint)}</p><div class="row">${acts}</div>`;
@@ -2402,13 +2485,15 @@ function openEditor(cardId) {
   const c = DB.byId.get(cardId); if (!c) return;
   const rows = DB.rows.filter(r => r.c.id === c.id);
   E = { c, orig: rows.map(r => r.note), rows: rows.length ? rows.map(r => ({ note: r.note, price: r.price ?? '', qty: r.qty ?? '', descr: r.descr || '' })) : [blankRow()], busy: false };
+  E.start = E.rows.filter(r => r.note || r.price !== '' || r.qty !== '' || r.descr).map(r => ({ ...r }));
   if ($('#detail').open) $('#detail').close();
   renderEditor(); $('#editor').showModal();
 }
 function renderEditor() {
   const c = E.c;
   $('#edBody').innerHTML = `<div class="dlg-head"><h2 id="edTitle">${t('eTitle')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
-    <div class="ed-card">${thumb(c, 56)}<div><b>${esc(c.n)}</b><div class="small muted">${cardNo(c)} · ${esc(c.r)}</div>${edTcg(c)}</div></div>
+    <div class="ed-card">${thumb(c, 56)}<div><b>${esc(c.n)}</b>${c.v ? ` <span class="ver">${esc(c.v)}</span>` : ''}<div class="small muted">${cardNo(c)} · ${esc(c.r)}${c.zh ? ` · <span lang="zh">${esc(c.zh.n)}</span>` : ''}</div>${edTcg(c)}</div></div>
+    ${edPrints(c)}
     <div class="ed-rows">
       <div class="ed-h"><span>${t('eNote')}</span><span>${t('ePrice')} (${esc(SHOP_CONFIG.currency)})</span><span>${t('eQty')}</span><span></span></div>
       ${E.rows.map((r, i) => `<div class="ed-row" data-i="${i}">
@@ -2423,15 +2508,24 @@ function renderEditor() {
     <p class="small muted">${t('eHint')}</p>
     <div class="ed-foot"><span class="small" id="edMsg" role="status"></span><button type="button" class="btn" data-close>${t('eCancel')}</button><button type="button" class="btn primary" data-ed="save">${t('eSave')}</button></div>`;
 }
-// A pricing guide in the stock editor: the card's TCGplayer price in baht, plain and in the other printings TCGplayer sells.
+// A pricing guide in the stock editor: the card's TCGplayer price in baht, plain and in the other printings TCGplayer sells
+// (for a printing, its own price first).
 function edTcg(c) {
   if (!TCG.ok) return '';
-  const parts = [['', t('tcgN')], ...TCG_TAGS.map(([, tag]) => [tag, tag])].map(([tag, label]) => {
-    const p = tcgPrints(c, tag)[0], usd = p && (p.N ?? p.F);
+  const own = c.base ? tcgUsd(c, '') : null, b = c.base || c, mine = own != null ? tcgTag(c.v || '') : null;
+  const parts = [['', t('tcgN')], ...TCG_TAGS.map(([, tag]) => [tag, tag])].filter(([tag]) => tag !== mine).map(([tag, label]) => {
+    const p = tcgPrints(b, tag)[0], usd = p && (p.N ?? p.F);
     return usd == null ? '' : `${esc(label)} <b class="num">${money(Math.round(usd * TCG.fx))}</b>`;
   }).filter(Boolean);
+  if (own != null) parts.unshift(`${esc(c.v || cardNo(c))} <b class="num">${money(Math.round(own * TCG.fx))}</b>`);
   return parts.length ? `<div class="small">TCGplayer: ${parts.join(' · ')}</div>` : '';
 }
+// The card's other printings in the editor, to price them too.
+function edPrints(c) {
+  const b = c.base || c, fam = DB.cards.filter(x => x !== c && (x === b || x.base === b));
+  return fam.length ? `<div class="prints"><span class="small muted">${t('ePrints')}:</span>${fam.map(x => `<button type="button" data-ed="go" data-id="${esc(x.id)}" title="${esc(cardNo(x) + (x.v ? ' · ' + x.v : ''))}">${thumb(x, 44)}<span>${esc(x.v || t('pkNormal'))}</span></button>`).join('')}</div>` : '';
+}
+const edDirty = () => E && JSON.stringify(E.rows.filter(r => r.note || r.price !== '' || r.qty !== '' || r.descr)) !== JSON.stringify(E.start);
 function edMsg(m, bad = true) { const el = $('#edMsg'); if (el) { el.textContent = m; el.className = 'small' + (bad ? ' bad-t' : ''); } }
 async function saveEditor() {
   if (!E || E.busy) return;
@@ -2489,7 +2583,7 @@ function exportCsv() {
   const cell = v => { const s = String(v ?? ''); return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const by = new Map(); DB.rows.forEach(r => { if (!by.has(r.c.id)) by.set(r.c.id, []); by.get(r.c.id).push(r); });
   const lines = [['id', 'name', 'set', 'rarity', 'price', 'qty', 'note', 'description']];
-  DB.cards.forEach(c => (by.get(c.id) || [{}]).forEach(r => lines.push([c.id, c.n, c.id.split('-')[0].toUpperCase(), c.r, r.price ?? '', r.qty ?? '', r.note || '', r.descr || ''])));
+  DB.cards.forEach(c => (by.get(c.id) || [{}]).forEach(r => lines.push([c.id, c.n + (c.v ? ` (${c.v})` : ''), idParts(c)[0].toUpperCase(), c.r, r.price ?? '', r.qty ?? '', r.note || '', r.descr || ''])));
   // The BOM makes Excel read it as UTF-8.
   const url = URL.createObjectURL(new Blob(['﻿' + lines.map(l => l.map(cell).join(',')).join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' }));
   Object.assign(document.createElement('a'), { href: url, download: 'stock.csv' }).click();
@@ -2506,6 +2600,7 @@ $('#keeper').addEventListener('click', async e => {
   else if (k === 'export') exportCsv();
   else if (k === 'import') $('#importFile').click();
   else if (k === 'newprod') openProductEditor(null);
+  else if (k === 'addcard') openPicker();
   else if (k === 'newdeck') openProductEditor(null, 'deck');
   else if (k === 'tiers') openTierEditor();
 });
@@ -2524,6 +2619,61 @@ $('#edBody').addEventListener('click', e => {
   } else if (act === 'del') { E.rows.splice(i, 1); if (!E.rows.length) E.rows.push(blankRow()); renderEditor(); }
   else if (act === 'add') { E.rows.push(blankRow()); renderEditor(); $(`#edBody [data-i="${E.rows.length - 1}"] [data-f="note"]`).focus(); }
   else if (act === 'save') saveEditor();
+  else if (act === 'go' && (!edDirty() || confirm(t('eDiscard')))) openEditor(b.dataset.id);
+});
+
+// The shopkeeper's card picker: every card and printing, to put one on sale (the shop's list shows only what's listed).
+let PK = null;  // { q, ver ('' all, 'normal', 'cn' Chinese-only, or a version name), set, shown }
+const pkHay = new WeakMap(), pkNorm = s => norm(s).replace(/['’]/g, '');  // "kaisa" finds Kai'Sa
+function pkHas(c, words) {
+  let h = pkHay.get(c);
+  if (h == null) { h = pkNorm([c.n, c.id, cardNo(c), c.v, c.t, ...c.d, ...(c.g || []), c.zh && c.zh.n].join(' ')); pkHay.set(c, h); }
+  return words.every(w => h.includes(w));
+}
+function pkList() {
+  const words = pkNorm(PK.q).split(' ').filter(Boolean);
+  return DB.cards.filter(c => (!PK.ver || (PK.ver === 'normal' ? !c.base : PK.ver === 'cn' ? c.cn : c.v === PK.ver))
+    && (!PK.set || idParts(c)[0] === PK.set) && (!words.length || pkHas(c, words)));
+}
+function openPicker() {
+  if (K.state !== 'keeper') { toast(t('kSignInFirst')); return; }
+  PK = PK || { q: '', ver: '', set: '', shown: PAGE };
+  const vers = [...new Set(DB.cards.map(c => c.v).filter(Boolean))].filter(v => !/print$/.test(v)).sort((a, b) => a.localeCompare(b));
+  const sets = [...new Set(DB.cards.map(c => idParts(c)[0]))].sort((a, b) => { const i = s => { const k = SET_ORDER.indexOf(s); return k < 0 ? 99 : k; }; return i(a) - i(b) || a.localeCompare(b); });
+  const opt = (v, label, cur) => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(label)}</option>`;
+  $('#pkBody').innerHTML = `<div class="dlg-head"><h2 id="pkTitle">${t('pkTitle')}</h2><button type="button" class="x" data-close aria-label="${esc(t('close'))}">${ICON_X}</button></div>
+    <p class="small muted">${t('pkHint')}</p>
+    <div class="pk-bar"><input type="search" id="pkQ" value="${esc(PK.q)}" placeholder="${esc(t('pkSearch'))}" aria-label="${esc(t('pkSearch'))}" autocomplete="off" enterkeyhint="search">
+      <select id="pkVer" aria-label="${esc(t('eNote'))}">${opt('', t('pkAllV'), PK.ver)}${opt('normal', t('pkNormal'), PK.ver)}${vers.map(v => opt(v, v, PK.ver)).join('')}${DB.cards.some(c => c.cn) ? opt('cn', t('pkCn'), PK.ver) : ''}</select>
+      <select id="pkSet" aria-label="${esc(t('fSet'))}">${opt('', t('allSets'), PK.set)}${sets.map(s => opt(s, SET_NAMES[s.toUpperCase()] ? `${SET_NAMES[s.toUpperCase()]} (${s.toUpperCase()})` : s.toUpperCase(), PK.set)).join('')}</select></div>
+    <div class="small muted" id="pkCount" aria-live="polite"></div><div class="pk-grid" id="pkGrid"></div>
+    <button type="button" class="btn more" id="pkMore" hidden>${t('more')}</button>`;
+  renderPicker();
+  $('#picker').showModal(); $('#pkQ').focus();
+}
+function renderPicker(add = false) {
+  const xs = pkList(), on = new Set(DB.rows.map(r => r.c.id));
+  if (!add) PK.shown = PAGE;
+  const from = add ? PK.shown - PAGE : 0;
+  const html = xs.slice(from, PK.shown).map(c => `<button type="button" data-pick="${esc(c.id)}">${thumb(c)}<span class="nm">${esc(c.n)}</span>
+    <span class="sub">${cardNo(c)}${c.v ? ` · <b>${esc(c.v)}</b>` : ''}</span>${c.zh ? `<span class="znm" lang="zh">${esc(c.zh.n)}</span>` : ''}${on.has(c.id) ? `<span class="pk-on">✓ ${t('pkOn')}</span>` : ''}</button>`).join('');
+  if (add) $('#pkGrid').insertAdjacentHTML('beforeend', html); else $('#pkGrid').innerHTML = html || `<div class="state">${t('noMatch')}</div>`;
+  $('#pkCount').textContent = t('results', xs.length);
+  $('#pkMore').hidden = PK.shown >= xs.length;
+}
+let pkTimer;
+$('#pkBody').addEventListener('input', e => {
+  if (!PK) return;
+  if (e.target.id === 'pkQ') { clearTimeout(pkTimer); pkTimer = setTimeout(() => { PK.q = e.target.value; renderPicker(); }, 150); }
+});
+$('#pkBody').addEventListener('change', e => {
+  if (!PK) return;
+  if (e.target.id === 'pkVer') { PK.ver = e.target.value; renderPicker(); } else if (e.target.id === 'pkSet') { PK.set = e.target.value; renderPicker(); }
+});
+$('#pkBody').addEventListener('click', e => {
+  if (e.target.closest('#pkMore')) { PK.shown += PAGE; renderPicker(true); return; }
+  const b = e.target.closest('[data-pick]'); if (!b) return;
+  $('#picker').close(); openEditor(b.dataset.pick);
 });
 $('#editor').addEventListener('close', () => { if (!$('#editor').open) E = null; });  // the close event can land after it was opened again
 
@@ -2693,7 +2843,7 @@ function teShowDetail(behavior) {
   d.scrollIntoView({ block: 'nearest', behavior });
 }
 function renderTierEditor() {
-  const all = DB.cards.filter(c => c.t === 'Legend').sort((a, b) => legendLabel(a).localeCompare(legendLabel(b)));
+  const all = DB.cards.filter(c => c.t === 'Legend' && !c.base).sort((a, b) => legendLabel(a).localeCompare(legendLabel(b)));
   const seen = new Set(), legends = all.filter(c => !seen.has(c.k) && seen.add(c.k));  // one picture per Legend in the pool
   const used = new Set(TL.tiers.flatMap(x => x.decks.map(e => { const c = DB.byId.get(e.legend); return c ? c.k : ''; })));
   const opts = (list, cur, first) => `<option value="">${esc(first)}</option>` + list.map(([v, label]) => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(label)}</option>`).join('');
@@ -2905,6 +3055,12 @@ const refilter = () => { S.shown = PAGE; renderFilters(); renderGrid(); };
 $('#fSort').addEventListener('change', e => { S.f.sort = e.target.value; S.f.dir = 1; refilter(); });
 $('#fDir').addEventListener('click', () => { S.f.dir = -S.f.dir; refilter(); });
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { S.view = b.dataset.view; store.set('rbshop.view', S.view); refilter(); }));
+// EN | 中文: card pictures in the English or the Chinese print, in the grid, the details and everywhere else (remembered).
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pic]'); if (!b) return;
+  S.zh = b.dataset.pic === 'zh'; store.set('rbshop.zh', S.zh); renderAll();
+  if ($('#detail').open) $('#detail [data-pic="' + b.dataset.pic + '"]')?.focus();
+});
 $('#fMoreBtn').addEventListener('click', () => { S.more = !S.more; renderFilters(); });
 // The type menu: tick as many as you like; "All types" clears them.
 const typeMenu = open => { $('#fTypes').hidden = !open; $('#fTypeBtn').setAttribute('aria-expanded', open); };
