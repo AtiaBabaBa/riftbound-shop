@@ -886,7 +886,7 @@ footer { color: var(--muted); }
   </aside>
 </main>
 
-<footer class="wrap"><p><button type="button" class="btn link" id="policyOpen" data-t="policyTitle"></button></p><p data-t="footer"></p></footer>
+<footer class="wrap"><p><button type="button" class="btn link" id="policyOpen" data-t="policyTitle"></button></p><p id="fbWrap" hidden><a id="fbLink" data-t="fbLink" target="_blank" rel="noopener"></a></p><p data-t="footer"></p></footer>
 
 <div class="scrim" id="scrim"></div>
 <div class="mbar" id="mbar">
@@ -943,6 +943,8 @@ const SHOP_CONFIG = {
   //          friends to send it to, so they have to add you as a friend first.
   lineOA: '@121peeif',
   lineId: '',
+  // The shop's Facebook page address, e.g. 'https://www.facebook.com/jakescardshop'. Shown at the bottom of the page. Empty = hidden.
+  facebook: '',
   // Cloud stock: the Supabase project that also holds the Riftcheese accounts (CLOUD_CONFIG in Riftcheese's riftbound-prep.html).
   // The shopkeeper zone (#keeper) saves prices, stock and products there and the shop reads them live; supabase/shop.sql
   // sets it up. Both values are public by design: only shopkeeper accounts can change stock. Empty = stockFile only.
@@ -978,7 +980,7 @@ const LANG = {
     phKick: 'Promotion', phTitle: 'Budget decks, ready to play', phSub: (n, v) => `${n} deck${n === 1 ? '' : 's'} from ${v}. Slide to see them all.`,
     phAll: 'See all budget decks', phPrev: 'Previous decks', phNext: 'Next decks',
     whyTitle: 'Why Chinese-print cards?',
-    why1h: 'Tournament legal', why1: 'Official Riftbound cards, accepted at sanctioned events. Play them in identical opaque sleeves, like any deck.',
+    why1h: 'Tournament legal', why1: 'Official Riftbound cards. Riot’s tournament rules (rule 420.1) allow cards in any language at sanctioned events. Play them in identical opaque sleeves, like any deck.',
     why2h: 'Much cheaper', why2: 'The same cards and the same game for far less than English prints. Each deck and card shows its TCGplayer price next to ours.',
     save: n => `Save ${n}%`, tcgCard: 'TCGplayer price (English card)', tcgDeck: n => `The same ${n} cards on TCGplayer`,
     tcgSave: (n, a) => `You save ${n}% (${a})`, tcgN: 'Normal',
@@ -986,7 +988,7 @@ const LANG = {
     tcgDeckNote: 'Each card counted at its cheapest printing on TCGplayer.', tcgMissing: n => `${n} card${n === 1 ? ' has' : 's have'} no TCGplayer price and ${n === 1 ? 'isn’t' : 'aren’t'} counted.`,
     kHidden: n => n > 0 ? `Hidden · ${n}% above` : 'Hidden · same price', cartTcg: 'TCGplayer price (English)', cartCheaper: 'Chinese print saves you', cartTcgMiss: n => `${n} item${n === 1 ? ' has' : 's have'} no TCGplayer price and ${n === 1 ? 'is' : 'are'} counted at our price.`,
     themeDark: 'Dark mode', themeLight: 'Light mode', pDeckTcg: v => `TCGplayer value ${v}`,
-    why3h: '100% genuine', why3: 'Guaranteed real product, from a certified shop.',
+    why3h: '100% genuine', why3: 'Real, official product, bought from established card game stores in China. Every single is Near Mint.',
     why4h: 'Easy to read', why4: 'Every deck here shows its cards in English, so you know what each one does.',
     dvOpen: 'See the whole deck on one page', dvMain: n => `${n} cards`, dvSide: 'Sideboard', dvPng: 'Save as image', dvMaking: 'Making the image…',
     dvFail: 'Couldn’t make the image here. Take a screenshot instead.',
@@ -1039,8 +1041,13 @@ const LANG = {
     // The shipping and return policy (ship: the shipping cost, or '' when it's free). Change it to match how you work.
     policyTitle: 'Shipping and returns',
     policy: ship => `<h3>Shipping</h3><ul><li>${ship ? `${ship} per order, anywhere in Thailand.` : 'Free, anywhere in Thailand.'}</li>
-      <li>We confirm your order on LINE and send you how to pay. Your cards ship within 10 days of payment, and we send you the tracking number.</li>
+      <li>We confirm your order on LINE and send you how to pay. In-stock orders ship within 2 days of payment, and we send you the tracking number.</li>
       <li>Cards are packed with care so they arrive flat and undamaged.</li></ul>
+      <h3>Condition</h3><ul><li>Every single we sell is Near Mint (NM).</li></ul>
+      <h3>Tournament play</h3><ul><li>Riftbound Tournament Rules 420.1: players may use official Riftbound cards of any language. A player can ask a judge for a card’s wording in their own language at any time (420.2).</li>
+      <li>A card from a set that isn’t out in English yet becomes legal once that set launches in the event’s region (601.2.b).</li>
+      <li>Use identical sleeves with opaque backs for the whole deck (422).</li></ul>
+      <p><a href="https://playriftbound.com/en-us/news/organizedplay/riftbound-tournament-rules/" target="_blank" rel="noopener">Read the official tournament rules</a></p>
       <h3>Returns</h3><ul><li><b>Wrong or damaged card:</b> tell us on LINE within 7 days of delivery, with photos (an unboxing video helps). We send the right card or refund you, and we pay the shipping.</li>
       <li>Refunds go back the way you paid, within 7 days of the return reaching us.</li></ul>
       <p class="muted">Questions? Message us on LINE before you order.</p>`,
@@ -1061,6 +1068,7 @@ const LANG = {
     linePrice: (each, sum, q) => q > 1 ? `${each} each = ${sum}` : each,
     cost: 'Cost', power: 'Power', might: 'Might',
     footer: 'Riftbound, its cards and card images are the property of Riot Games. This shop is not affiliated with Riot Games.',
+    condNM: 'Condition: Near Mint (NM)', fbLink: 'Jake’s Card Shop on Facebook',
     kTitle: 'Shopkeeper zone', kBack: 'Back to the shop', kConnecting: 'Connecting…',
     kSignInHint: 'Sign in with your Riftcheese account.', kUser: 'Username', kPass: 'Password', kSignIn: 'Sign in', kSigningIn: 'Signing in…', kSignOut: 'Sign out',
     kAs: n => `Signed in as ${n}`,
@@ -1106,7 +1114,7 @@ const LANG = {
     phKick: 'โปรโมชัน', phTitle: 'เด็คราคาประหยัด พร้อมเล่น', phSub: (n, v) => `${n} เด็ค เริ่มต้น ${v} เลื่อนดูได้ทั้งหมด`,
     phAll: 'ดูเด็คราคาประหยัดทั้งหมด', phPrev: 'เด็คก่อนหน้า', phNext: 'เด็คถัดไป',
     whyTitle: 'ทำไมต้องการ์ดพิมพ์จีน?',
-    why1h: 'ใช้แข่งได้', why1: 'การ์ด Riftbound ของแท้ ใช้ในงานแข่งที่ได้รับการรับรองได้ ใส่สลีฟทึบแบบเดียวกันทั้งเด็คเหมือนเด็คทั่วไป',
+    why1h: 'ใช้แข่งได้', why1: 'การ์ด Riftbound ของแท้ กติกาการแข่งขันของ Riot (ข้อ 420.1) อนุญาตให้ใช้การ์ดทุกภาษาในงานแข่งที่ได้รับการรับรอง ใส่สลีฟทึบแบบเดียวกันทั้งเด็คเหมือนเด็คทั่วไป',
     why2h: 'ราคาถูกกว่ามาก', why2: 'การ์ดเหมือนกัน เล่นได้เหมือนกัน แต่ราคาถูกกว่าการ์ดพิมพ์อังกฤษมาก ทุกเด็คและการ์ดแสดงราคา TCGplayer เทียบกับราคาร้าน',
     save: n => `ถูกกว่า ${n}%`, tcgCard: 'ราคา TCGplayer (การ์ดภาษาอังกฤษ)', tcgDeck: n => `การ์ด ${n} ใบเดียวกันบน TCGplayer`,
     tcgSave: (n, a) => `ประหยัด ${n}% (${a})`, tcgN: 'ปกติ',
@@ -1114,7 +1122,7 @@ const LANG = {
     tcgDeckNote: 'คิดการ์ดแต่ละใบจากเวอร์ชันที่ถูกที่สุดบน TCGplayer', tcgMissing: n => `การ์ด ${n} ใบไม่มีราคาบน TCGplayer จึงไม่ได้นับรวม`,
     kHidden: n => n > 0 ? `ซ่อน · แพงกว่า ${n}%` : 'ซ่อน · ราคาเท่ากัน', cartTcg: 'ราคาบน TCGplayer (ภาษาอังกฤษ)', cartCheaper: 'ประหยัดกว่าด้วยการ์ดจีน', cartTcgMiss: n => `มี ${n} ชิ้นที่ไม่มีราคาบน TCGplayer คิดตามราคาร้าน`,
     themeDark: 'โหมดมืด', themeLight: 'โหมดสว่าง', pDeckTcg: v => `มูลค่าบน TCGplayer ${v}`,
-    why3h: 'ของแท้ 100%', why3: 'รับประกันสินค้าของแท้ จากร้านที่ได้รับการรับรอง',
+    why3h: 'ของแท้ 100%', why3: 'สินค้าของแท้ ซื้อจากร้านการ์ดเกมที่มีหน้าร้านจริงในประเทศจีน การ์ดเดี่ยวทุกใบสภาพ Near Mint',
     why4h: 'อ่านง่าย', why4: 'ทุกเด็คในร้านแสดงการ์ดเป็นภาษาอังกฤษ จึงรู้ว่าการ์ดแต่ละใบทำอะไร',
     dvOpen: 'ดูการ์ดทั้งเด็คในหน้าเดียว', dvMain: n => `${n} ใบ`, dvSide: 'Sideboard', dvPng: 'บันทึกเป็นรูปภาพ', dvMaking: 'กำลังสร้างรูป…',
     dvFail: 'สร้างรูปในเครื่องนี้ไม่ได้ ให้แคปหน้าจอแทน',
@@ -1165,8 +1173,13 @@ const LANG = {
     promoMin: m => `โค้ดนี้ใช้ได้เมื่อสั่งซื้อตั้งแต่ ${m} ขึ้นไป (ไม่รวมค่าส่ง)`, promoPct: n => `ลด ${n}%`, promoAmt: m => `ลด ${m}`, promoShip: 'ส่งฟรี',
     policyTitle: 'การจัดส่งและการคืนสินค้า',
     policy: ship => `<h3>การจัดส่ง</h3><ul><li>${ship ? `ค่าส่ง ${ship} ต่อคำสั่งซื้อ ส่งได้ทั่วประเทศไทย` : 'ส่งฟรีทั่วประเทศไทย'}</li>
-      <li>ร้านยืนยันคำสั่งซื้อและแจ้งวิธีชำระเงินทาง LINE จัดส่งภายใน 10 วันหลังชำระเงิน พร้อมแจ้งเลขพัสดุ</li>
+      <li>ร้านยืนยันคำสั่งซื้อและแจ้งวิธีชำระเงินทาง LINE สินค้าที่มีในสต็อกจัดส่งภายใน 2 วันหลังชำระเงิน พร้อมแจ้งเลขพัสดุ</li>
       <li>แพ็กการ์ดอย่างดี ถึงมือเรียบร้อย ไม่งอ ไม่เสียหาย</li></ul>
+      <h3>สภาพการ์ด</h3><ul><li>การ์ดเดี่ยวทุกใบที่ร้านขายเป็นสภาพ Near Mint (NM)</li></ul>
+      <h3>การใช้แข่งขัน</h3><ul><li>กติกาการแข่งขัน Riftbound ข้อ 420.1 อนุญาตให้ใช้การ์ด Riftbound ของแท้ได้ทุกภาษา และผู้เล่นขอให้กรรมการบอกข้อความบนการ์ดเป็นภาษาที่ต้องการได้ทุกเมื่อ (ข้อ 420.2)</li>
+      <li>การ์ดจากชุดที่ยังไม่วางขายภาษาอังกฤษ จะใช้แข่งได้เมื่อชุดนั้นวางขายในภูมิภาคของงานแข่งแล้ว (ข้อ 601.2.b)</li>
+      <li>ใส่สลีฟแบบเดียวกันที่หลังทึบทั้งเด็ค (ข้อ 422)</li></ul>
+      <p><a href="https://playriftbound.com/en-us/news/organizedplay/riftbound-tournament-rules/" target="_blank" rel="noopener">อ่านกติกาการแข่งขันฉบับเต็ม (ภาษาอังกฤษ)</a></p>
       <h3>การคืนสินค้า</h3><ul><li><b>ได้การ์ดผิดหรือการ์ดเสียหาย:</b> แจ้งร้านทาง LINE ภายใน 7 วันหลังได้รับสินค้า พร้อมรูปถ่าย (มีคลิปตอนแกะพัสดุจะดีมาก) ร้านจะส่งการ์ดที่ถูกต้องให้หรือคืนเงิน โดยร้านออกค่าส่งให้</li>      <li>คืนเงินทางช่องทางเดียวกับที่ชำระ ภายใน 7 วันหลังร้านได้รับของคืน</li></ul>
       <p class="muted">มีคำถาม? ทักร้านทาง LINE ก่อนสั่งได้เลย</p>`,
     countItems: n => `${n} ชิ้น`, toPriceItems: n => `+ อีก ${n} ชิ้นรอแจ้งราคา`, resultsItems: n => `${n.toLocaleString('en-US')} รายการ`,
@@ -1186,6 +1199,7 @@ const LANG = {
     linePrice: (each, sum, q) => q > 1 ? `ใบละ ${each} = ${sum}` : each,
     cost: 'ค่าร่าย', power: 'พาวเวอร์', might: 'ไมต์',
     footer: 'Riftbound การ์ด และภาพการ์ดเป็นทรัพย์สินของ Riot Games ร้านนี้ไม่ได้เกี่ยวข้องกับ Riot Games',
+    condNM: 'สภาพ: Near Mint (NM)', fbLink: 'Jake’s Card Shop บน Facebook',
     kTitle: 'โซนเจ้าของร้าน', kBack: 'กลับไปหน้าร้าน', kConnecting: 'กำลังเชื่อมต่อ…',
     kSignInHint: 'เข้าสู่ระบบด้วยบัญชี Riftcheese ของคุณ', kUser: 'ชื่อผู้ใช้', kPass: 'รหัสผ่าน', kSignIn: 'เข้าสู่ระบบ', kSigningIn: 'กำลังเข้าสู่ระบบ…', kSignOut: 'ออกจากระบบ',
     kAs: n => `เข้าสู่ระบบเป็น ${n}`,
@@ -2225,6 +2239,7 @@ function renderDetail() {
       <div class="tags">${c.d.map(d => `<span class="d">${domIcon(d, 18)}${d}</span>`).join('')}${stats.length ? `<span>${stats.join(' · ')}</span>` : ''}</div>
       ${c.x ? `<p class="ctext">${esc(readable(c.x))}</p>` : ''}
       <div class="small muted">${esc(c.r)} · ${cardNo(c)} · ${c.s.map(s => esc(SET_NAMES[s] || s)).join(', ')}</div>
+      <div class="small">${t('condNM')}</div>
       ${shopDesc(x)}
       ${dbuy(x)}
       ${tcgBox(x)}
@@ -2243,6 +2258,7 @@ function applyLang() {
   $('#notSetup').hidden = lineReady();
   $('#notSetup').innerHTML = t('notSetup');
   document.querySelectorAll('.policy-body').forEach(el => { el.innerHTML = policyHtml(); });
+  const fb = (SHOP_CONFIG.facebook || '').trim(); $('#fbWrap').hidden = !fb; if (fb) $('#fbLink').href = fb;
 }
 // Light or dark: the device's setting until the visitor taps the sun/moon, then theirs (rbshop.theme; the <head> applies it
 // before the page paints). html[data-dark] says which one is showing, for the button's icon.
