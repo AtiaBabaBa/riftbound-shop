@@ -633,15 +633,15 @@ a { color: var(--ink); }
 
 /* header: language and LINE on the sides, the shop's yellow tab hanging from the top in the middle */
 .top { position: relative; background: none; border-bottom: 0; }
-.top-row { position: relative; justify-content: space-between; align-items: flex-start; min-height: 112px; padding-block: 14px 0; }
+.top-row { position: relative; justify-content: space-between; align-items: flex-start; min-height: 140px; padding-block: 14px 0; }
 .badge { position: absolute; left: 50%; top: 0; transform: translateX(-50%); display: grid; justify-items: center; text-decoration: none; color: var(--on-yellow); }
 .badge-bar { display: flex; align-items: center; gap: 14px; background: var(--yellow); border-radius: 0 0 12px 12px; padding: 12px 18px 12px; min-width: 330px; justify-content: space-between;
   font-family: var(--f-display); font-weight: 800; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
 .badge-bar i { flex: 1; height: 9px; border-block: 2px solid currentColor; position: relative; min-width: 60px; }
 .badge-bar i::after { content: ""; position: absolute; left: 0; right: 0; top: 1.5px; border-top: 2px solid currentColor; }
-.badge-disc { display: grid; place-items: center; width: 180px; height: 82px; margin-top: -2px; background: var(--yellow); border-radius: 0 0 90px 90px; padding-bottom: 8px; }
-.badge:hover .badge-disc svg { transform: rotate(-8deg); }
-.badge-disc svg { transition: transform .2s ease; }
+.badge-disc { display: grid; place-items: center; width: 200px; height: 112px; margin-top: -2px; background: var(--yellow); border-radius: 0 0 100px 100px; padding-bottom: 8px; }
+.badge:hover .badge-disc img { transform: rotate(-6deg) scale(1.04); }
+.badge-disc img { display: block; width: auto; height: 96px; transition: transform .2s ease; }
 .top .seg, #addFriend, #themeBtn { margin-top: 6px; }
 .top-r { display: flex; align-items: flex-start; gap: 8px; }
 #themeBtn { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 2px solid var(--ink); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
@@ -651,11 +651,11 @@ a { color: var(--ink); }
 .btn.pill, .seg { border-radius: 999px; }
 #addFriend { background: var(--raised); border: 0; box-shadow: 0 4px 14px rgb(var(--shade) / .14); padding: 8px 14px; }
 @media (max-width: 640px) {
-  .top-row { min-height: 96px; }
+  .top-row { min-height: 110px; }
   .badge-bar { min-width: 0; gap: 8px; padding: 9px 12px; font-size: 11px; }
   .badge-bar i { min-width: 22px; }
-  .badge-disc { width: 120px; height: 58px; }
-  .badge-disc svg { width: 40px; height: 40px; }
+  .badge-disc { width: 130px; height: 80px; }
+  .badge-disc img { height: 66px; }
   #addFriend span { display: none; }
 }
 @media (max-width: 420px) { .badge-bar span { display: none; } .badge-bar i { width: 60px; } }
@@ -791,7 +791,7 @@ footer { color: var(--muted); }
     <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div>
     <a class="badge" href="#home" aria-label="Jake's Card Shop">
       <span class="badge-bar"><span>Riftbound</span><i aria-hidden="true"></i><span>Card shop</span></span>
-      <span class="badge-disc"><svg width="58" height="58" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 27.5 9v14L16 29.5 4.5 23V9z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 8.5v15M10.5 12.2l5.5 3.6 5.5-3.6M10.5 19.8l5.5-3.6 5.5 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="badge-disc"><img src="logo.webp" width="96" height="102" alt="" decoding="async"></span>
     </a>
     <div class="top-r">
       <button type="button" id="themeBtn" data-t-label="themeDark"><svg class="moon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><svg class="sun" width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
